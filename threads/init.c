@@ -62,7 +62,7 @@ int main (void) NO_RETURN;
 
 /* Pintos main program. */
 int
-main (void) {
+main (void) { //지수야 화이팅
 	uint64_t mem_end;
 	char **argv;
 
