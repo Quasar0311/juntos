@@ -15,21 +15,6 @@
 #include "userprog/process.h"
 #endif
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-
-=======
->>>>>>> parent of dfc65ac... Update thread.c
-=======
->>>>>>> parent of dfc65ac... Update thread.c
-=======
->>>>>>> parent of dfc65ac... Update thread.c
-=======
-testtest
-
->>>>>>> parent of 3f464f5... Revert "Update thread.c"
 /* Random value for struct thread's `magic' member.
    Used to detect stack overflow.  See the big comment at the top
    of thread.h for details. */
