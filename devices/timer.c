@@ -17,6 +17,12 @@
 #error TIMER_FREQ <= 1000 recommended
 #endif
 
+/*** List of processes which are sleeping. About timer_sleep()
+   function. ***/
+static struct list sleep_list;
+
+static int64_t earliest_wake_up_tick = 0xFFFFFFFFFFFFFFFF;
+
 /* Number of timer ticks since OS booted. */
 static int64_t ticks;
 
@@ -41,6 +47,9 @@ timer_init (void) {
 	outb (0x43, 0x34);    /* CW: counter 0, LSB then MSB, mode 2, binary. */
 	outb (0x40, count & 0xff);
 	outb (0x40, count >> 8);
+
+	/* Init the sleep_list (timer_sleep()). */
+	list_init (&sleep_list);
 
 	intr_register_ext (0x20, timer_interrupt, "8254 Timer");
 }
@@ -91,10 +100,50 @@ timer_elapsed (int64_t then) {
 void
 timer_sleep (int64_t ticks) {
 	int64_t start = timer_ticks ();
+	struct thread *sleeper = thread_current();
+	enum intr_level old_level = intr_disable();
 
 	ASSERT (intr_get_level () == INTR_ON);
-	while (timer_elapsed (start) < ticks)
-		thread_yield ();
+	sleeper -> alarm = timer_elapsed(start) + ticks;
+	if (list_empty(&sleep_list)) {
+		list_push_back(&sleep_list, &sleeper -> elem);
+	}
+	else {
+		list_insert_ordered(&sleep_list, &sleeper -> elem, timer_comparator, NULL);
+	}
+	
+	earliest_time(sleeper -> alarm);
+	thread_block();
+	intr_set_level(old_level);
+}
+
+/*** Waking up sleeping thread. ***/
+void
+timer_wakeup (void) {
+	list_pop_front(&sleep_list);
+	if (list_empty(&sleep_list)) {
+		earliest_wake_up_tick = 0xFFFFFFFFFFFFFFFF;
+	}
+	else {
+		earliest_wake_up_tick = list_head(&sleep_list) -> alarm;
+	}
+	thread_unblock();
+}
+
+/*** list_less_func parameter in list_insert_ordered() function. ***/
+bool
+timer_comparator (const struct list_elem *x, 
+const struct list_elem *y, void *aux) {
+	return list_entry(x, struct thread, elem) -> alarm > 
+			list_entry(y, struct thread, elem) -> alarm;
+}
+
+/*** update the tick of earliest thread to wake up. ***/
+void
+earliest_time (int64_t ticks) {
+	if (earliest_wake_up_tick > ticks) {
+		earliest_wake_up_tick = ticks;
+	}
 }
 
 /* Suspends execution for approximately MS milliseconds. */
@@ -126,6 +175,10 @@ static void
 timer_interrupt (struct intr_frame *args UNUSED) {
 	ticks++;
 	thread_tick ();
+
+	while (ticks >= earliest_wake_up_tick) {
+		timer_wakeup();
+	}
 }
 
 /* Returns true if LOOPS iterations waits for more than one timer
