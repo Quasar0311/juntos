@@ -1,49 +1,10 @@
 FAIL
-Test output failed to match any acceptable form.
-
-Acceptable output:
-  (priority-sema) begin
-  (priority-sema) Thread priority 30 woke up.
-  (priority-sema) Back in main thread.
-  (priority-sema) Thread priority 29 woke up.
-  (priority-sema) Back in main thread.
-  (priority-sema) Thread priority 28 woke up.
-  (priority-sema) Back in main thread.
-  (priority-sema) Thread priority 27 woke up.
-  (priority-sema) Back in main thread.
-  (priority-sema) Thread priority 26 woke up.
-  (priority-sema) Back in main thread.
-  (priority-sema) Thread priority 25 woke up.
-  (priority-sema) Back in main thread.
-  (priority-sema) Thread priority 24 woke up.
-  (priority-sema) Back in main thread.
-  (priority-sema) Thread priority 23 woke up.
-  (priority-sema) Back in main thread.
-  (priority-sema) Thread priority 22 woke up.
-  (priority-sema) Back in main thread.
-  (priority-sema) Thread priority 21 woke up.
-  (priority-sema) Back in main thread.
-  (priority-sema) end
-Differences in `diff -u' format:
-  (priority-sema) begin
-- (priority-sema) Thread priority 30 woke up.
-  (priority-sema) Back in main thread.
-- (priority-sema) Thread priority 29 woke up.
-  (priority-sema) Back in main thread.
-- (priority-sema) Thread priority 28 woke up.
-  (priority-sema) Back in main thread.
-- (priority-sema) Thread priority 27 woke up.
-  (priority-sema) Back in main thread.
-- (priority-sema) Thread priority 26 woke up.
-  (priority-sema) Back in main thread.
-- (priority-sema) Thread priority 25 woke up.
-  (priority-sema) Back in main thread.
-- (priority-sema) Thread priority 24 woke up.
-  (priority-sema) Back in main thread.
-- (priority-sema) Thread priority 23 woke up.
-  (priority-sema) Back in main thread.
-- (priority-sema) Thread priority 22 woke up.
-  (priority-sema) Back in main thread.
-- (priority-sema) Thread priority 21 woke up.
-  (priority-sema) Back in main thread.
-  (priority-sema) end
+Kernel panic in run: PANIC at ../../threads/thread.c:341 in cmp_max_priority(): assertion `!list_empty(&ready_list)' failed.
+Call stack: 0x800420e262 0x800420716b 0x8004212304 0x80042105ae 0x8004206036 0x8004206474
+Translation of call stack:
+0x000000800420e262: debug_panic (lib/kernel/debug.c:32)
+0x000000800420716b: cmp_max_priority (threads/thread.c:343)
+0x0000008004212304: test_priority_sema (tests/threads/priority-sema.c:27 (discriminator 3))
+0x00000080042105ae: run_test (tests/threads/tests.c:61)
+0x0000008004206036: run_task (threads/init.c:237)
+0x0000008004206474: run_actions (threads/init.c:282)

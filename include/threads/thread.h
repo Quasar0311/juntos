@@ -118,7 +118,7 @@ tid_t thread_create (const char *name, int priority, thread_func *, void *);
 void thread_block (void);
 void thread_unblock (struct thread *);
 /*** compares the priority of two threads A and B ***/
-typedef bool priority_less_func(const struct list_elem *a, const struct list_elem *b, void *aux UNUSED);
+bool priority_less_func(const struct list_elem *a, const struct list_elem *b, void *aux UNUSED);
 
 struct thread *thread_current (void);
 tid_t thread_tid (void);
