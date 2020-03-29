@@ -107,6 +107,10 @@ struct thread {
    Controlled by kernel command-line option "-o mlfqs". */
 extern bool thread_mlfqs;
 
+void thread_sleep (int64_t ticks);
+void thread_wakeup (int64_t ticks);
+void earliest_time (int64_t ticks);
+
 void thread_init (void);
 void thread_start (void);
 

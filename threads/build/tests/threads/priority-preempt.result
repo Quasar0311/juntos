@@ -1,23 +1,12 @@
 FAIL
-Test output failed to match any acceptable form.
-
-Acceptable output:
-  (priority-preempt) begin
-  (priority-preempt) Thread high-priority iteration 0
-  (priority-preempt) Thread high-priority iteration 1
-  (priority-preempt) Thread high-priority iteration 2
-  (priority-preempt) Thread high-priority iteration 3
-  (priority-preempt) Thread high-priority iteration 4
-  (priority-preempt) Thread high-priority done!
-  (priority-preempt) The high-priority thread should have already completed.
-  (priority-preempt) end
-Differences in `diff -u' format:
-  (priority-preempt) begin
-- (priority-preempt) Thread high-priority iteration 0
-- (priority-preempt) Thread high-priority iteration 1
-- (priority-preempt) Thread high-priority iteration 2
-- (priority-preempt) Thread high-priority iteration 3
-- (priority-preempt) Thread high-priority iteration 4
-- (priority-preempt) Thread high-priority done!
-  (priority-preempt) The high-priority thread should have already completed.
-  (priority-preempt) end
+Kernel panic in run: PANIC at ../../lib/kernel/list.c:270 in list_front(): assertion `!list_empty (list)' failed.
+Call stack: 0x800420e30c 0x800420eb51 0x800420eb6b 0x800420a9e6 0x800420aa91 0x800420792f 0x8004207afb 0x8004206436
+Translation of call stack:
+0x000000800420e30c: debug_panic (lib/kernel/debug.c:32)
+0x000000800420eb51: list_front (lib/kernel/list.c:271)
+0x000000800420eb6b: list_pop_front (lib/kernel/list.c:252)
+0x000000800420a9e6: timer_wakeup (devices/timer.c:133)
+0x000000800420aa91: timer_interrupt (devices/timer.c:182)
+0x000000800420792f: intr_handler (threads/interrupt.c:352)
+0x0000008004207afb: intr_entry (threads/intr-stubs.o:?)
+0x0000008004206436: main (threads/init.c:111)

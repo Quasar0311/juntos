@@ -29,6 +29,10 @@
    that are ready to run but not actually running. */
 static struct list ready_list;
 
+struct list sleep_list;
+
+int64_t earliest_wake_up_tick = INT64_MAX;
+
 /* Idle thread. */
 static struct thread *idle_thread;
 
@@ -80,6 +84,73 @@ static tid_t allocate_tid (void);
 // setup temporal gdt first.
 static uint64_t gdt[3] = { 0, 0x00af9a000000ffff, 0x00cf92000000ffff };
 
+
+/*** list_less_func parameter in list_insert_ordered() function. ***/
+static bool timer_comparator (const struct list_elem *x, 
+const struct list_elem *y, void *aux UNUSED) {
+	return list_entry(x, struct thread, elem) -> alarm > 
+			list_entry(y, struct thread, elem) -> alarm;
+}
+
+
+void
+thread_sleep (int64_t ticks) {
+	
+	struct thread *sleeper = thread_current();
+	if (sleeper != idle_thread) {
+		return;
+	}
+	enum intr_level old_level;
+	old_level = intr_disable();
+
+	ASSERT(thread_current() != idle_thread);
+
+	if (ticks <= 0) {
+		return;
+	}
+
+	sleeper -> alarm = ticks;
+	earliest_time(sleeper -> alarm);
+
+	printf("inserted : %d and", sleeper -> alarm);
+	list_insert_ordered(&sleep_list, &sleeper -> elem, timer_comparator, NULL);
+	
+	
+	printf("blocked\n");
+	thread_block();
+	printf("hi\n");
+	
+	intr_set_level(old_level);
+}
+
+/*** Waking up sleeping thread. ***/
+void
+thread_wakeup (int64_t ticks) {
+	
+	if (list_empty(&sleep_list)) {
+		earliest_wake_up_tick = INT64_MAX;
+	}
+	else {
+		while (ticks >= earliest_wake_up_tick) {
+			printf("%d\n", earliest_wake_up_tick);
+			thread_unblock(list_entry(list_begin(&sleep_list), struct thread, elem));
+			list_pop_front(&sleep_list);
+			earliest_wake_up_tick = list_entry(list_begin(&sleep_list), struct thread, elem) -> alarm;
+		}
+
+	}
+	
+}
+
+
+/*** update the tick of earliest thread to wake up. ***/
+void
+earliest_time (int64_t ticks) {
+	if (earliest_wake_up_tick > ticks) {
+		earliest_wake_up_tick = ticks;
+	}
+}
+
 /* Initializes the threading system by transforming the code
    that's currently running into a thread.  This can't work in
    general and it is possible in this case only because loader.S
@@ -110,6 +181,9 @@ thread_init (void) {
 	lock_init (&tid_lock);
 	list_init (&ready_list);
 	list_init (&destruction_req);
+
+	/* Init the sleep_list (timer_sleep()). */
+	list_init (&sleep_list);
 
 	/* Set up a thread structure for the running thread. */
 	initial_thread = running_thread ();
