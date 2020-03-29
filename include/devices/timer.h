@@ -14,11 +14,6 @@ int64_t timer_ticks (void);
 int64_t timer_elapsed (int64_t);
 
 void timer_sleep (int64_t ticks);
-/*** New function for alarm ***/
-void timer_wakeup (void);
-// bool timer_comparator (const struct list_elem *x,
-// const struct list_elem *y, void *aux);
-void earliest_time (int64_t ticks);
 
 void timer_msleep (int64_t milliseconds);
 void timer_usleep (int64_t microseconds);
