@@ -1,0 +1,4 @@
+FAIL
+Kernel panic in run: PANIC at ../../threads/synch.c:187 in lock_acquire(): assertion `lock != NULL' failed.
+Call stack: 0x800420e17e 0x8004208a61 0x800421251b 0x8004206fef
+Translation of call stack:
