@@ -15,13 +15,6 @@
 #include "userprog/process.h"
 #endif
 
-/*** list_less_func parameter in list_insert ordered() function ***/
-bool
-priority_less_func(const struct list_elem *a, const struct list_elem *b, void *aux){
-	return list_entry(a, struct thread, elem)->priority>
-			list_entry(b, struct thread, elem)->priority;
-}
-
 /* Random value for struct thread's `magic' member.
    Used to detect stack overflow.  See the big comment at the top
    of thread.h for details. */
@@ -238,6 +231,13 @@ thread_block (void) {
 	schedule ();
 }
 
+/*** list_less_func parameter in list_insert ordered() function ***/
+bool
+priority_less_func(const struct list_elem *a, const struct list_elem *b, void *aux UNUSED){
+	return list_entry(a, struct thread, elem)->priority>
+			list_entry(b, struct thread, elem)->priority;
+}
+
 /* Transitions a blocked thread T to the ready-to-run state.
    This is an error if T is not blocked.  (Use thread_yield() to
    make the running thread ready.)
@@ -338,9 +338,10 @@ thread_set_priority (int new_priority) {
 void
 cmp_max_priority(void){
 	/*** ensure ready_list is not empty ***/
-	ASSERT(!list_empty(&ready_list));
+	if(list_empty(&ready_list)) return;
 
-	if(list_entry(list_front(&ready_list), struct thread, elem)->priority
+	if(list_entry(list_max(&ready_list, priority_less_func, NULL), struct thread, elem)->priority
+	//if(list_entry(list_front(&ready_list), struct thread, elem)->priority
 	> thread_get_priority())
 		thread_yield();
 }
