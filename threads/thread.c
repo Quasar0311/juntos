@@ -207,7 +207,7 @@ thread_create (const char *name, int priority,
 	/* Add to run queue. */
 	thread_unblock (t);
 
-	/*** if priority of new thread is higher than current thread, 
+	/*** if new thread's priority is higher than current thread's priority, 
 	yield CPU ***/
 	if(priority>thread_get_priority()){
 		thread_yield();
@@ -246,7 +246,6 @@ thread_unblock (struct thread *t) {
 
 	old_level = intr_disable ();
 	ASSERT (t->status == THREAD_BLOCKED);
-
 	/*** operation on ready_list with priority ordered threads ***/
 	list_insert_ordered(%ready_list, &t->elem, priority_less_func, NULL)
 
@@ -319,7 +318,8 @@ thread_yield (void) {
 
 	old_level = intr_disable ();
 	if (curr != idle_thread)
-		list_push_back (&ready_list, &curr->elem);
+		/*** operation on ready_list with priority ordered threads ***/
+		list_insert_ordered(%ready_list, &curr->elem, priority_less_func, NULL);
 	do_schedule (THREAD_READY);
 	intr_set_level (old_level);
 }
@@ -328,6 +328,17 @@ thread_yield (void) {
 void
 thread_set_priority (int new_priority) {
 	thread_current ()->priority = new_priority;
+
+	/*** ensure preoccupation occurs according to priority 
+	when thread's priority is changed ***/
+}
+
+void
+cmp_max_priority(void){
+	/*** ensure ready_list is not empty ***/
+	ASSERT(!list_empty(ready_list));
+
+	if(list_entry(list_front(ready_list)))
 }
 
 /* Returns the current thread's priority. */
