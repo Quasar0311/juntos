@@ -1,0 +1,10 @@
+FAIL
+Kernel panic in run: PANIC at ../../threads/thread.c:341 in cmp_max_priority(): assertion `!list_empty(&ready_list)' failed.
+Call stack: 0x800420e262 0x800420716b 0x80042124cf 0x80042105ae 0x8004206036 0x8004206474
+Translation of call stack:
+0x000000800420e262: debug_panic (lib/kernel/debug.c:32)
+0x000000800420716b: cmp_max_priority (threads/thread.c:343)
+0x00000080042124cf: test_priority_condvar (tests/threads/priority-condvar.c:30 (discriminator 3))
+0x00000080042105ae: run_test (tests/threads/tests.c:61)
+0x0000008004206036: run_task (threads/init.c:237)
+0x0000008004206474: run_actions (threads/init.c:282)

@@ -61,8 +61,7 @@ static void print_stats (void);
 int main (void) NO_RETURN;
 
 /* Pintos main program. */
-int
-main (void) {
+int main (void) { 
 	uint64_t mem_end;
 	char **argv;
 
@@ -243,7 +242,7 @@ run_task (char **argv) {
 static void
 run_actions (char **argv) {
 	/* An action. */
-	struct action {
+	struct action { //준성아 사랑해
 		char *name;                       /* Action name. */
 		int argc;                         /* # of args, including action name. */
 		void (*function) (char **argv);   /* Function to execute action. */

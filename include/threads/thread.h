@@ -117,6 +117,8 @@ tid_t thread_create (const char *name, int priority, thread_func *, void *);
 
 void thread_block (void);
 void thread_unblock (struct thread *);
+/*** compares the priority of two threads A and B ***/
+bool priority_less_func(const struct list_elem *a, const struct list_elem *b, void *aux UNUSED);
 
 struct thread *thread_current (void);
 tid_t thread_tid (void);
@@ -127,6 +129,9 @@ void thread_yield (void);
 
 int thread_get_priority (void);
 void thread_set_priority (int);
+/*** scheduling by comparing current thread's priority 
+and highest thread's priority ***/
+void cmp_max_priority(void);
 
 int thread_get_nice (void);
 void thread_set_nice (int);
