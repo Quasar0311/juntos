@@ -9,15 +9,51 @@ Booting from Hard Disk..Kernel command line: -q run priority-donate-chain
 Pintos booting with: 
 	base_mem: 0x0 ~ 0x100000 (Usable: 704 kB)
 	ext_mem: 0x100000 ~ 0x100000000 (Usable: 261,376 kB)
-Calibrating timer...  106,086,400 loops/s.
+Calibrating timer...  105,472,000 loops/s.
 Boot complete.
 Executing 'priority-donate-chain':
 (priority-donate-chain) begin
-Kernel PANIC at ../../threads/thread.c:341 in cmp_max_priority(): assertion `!list_empty(&ready_list)' failed.
-Call stack: 0x800420e262 0x800420716b 0x800421270f 0x80042105ae 0x8004206036 0x8004206474.
-The `backtrace' program can make call stacks useful.
-Read "Backtraces" in the "Debugging Tools" chapter
-of the Pintos documentation for more information.
-Timer: 29 ticks
-Thread: 0 idle ticks, 29 kernel ticks, 0 user ticks
-Console: 
+(priority-donate-chain) main got lock.
+(priority-donate-chain) main should have priority 3.  Actual priority: 0.
+(priority-donate-chain) interloper 1 finished.
+(priority-donate-chain) main should have priority 6.  Actual priority: 0.
+(priority-donate-chain) interloper 2 finished.
+(priority-donate-chain) main should have priority 9.  Actual priority: 0.
+(priority-donate-chain) interloper 3 finished.
+(priority-donate-chain) main should have priority 12.  Actual priority: 0.
+(priority-donate-chain) interloper 4 finished.
+(priority-donate-chain) main should have priority 15.  Actual priority: 0.
+(priority-donate-chain) interloper 5 finished.
+(priority-donate-chain) main should have priority 18.  Actual priority: 0.
+(priority-donate-chain) interloper 6 finished.
+(priority-donate-chain) main should have priority 21.  Actual priority: 0.
+(priority-donate-chain) interloper 7 finished.
+(priority-donate-chain) thread 1 got lock
+(priority-donate-chain) thread 1 should have priority 21. Actual priority: 3
+(priority-donate-chain) thread 1 finishing with priority 3.
+(priority-donate-chain) thread 2 got lock
+(priority-donate-chain) thread 2 should have priority 21. Actual priority: 6
+(priority-donate-chain) thread 2 finishing with priority 6.
+(priority-donate-chain) thread 3 got lock
+(priority-donate-chain) thread 3 should have priority 21. Actual priority: 9
+(priority-donate-chain) thread 3 finishing with priority 9.
+(priority-donate-chain) thread 4 got lock
+(priority-donate-chain) thread 4 should have priority 21. Actual priority: 12
+(priority-donate-chain) thread 4 finishing with priority 12.
+(priority-donate-chain) thread 5 got lock
+(priority-donate-chain) thread 5 should have priority 21. Actual priority: 15
+(priority-donate-chain) thread 5 finishing with priority 15.
+(priority-donate-chain) thread 6 got lock
+(priority-donate-chain) thread 6 should have priority 21. Actual priority: 18
+(priority-donate-chain) thread 6 finishing with priority 18.
+(priority-donate-chain) thread 7 got lock
+(priority-donate-chain) thread 7 should have priority 21. Actual priority: 21
+(priority-donate-chain) thread 7 finishing with priority 21.
+(priority-donate-chain) main finishing with priority 0.
+(priority-donate-chain) end
+Execution of 'priority-donate-chain' complete.
+Timer: 42 ticks
+Thread: 0 idle ticks, 42 kernel ticks, 0 user ticks
+Console: 2642 characters output
+Keyboard: 0 keys pressed
+Powering off...

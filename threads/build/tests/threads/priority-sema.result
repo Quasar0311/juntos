@@ -1,10 +1,12 @@
 FAIL
-Kernel panic in run: PANIC at ../../threads/thread.c:341 in cmp_max_priority(): assertion `!list_empty(&ready_list)' failed.
-Call stack: 0x800420e262 0x800420716b 0x8004212304 0x80042105ae 0x8004206036 0x8004206474
+Kernel panic in run: PANIC at ../../lib/kernel/list.c:341 in find_end_of_run(): assertion `a != NULL' failed.
+Call stack: 0x800420e342 0x800420e677 0x800420eda2 0x80042086c9 0x800420f095 0x8004208837 0x800421232f 0x8004206e6a
 Translation of call stack:
-0x000000800420e262: debug_panic (lib/kernel/debug.c:32)
-0x000000800420716b: cmp_max_priority (threads/thread.c:343)
-0x0000008004212304: test_priority_sema (tests/threads/priority-sema.c:27 (discriminator 3))
-0x00000080042105ae: run_test (tests/threads/tests.c:61)
-0x0000008004206036: run_task (threads/init.c:237)
-0x0000008004206474: run_actions (threads/init.c:282)
+0x000000800420e342: debug_panic (lib/kernel/debug.c:32)
+0x000000800420e677: find_end_of_run (lib/kernel/list.c:344)
+0x000000800420eda2: list_sort (lib/kernel/list.c:402)
+0x00000080042086c9: sema_less_func (threads/synch.c:69)
+0x000000800420f095: list_insert_ordered (lib/kernel/list.c:428)
+0x0000008004208837: sema_down (threads/synch.c:94)
+0x000000800421232f: priority_sema_thread (tests/threads/priority-sema.c:44)
+0x0000008004206e6a: kernel_thread (threads/thread.c:425)
