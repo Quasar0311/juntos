@@ -9,15 +9,15 @@ Booting from Hard Disk..Kernel command line: -q run priority-sema
 Pintos booting with: 
 	base_mem: 0x0 ~ 0x100000 (Usable: 704 kB)
 	ext_mem: 0x100000 ~ 0x100000000 (Usable: 261,376 kB)
-Calibrating timer...  107,929,600 loops/s.
+Calibrating timer...  107,110,400 loops/s.
 Boot complete.
 Executing 'priority-sema':
 (priority-sema) begin
-Kernel PANIC at ../../threads/thread.c:341 in cmp_max_priority(): assertion `!list_empty(&ready_list)' failed.
-Call stack: 0x800420e262 0x800420716b 0x8004212304 0x80042105ae 0x8004206036 0x8004206474.
+Kernel PANIC at ../../lib/kernel/list.c:341 in find_end_of_run(): assertion `a != NULL' failed.
+Call stack: 0x800420e342 0x800420e677 0x800420eda2 0x80042086c9 0x800420f095 0x8004208837 0x800421232f 0x8004206e6a.
 The `backtrace' program can make call stacks useful.
 Read "Backtraces" in the "Debugging Tools" chapter
 of the Pintos documentation for more information.
-Timer: 27 ticks
-Thread: 0 idle ticks, 27 kernel ticks, 0 user ticks
+Timer: 28 ticks
+Thread: 0 idle ticks, 28 kernel ticks, 0 user ticks
 Console: 

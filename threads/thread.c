@@ -28,7 +28,7 @@
    that are ready to run but not actually running. */
 static struct list ready_list;
 
-/* Idle thread. */
+/* Idle thread. */ 
 static struct thread *idle_thread;
 
 /* Initial thread, the thread running init.c:main(). */
@@ -231,10 +231,10 @@ thread_block (void) {
 	schedule ();
 }
 
-/*** list_less_func parameter in list_insert ordered() function ***/
+/*** list_less_func parameter in list_insert_ordered() function ***/
 bool
 priority_less_func(const struct list_elem *a, const struct list_elem *b, void *aux UNUSED){
-	return list_entry(a, struct thread, elem)->priority>
+	return list_entry(a, struct thread, elem)->priority >
 			list_entry(b, struct thread, elem)->priority;
 }
 
@@ -330,7 +330,7 @@ void
 thread_set_priority (int new_priority) {
 	thread_current ()->priority = new_priority;
 
-	/*** ensure preoccupation occurs according to priority 
+	/*** ensure priority preemption occurs 
 	when thread's priority is changed ***/
 	cmp_max_priority();
 }
@@ -340,8 +340,7 @@ cmp_max_priority(void){
 	/*** ensure ready_list is not empty ***/
 	if(list_empty(&ready_list)) return;
 
-	// if(list_entry(list_max(&ready_list, priority_less_func, NULL), struct thread, elem)->priority
-	if(list_entry(list_front(&ready_list), struct thread, elem)->priority
+	if(list_entry(list_max(&ready_list, priority_less_func, NULL), struct thread, elem)->priority
 	> thread_get_priority())
 		thread_yield();
 }

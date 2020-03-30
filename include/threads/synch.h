@@ -12,7 +12,7 @@ struct semaphore {
 
 /*** initialize semaphore to given value ***/
 void sema_init (struct semaphore *, unsigned value);
-bool sema_lower_func(const struct list_elem *a, const struct list_elem *b, void *aux);
+bool sema_less_func(const struct list_elem *a, const struct list_elem *b, void *aux);
 /*** lower value by 1 when requested and acquired semaphore ***/
 void sema_down (struct semaphore *);
 bool sema_try_down (struct semaphore *);
