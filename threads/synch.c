@@ -62,7 +62,7 @@ sema_less_func(const struct list_elem *a, const struct list_elem *b, void *aux U
 
 	if(list_empty(&sa->semaphore.waiters)) return false;
 	if(list_empty(&sb->semaphore.waiters)) return true;
-	if(sb==NULL) return true;
+	// if(sb==NULL) return true;
 
 	/*** sort semaphore list with priority ordered threads ***/
 	list_sort(&sa->semaphore.waiters, priority_less_func, NULL);
