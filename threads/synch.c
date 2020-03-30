@@ -50,12 +50,12 @@ sema_init (struct semaphore *sema, unsigned value) {
 }
 
 /*** list_less_func parameter in list_insert ordered() function ***/
-bool
-sema_lower_func(const struct list_elem *a, const struct list_elem *b, void *aux UNUSED){
-	struct semaphore_elem *sa=list_entry(a, struct semaphore_elem, elem);
-	struct semaphore_elem *sb=list_entry(b, struct semaphore_elem, elem);
-	return sema->waiters;
-}
+// bool
+// sema_lower_func(const struct list_elem *a, const struct list_elem *b, void *aux UNUSED){
+// 	struct semaphore_elem *sa=list_entry(a, struct semaphore_elem, elem);
+// 	struct semaphore_elem *sb=list_entry(b, struct semaphore_elem, elem);
+// 	return sema->waiters;
+// }
 
 /* Down or "P" operation on a semaphore.  Waits for SEMA's value
    to become positive and then atomically decrements it.

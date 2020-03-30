@@ -340,8 +340,8 @@ cmp_max_priority(void){
 	/*** ensure ready_list is not empty ***/
 	if(list_empty(&ready_list)) return;
 
-	if(list_entry(list_max(&ready_list, priority_less_func, NULL), struct thread, elem)->priority
-	//if(list_entry(list_front(&ready_list), struct thread, elem)->priority
+	// if(list_entry(list_max(&ready_list, priority_less_func, NULL), struct thread, elem)->priority
+	if(list_entry(list_front(&ready_list), struct thread, elem)->priority
 	> thread_get_priority())
 		thread_yield();
 }
