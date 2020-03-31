@@ -364,17 +364,19 @@ cmp_donation_priority (void) {
 	 > thread_get_priority()) {
 		 thread_yield();
 	 }
+	 thread_yield();
 }
 
 /*** priority donation function. ***/
 void
-priority_donation (void) {
+priority_donation (struct lock *lock) {
 	struct thread *curr = thread_current();
-	struct thread *holder = (curr -> lock_waiting) -> holder;
+	struct thread *holder = lock -> holder;
 
-	// msg("holder priority : %d\n", holder -> init_priority);
+	//msg("holder priority : %d\n", holder -> init_priority);
 	if (holder -> priority < curr -> priority) {
 		holder -> priority = curr -> priority;
+		
 	}
 	
 	//msg("holder priority : %d\n", holder -> priority);

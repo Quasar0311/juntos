@@ -142,7 +142,7 @@ void cmp_max_priority(void);
 void cmp_donation_priority (void);
 
 /*** priority donation function. ***/
-void priority_donation (void);
+void priority_donation (struct lock *lock);
 void remove_lock (struct lock *lock);
 void restore_priority (void);
 

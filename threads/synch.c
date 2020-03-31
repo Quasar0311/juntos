@@ -207,7 +207,7 @@ lock_acquire (struct lock *lock) {
 		//list_insert_ordered(&hold_donation, &curr -> elem, donation_comparator, NULL);
 		list_push_back(&hold_donation, &curr -> elem);
 		//msg("inserted! : %d\n", list_entry(list_front(&hold_donation), struct thread, elem) -> priority);
-		priority_donation();
+		priority_donation(lock);
 	}
 
 	sema_down (&lock->semaphore);
@@ -250,11 +250,12 @@ lock_release (struct lock *lock) {
 	enum intr_level old_level;
 	old_level = intr_disable();
 
-	//msg("release curr pri : %d\n", curr -> priority);
+	//printf("release curr pri : %d\n", curr -> priority);
 	/*** priority donation ***/
-	
+	//printf("curr pri :%d\n", thread_get_priority());
 	restore_priority();
-	// remove_lock(lock);
+	//thread_set_priority(curr -> init_priority);
+	//remove_lock(lock);
 	lock -> holder = NULL;
 	sema_up (&lock->semaphore);
 	// msg("released\n");
