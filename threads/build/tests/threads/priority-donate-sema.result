@@ -1,12 +1,23 @@
 FAIL
-Kernel panic in run: PANIC at ../../lib/kernel/list.c:341 in find_end_of_run(): assertion `a != NULL' failed.
-Call stack: 0x800420e342 0x800420e677 0x800420eda2 0x80042086c9 0x800420f095 0x8004208837 0x8004211b4b 0x8004206e6a
-Translation of call stack:
-0x000000800420e342: debug_panic (lib/kernel/debug.c:32)
-0x000000800420e677: find_end_of_run (lib/kernel/list.c:344)
-0x000000800420eda2: list_sort (lib/kernel/list.c:402)
-0x00000080042086c9: sema_less_func (threads/synch.c:69)
-0x000000800420f095: list_insert_ordered (lib/kernel/list.c:428)
-0x0000008004208837: sema_down (threads/synch.c:94)
-0x0000008004211b4b: m_thread_func (tests/threads/priority-donate-sema.c:69)
-0x0000008004206e6a: kernel_thread (threads/thread.c:425)
+Test output failed to match any acceptable form.
+
+Acceptable output:
+  (priority-donate-sema) begin
+  (priority-donate-sema) Thread L acquired lock.
+  (priority-donate-sema) Thread L downed semaphore.
+  (priority-donate-sema) Thread H acquired lock.
+  (priority-donate-sema) Thread H finished.
+  (priority-donate-sema) Thread M finished.
+  (priority-donate-sema) Thread L finished.
+  (priority-donate-sema) Main thread finished.
+  (priority-donate-sema) end
+Differences in `diff -u' format:
+  (priority-donate-sema) begin
+  (priority-donate-sema) Thread L acquired lock.
+- (priority-donate-sema) Thread L downed semaphore.
+- (priority-donate-sema) Thread H acquired lock.
+- (priority-donate-sema) Thread H finished.
+  (priority-donate-sema) Thread M finished.
+- (priority-donate-sema) Thread L finished.
+  (priority-donate-sema) Main thread finished.
+  (priority-donate-sema) end

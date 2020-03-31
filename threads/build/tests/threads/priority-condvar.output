@@ -9,17 +9,44 @@ Booting from Hard Disk..Kernel command line: -q run priority-condvar
 Pintos booting with: 
 	base_mem: 0x0 ~ 0x100000 (Usable: 704 kB)
 	ext_mem: 0x100000 ~ 0x100000000 (Usable: 261,376 kB)
-Calibrating timer...  107,929,600 loops/s.
+Calibrating timer...  104,857,600 loops/s.
 Boot complete.
 Executing 'priority-condvar':
 (priority-condvar) begin
 (priority-condvar) Thread priority 23 starting.
 (priority-condvar) Thread priority 22 starting.
-Kernel PANIC at ../../lib/kernel/list.c:341 in find_end_of_run(): assertion `a != NULL' failed.
-Call stack: 0x800420e342 0x800420e677 0x800420eda2 0x80042086c9 0x800420f095 0x8004208f2b 0x80042124e0 0x8004206e6a.
-The `backtrace' program can make call stacks useful.
-Read "Backtraces" in the "Debugging Tools" chapter
-of the Pintos documentation for more information.
-Timer: 27 ticks
-Thread: 0 idle ticks, 27 kernel ticks, 0 user ticks
-Console: 
+(priority-condvar) Thread priority 21 starting.
+(priority-condvar) Thread priority 30 starting.
+(priority-condvar) Thread priority 29 starting.
+(priority-condvar) Thread priority 28 starting.
+(priority-condvar) Thread priority 27 starting.
+(priority-condvar) Thread priority 26 starting.
+(priority-condvar) Thread priority 25 starting.
+(priority-condvar) Thread priority 24 starting.
+(priority-condvar) Signaling...
+(priority-condvar) Thread priority 23 woke up.
+(priority-condvar) Signaling...
+(priority-condvar) Thread priority 22 woke up.
+(priority-condvar) Signaling...
+(priority-condvar) Thread priority 21 woke up.
+(priority-condvar) Signaling...
+(priority-condvar) Thread priority 30 woke up.
+(priority-condvar) Signaling...
+(priority-condvar) Thread priority 29 woke up.
+(priority-condvar) Signaling...
+(priority-condvar) Thread priority 28 woke up.
+(priority-condvar) Signaling...
+(priority-condvar) Thread priority 27 woke up.
+(priority-condvar) Signaling...
+(priority-condvar) Thread priority 26 woke up.
+(priority-condvar) Signaling...
+(priority-condvar) Thread priority 25 woke up.
+(priority-condvar) Signaling...
+(priority-condvar) Thread priority 24 woke up.
+(priority-condvar) end
+Execution of 'priority-condvar' complete.
+Timer: 38 ticks
+Thread: 0 idle ticks, 38 kernel ticks, 0 user ticks
+Console: 1680 characters output
+Keyboard: 0 keys pressed
+Powering off...
