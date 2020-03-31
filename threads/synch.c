@@ -60,9 +60,9 @@ sema_less_func(const struct list_elem *a, const struct list_elem *b, void *aux U
 	struct semaphore_elem *sa=list_entry(a, struct semaphore_elem, elem);
 	struct semaphore_elem *sb=list_entry(b, struct semaphore_elem, elem);
 
-	if(list_empty(&sa->semaphore.waiters)) return false;
-	if(list_empty(&sb->semaphore.waiters)) return true;
-	// if(sb==NULL) return true;
+	/*** find_end_of_run(): assertion a!=NULL failed ***/
+	if(list_begin(&sa->semaphore.waiters)==NULL) return false;
+	if(list_begin(&sb->semaphore.waiters)==NULL) return true;
 
 	/*** sort semaphore list with priority ordered threads ***/
 	list_sort(&sa->semaphore.waiters, priority_less_func, NULL);
@@ -134,9 +134,9 @@ sema_up (struct semaphore *sema) {
 
 	old_level = intr_disable ();
 	if (!list_empty (&sema->waiters)){
-		/*** considering priority change while thread in in the waiters list,
+		/*** considering priority change while thread in the waiters list,
 		 * sort the waiters list as a priority ***/
-		list_sort(&sema->waiters, priority_less_func, NULL);
+		list_sort(&sema->waiters, sema_less_func, NULL);
 		thread_unblock (list_entry (list_pop_front (&sema->waiters),
 					struct thread, elem));
 	}
@@ -309,7 +309,7 @@ cond_wait (struct condition *cond, struct lock *lock) {
 
 	sema_init (&waiter.semaphore, 0);
 	/*** operation on waiters list with priority ordered threads ***/
-	list_insert_ordered(&cond->waiters, &thread_current()->elem, sema_less_func, NULL);
+	list_insert_ordered(&cond->waiters, &waiter.elem, priority_less_func, NULL);
 	lock_release (lock);
 	sema_down (&waiter.semaphore);
 	lock_acquire (lock);
@@ -330,8 +330,8 @@ cond_signal (struct condition *cond, struct lock *lock UNUSED) {
 	ASSERT (lock_held_by_current_thread (lock));
 
 	if (!list_empty (&cond->waiters)){
-		/*** rearrange condition variable wait list by priority ***/
-		list_sort(&cond->waiters, sema_less_func, NULL);
+		/*** rearrange condition vxsariable wait list by priority ***/
+		list_sort(&cond->waiters, priority_less_func, NULL);
 		sema_up (&list_entry (list_pop_front (&cond->waiters),
 					struct semaphore_elem, elem)->semaphore);
 	}
