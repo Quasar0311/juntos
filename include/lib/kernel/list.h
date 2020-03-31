@@ -101,7 +101,7 @@ struct list {
    of the list element.  See the big comment at the top of the
    file for an example. */
 /*** list_entry(pointer address of embeded list, struct type, variable name of list_elem) ***/
-#define list_entry(LIST_ELEM, STRUCT, MEMBER)           \
+#define list_entry(LIST_ELEM, STRUCT, MEMBER)           \ 
 	((STRUCT *) ((uint8_t *) &(LIST_ELEM)->next     \
 		- offsetof (STRUCT, MEMBER.next)))
 

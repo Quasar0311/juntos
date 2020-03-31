@@ -1,18 +1,13 @@
 FAIL
-Kernel panic in run: PANIC at ../../threads/interrupt.c:361 in intr_handler(): Unexpected interrupt
-Call stack: 0x800420e332 0x8004207a2d 0x8004207bac 0x800420e597 0x800420e6b3 0x800420ed92 0x80042086c3 0x800420e6bf 0x800420ed92 0x8004208967 0x800421130d 0x800421067e 0x8004206036 0x8004206474
+Kernel panic in run: PANIC at ../../lib/kernel/list.c:341 in find_end_of_run(): assertion `a != NULL' failed.
+Call stack: 0x800420e342 0x800420e677 0x800420eda2 0x80042086c9 0x800420f095 0x8004208837 0x8004208c3a 0x8004211156 0x8004206e6a
 Translation of call stack:
-0x000000800420e332: debug_panic (lib/kernel/debug.c:32)
-0x0000008004207a2d: intr_handler (threads/interrupt.c:365)
-0x0000008004207bac: intr_entry (threads/intr-stubs.o:?)
-0x000000800420e597: list_prev (lib/kernel/list.c:106)
-0x000000800420e6b3: find_end_of_run (lib/kernel/list.c:348)
-0x000000800420ed92: list_sort (lib/kernel/list.c:402)
-0x00000080042086c3: sema_less_func (threads/synch.c:69)
-0x000000800420e6bf: find_end_of_run (lib/kernel/list.c:348)
-0x000000800420ed92: list_sort (lib/kernel/list.c:402)
-0x0000008004208967: sema_up (threads/synch.c:140)
-0x000000800421130d: test_priority_donate_one (tests/threads/priority-donate-one.c:41)
-0x000000800421067e: run_test (tests/threads/tests.c:61)
-0x0000008004206036: run_task (threads/init.c:237)
-0x0000008004206474: run_actions (threads/init.c:282)
+0x000000800420e342: debug_panic (lib/kernel/debug.c:32)
+0x000000800420e677: find_end_of_run (lib/kernel/list.c:344)
+0x000000800420eda2: list_sort (lib/kernel/list.c:402)
+0x00000080042086c9: sema_less_func (threads/synch.c:69)
+0x000000800420f095: list_insert_ordered (lib/kernel/list.c:428)
+0x0000008004208837: sema_down (threads/synch.c:94)
+0x0000008004208c3a: lock_acquire (threads/synch.c:224)
+0x0000008004211156: acquire2_thread_func (tests/threads/priority-donate-one.c:62)
+0x0000008004206e6a: kernel_thread (threads/thread.c:425)

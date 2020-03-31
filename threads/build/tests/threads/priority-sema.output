@@ -9,23 +9,15 @@ Booting from Hard Disk..Kernel command line: -q run priority-sema
 Pintos booting with: 
 	base_mem: 0x0 ~ 0x100000 (Usable: 704 kB)
 	ext_mem: 0x100000 ~ 0x100000000 (Usable: 261,376 kB)
-Calibrating timer...  49,100,800 loops/s.
+Calibrating timer...  107,110,400 loops/s.
 Boot complete.
 Executing 'priority-sema':
 (priority-sema) begin
-Interrupt 0x0d (#GP General Protection Exception) at rip=800420e38f
- cr2=0000000000000000 error=               0
-rax 0000000000000000 rbx 55c35d01e08309e8 rcx 0000000000000000 rdx 55c35d01e08309e8
-rsp 0000008004000d40 rbp 0000008004000d40 rsi 0000008004a46048 rdi 55c35d01e08309e8
-rip 000000800420e38f r8 0000008004a4e008  r9 0000000000000000 r10 0000000000000000
-r11 0000000000000002 r12 000000800420653a r13 0000008004a46048 r14 0000000000000000
-r15 000000800420e4af rflags 00200006
-es: 0010 ds: 0010 cs: 0008 ss: 0010
-Kernel PANIC at ../../threads/interrupt.c:361 in intr_handler(): Unexpected interrupt
-Call stack: 0x800420e332 0x8004207a2d 0x8004207bac 0x800420e597 0x800420e6b3 0x800420ed92 0x80042086c3 0x800420e6bf 0x800420ed92 0x8004208967 0x8004212444 0x800421067e 0x8004206036 0x8004206474.
+Kernel PANIC at ../../lib/kernel/list.c:341 in find_end_of_run(): assertion `a != NULL' failed.
+Call stack: 0x800420e342 0x800420e677 0x800420eda2 0x80042086c9 0x800420f095 0x8004208837 0x800421232f 0x8004206e6a.
 The `backtrace' program can make call stacks useful.
 Read "Backtraces" in the "Debugging Tools" chapter
 of the Pintos documentation for more information.
-Timer: 25 ticks
-Thread: 0 idle ticks, 25 kernel ticks, 0 user ticks
-Console: 1
+Timer: 28 ticks
+Thread: 0 idle ticks, 28 kernel ticks, 0 user ticks
+Console: 
