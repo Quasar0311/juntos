@@ -76,3 +76,38 @@ Executing 'mlfqs-recent-1':
 (mlfqs-recent-1) After 120 seconds, recent_cpu is 0.00, load_avg is 0.00.
 (mlfqs-recent-1) After 122 seconds, recent_cpu is 0.00, load_avg is 0.00.
 (mlfqs-recent-1) After 124 seconds, recent_cpu is 0.00, load_avg is 0.00.
+(mlfqs-recent-1) After 126 seconds, recent_cpu is 0.00, load_avg is 0.00.
+(mlfqs-recent-1) After 128 seconds, recent_cpu is 0.00, load_avg is 0.00.
+(mlfqs-recent-1) After 130 seconds, recent_cpu is 0.00, load_avg is 0.00.
+(mlfqs-recent-1) After 132 seconds, recent_cpu is 0.00, load_avg is 0.00.
+(mlfqs-recent-1) After 134 seconds, recent_cpu is 0.00, load_avg is 0.00.
+(mlfqs-recent-1) After 136 seconds, recent_cpu is 0.00, load_avg is 0.00.
+(mlfqs-recent-1) After 138 seconds, recent_cpu is 0.00, load_avg is 0.00.
+(mlfqs-recent-1) After 140 seconds, recent_cpu is 0.00, load_avg is 0.00.
+(mlfqs-recent-1) After 142 seconds, recent_cpu is 0.00, load_avg is 0.00.
+(mlfqs-recent-1) After 144 seconds, recent_cpu is 0.00, load_avg is 0.00.
+(mlfqs-recent-1) After 146 seconds, recent_cpu is 0.00, load_avg is 0.00.
+(mlfqs-recent-1) After 148 seconds, recent_cpu is 0.00, load_avg is 0.00.
+(mlfqs-recent-1) After 150 seconds, recent_cpu is 0.00, load_avg is 0.00.
+(mlfqs-recent-1) After 152 seconds, recent_cpu is 0.00, load_avg is 0.00.
+(mlfqs-recent-1) After 154 seconds, recent_cpu is 0.00, load_avg is 0.00.
+(mlfqs-recent-1) After 156 seconds, recent_cpu is 0.00, load_avg is 0.00.
+(mlfqs-recent-1) After 158 seconds, recent_cpu is 0.00, load_avg is 0.00.
+(mlfqs-recent-1) After 160 seconds, recent_cpu is 0.00, load_avg is 0.00.
+(mlfqs-recent-1) After 162 seconds, recent_cpu is 0.00, load_avg is 0.00.
+(mlfqs-recent-1) After 164 seconds, recent_cpu is 0.00, load_avg is 0.00.
+(mlfqs-recent-1) After 166 seconds, recent_cpu is 0.00, load_avg is 0.00.
+(mlfqs-recent-1) After 168 seconds, recent_cpu is 0.00, load_avg is 0.00.
+(mlfqs-recent-1) After 170 seconds, recent_cpu is 0.00, load_avg is 0.00.
+(mlfqs-recent-1) After 172 seconds, recent_cpu is 0.00, load_avg is 0.00.
+(mlfqs-recent-1) After 174 seconds, recent_cpu is 0.00, load_avg is 0.00.
+(mlfqs-recent-1) After 176 seconds, recent_cpu is 0.00, load_avg is 0.00.
+(mlfqs-recent-1) After 178 seconds, recent_cpu is 0.00, load_avg is 0.00.
+(mlfqs-recent-1) After 180 seconds, recent_cpu is 0.00, load_avg is 0.00.
+(mlfqs-recent-1) end
+Execution of 'mlfqs-recent-1' complete.
+Timer: 19001 ticks
+Thread: 0 idle ticks, 19001 kernel ticks, 0 user ticks
+Console: 7102 characters output
+Keyboard: 0 keys pressed
+Powering off...
