@@ -1,3 +1,4 @@
+#include "threads/fixed_point.h"
 #include "threads/thread.h"
 #include <debug.h>
 #include <stddef.h>
@@ -14,6 +15,11 @@
 #ifdef USERPROG
 #include "userprog/process.h"
 #endif
+
+#define NICE_DEFAULT 0
+#define RECENT_CPU_DEFAULT 0
+#define LOAD_AVG_DEFAULT 0
+int load_avg;
 
 /* Random value for struct thread's `magic' member.
    Used to detect stack overflow.  See the big comment at the top
@@ -125,6 +131,7 @@ thread_start (void) {
 	struct semaphore idle_started;
 	sema_init (&idle_started, 0);
 	thread_create ("idle", PRI_MIN, idle, &idle_started);
+	load_avg=LOAD_AVG_DEFAULT;
 
 	/* Start preemptive thread scheduling. */
 	intr_enable ();
@@ -440,6 +447,9 @@ init_thread (struct thread *t, const char *name, int priority) {
 	t->tf.rsp = (uint64_t) t + PGSIZE - sizeof (void *);
 	t->priority = priority;
 	t->magic = THREAD_MAGIC;
+
+	t->nice=NICE_DEFAULT;
+	t->recent_cpu=RECENT_CPU_DEFAULT;
 }
 
 /* Chooses and returns the next thread to be scheduled.  Should
@@ -618,4 +628,59 @@ allocate_tid (void) {
 	lock_release (&tid_lock);
 
 	return tid;
+}
+
+void
+mlfqs_priority(struct thread *t){
+	/*** check if t is idle_thread ***/
+	if(t==idle_thread) return;
+
+	/*** priority calculation using fixed_point.h 
+	PRI_MAX-(recnet_cpu/4)-(nice*2) ***/
+	t->priority=sub_mixed(PRI_MAX-(t->nice*2), div_mixed(t->recent_cpu/4));
+}
+
+void
+mlfqs_recent_cpu(struct thread *t){
+	int a, b, c;
+
+	/*** check if t is idle_thread ***/
+	if(t==idle_thread) return;
+	
+	/*** recent_cpu calculation using fixed_point.h 
+	(2*load_avg)/(2*load_avg+1)* recent_cpu+ nice ***/
+	a=mult_mixed(2, load_avg);
+	b=div_fp(a, add_mixed(a, 1));
+	t->recent_cpu=add_mixed(div_mixed(b, t->recent_cpu));
+}
+
+void
+mlfqs_load_avg(void){
+	int a;
+
+	/*** load_avg calculation using fixed_point.h 
+	(59/60)*load_avg+ (1/60)*ready_threads ***/
+	a=add_fp(mult_fp((59/60), load_avg),
+				mult_fp((1/60), ready_threads));
+
+	/*** load_avg cannot be smaller than 0 ***/
+	if(a>=0) load_avg=a;
+	else load_avg=LOAD_AVG_DEFAULT;
+}
+
+void
+mlfqs_increment(void){
+	struct thread *t=thread_current();
+
+	/*** check if t is idle_thread ***/
+	if(t==idle_thread) return;
+
+	/*** increment current thread recent_cpu by 1 ***/
+	t->recent_cpu++;
+}
+
+void
+mlfqs_recalc(void){
+	/*** recalculate recent_cpu and priority of all the threads ***/
+
 }
