@@ -88,6 +88,13 @@ struct thread {
 	char name[16];                      /* Name (for debugging purposes). */
 	int priority;                       /* Priority. */
 
+	/*** Save initial priority for donation. ***/
+	int init_priority;
+	struct list donations;
+	struct lock *lock_waiting;
+	
+
+
 	/* Shared between thread.c and synch.c. */
 	struct list_elem elem;              /* List element. */
 
@@ -132,6 +139,12 @@ void thread_set_priority (int);
 /*** scheduling by comparing current thread's priority 
 and highest thread's priority ***/
 void cmp_max_priority(void);
+void cmp_donation_priority (void);
+
+/*** priority donation function. ***/
+void priority_donation (void);
+void remove_lock (struct lock *lock);
+void restore_priority (void);
 
 int thread_get_nice (void);
 void thread_set_nice (int);

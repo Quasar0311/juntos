@@ -1,32 +1,9 @@
 FAIL
-Test output failed to match any acceptable form.
-
-Acceptable output:
-  (priority-donate-multiple2) begin
-  (priority-donate-multiple2) Main thread should have priority 34.  Actual priority: 34.
-  (priority-donate-multiple2) Main thread should have priority 36.  Actual priority: 36.
-  (priority-donate-multiple2) Main thread should have priority 36.  Actual priority: 36.
-  (priority-donate-multiple2) Thread b acquired lock b.
-  (priority-donate-multiple2) Thread b finished.
-  (priority-donate-multiple2) Thread a acquired lock a.
-  (priority-donate-multiple2) Thread a finished.
-  (priority-donate-multiple2) Thread c finished.
-  (priority-donate-multiple2) Threads b, a, c should have just finished, in that order.
-  (priority-donate-multiple2) Main thread should have priority 31.  Actual priority: 31.
-  (priority-donate-multiple2) end
-Differences in `diff -u' format:
-  (priority-donate-multiple2) begin
-- (priority-donate-multiple2) Main thread should have priority 34.  Actual priority: 34.
-- (priority-donate-multiple2) Main thread should have priority 36.  Actual priority: 36.
-- (priority-donate-multiple2) Main thread should have priority 36.  Actual priority: 36.
-- (priority-donate-multiple2) Thread b acquired lock b.
-- (priority-donate-multiple2) Thread b finished.
-- (priority-donate-multiple2) Thread a acquired lock a.
-- (priority-donate-multiple2) Thread a finished.
-+ (priority-donate-multiple2) Main thread should have priority 34.  Actual priority: 31.
-  (priority-donate-multiple2) Thread c finished.
-+ (priority-donate-multiple2) Main thread should have priority 36.  Actual priority: 31.
-+ (priority-donate-multiple2) Main thread should have priority 36.  Actual priority: 31.
-  (priority-donate-multiple2) Threads b, a, c should have just finished, in that order.
-  (priority-donate-multiple2) Main thread should have priority 31.  Actual priority: 31.
-  (priority-donate-multiple2) end
+Kernel panic in run: PANIC at ../../threads/interrupt.c:361 in intr_handler(): Unexpected interrupt
+Call stack: 0x800420e226 0x8004207a21 0x8004207ba0 0x8004206098 0x800420652e
+Translation of call stack:
+0x000000800420e226: debug_panic (lib/kernel/debug.c:32)
+0x0000008004207a21: intr_handler (threads/interrupt.c:365)
+0x0000008004207ba0: intr_entry (threads/intr-stubs.o:?)
+0x0000008004206098: outw (include/threads/io.h:129)
+0x000000800420652e: main (threads/init.c:118)

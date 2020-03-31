@@ -333,16 +333,110 @@ thread_set_priority (int new_priority) {
 	/*** ensure preoccupation occurs according to priority 
 	when thread's priority is changed ***/
 	cmp_max_priority();
+
+	cmp_donation_priority();
 }
 
 void
 cmp_max_priority(void){
 	/*** ensure ready_list is not empty ***/
-	ASSERT(!list_empty(&ready_list));
+	if (list_empty(&ready_list)) {
+	 	return;
+	}
 
 	if(list_entry(list_front(&ready_list), struct thread, elem)->priority
-	> thread_get_priority())
+	> thread_get_priority()) {
 		thread_yield();
+	}
+
+}
+
+void
+cmp_donation_priority (void) {
+	struct thread *curr = thread_current();
+	struct list donation = curr -> donations;
+	if (list_empty(&donation)) {
+	 	return;
+	}
+	// msg("donation prior : %d\n", list_entry(list_back(&donation), struct thread, elem) -> priority);
+	// msg("current pri : %d\n", thread_get_priority());
+	if (list_entry(list_front(&donation), struct thread, elem) -> priority
+	 > thread_get_priority()) {
+		 thread_yield();
+	 }
+}
+
+/*** priority donation function. ***/
+void
+priority_donation (void) {
+	struct thread *curr = thread_current();
+	struct thread *holder = (curr -> lock_waiting) -> holder;
+
+	// msg("holder priority : %d\n", holder -> init_priority);
+	if (holder -> priority < curr -> priority) {
+		holder -> priority = curr -> priority;
+	}
+	
+	//msg("holder priority : %d\n", holder -> priority);
+	/*** while loop for nested donation. Every thread related with
+	holder's lock have to be donated. ***/
+	while (holder -> lock_waiting != NULL) {
+		((holder -> lock_waiting) -> holder) -> priority = curr -> priority;
+		holder = (holder -> lock_waiting) -> holder;
+	}
+	//thread_yield();
+	
+}
+
+void
+remove_lock (struct lock *lock) {
+	struct thread *curr = thread_current();
+	struct list_elem *e;
+	struct list donation = curr -> donations;
+	struct list new_donation;
+
+	list_init(&new_donation);
+	//msg("holder priority : %d\n", curr -> init_priority);
+	/*** Iterate through donation list. We have to pop out 
+	thread which lock is just released. ***/
+	for (e = list_begin(&donation); e != list_end(&donation); e = list_next(e)) {
+		//printf("iterating...\n");
+		if (list_entry(e, struct thread, elem) -> lock_waiting == lock) {
+			continue;
+		}
+		else {
+			list_push_front(&new_donation, e);
+		}
+	}
+	while (!list_empty(&curr -> donations)) {
+		list_pop_front(&curr -> donations);
+	}
+	for (e = list_begin(&new_donation); e != list_end(&new_donation); e = list_next(e)) {
+		list_push_front(&curr -> donations, e);
+	}
+}
+
+void
+restore_priority (void) {
+	struct thread *curr = thread_current();
+	
+	struct list donation = curr -> donations;
+	// msg("holder priority : %d\n", curr -> init_priority);
+	// : %d\n", curr -> priority);
+	// curr -> priority = curr -> init_priority;
+	//msg("list pr : %d\n", list_entry(list_begin(&donation), struct thread, elem) -> priority);
+	thread_set_priority(curr -> init_priority);
+	// if (list_empty(&donation)) {
+	// 	msg("hi");
+	// 	return;
+	// }
+	//thread_yield();
+	// if (curr -> priority < list_entry(list_begin(&donation), struct thread, elem) -> priority) {
+	// 	curr -> priority = list_entry(list_begin(&donation), struct thread, elem) -> priority;
+	// }
+	//msg("list pr : %d\n", list_entry(list_begin(&donation), struct thread, elem) -> priority);
+	// msg("current pr : %d\n", curr -> priority);
+	
 }
 
 /* Returns the current thread's priority. */
@@ -435,6 +529,14 @@ init_thread (struct thread *t, const char *name, int priority) {
 	ASSERT (name != NULL);
 
 	memset (t, 0, sizeof *t);
+
+	/*** Initialization for priority donation ***/
+	t -> init_priority = priority;
+	t -> lock_waiting = NULL;
+	list_init(&(t -> donations));
+	// lock_init((t -> lock_waiting));
+	
+
 	t->status = THREAD_BLOCKED;
 	strlcpy (t->name, name, sizeof t->name);
 	t->tf.rsp = (uint64_t) t + PGSIZE - sizeof (void *);
