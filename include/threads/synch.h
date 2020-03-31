@@ -12,7 +12,6 @@ struct semaphore {
 
 /*** initialize semaphore to given value ***/
 void sema_init (struct semaphore *, unsigned value);
-bool sema_less_func(const struct list_elem *a, const struct list_elem *b, void *aux);
 /*** lower value by 1 when requested and acquired semaphore ***/
 void sema_down (struct semaphore *);
 bool sema_try_down (struct semaphore *);
@@ -42,6 +41,7 @@ struct condition {
 
 /*** initialize condition variable data structure ***/
 void cond_init (struct condition *);
+bool sema_less_func(const struct list_elem *a, const struct list_elem *b, void *aux);
 /*** wait until signal is noticed by condition variable ***/
 void cond_wait (struct condition *, struct lock *);
 /*** send signal to highest priority thread waiting in condition variable ***/
