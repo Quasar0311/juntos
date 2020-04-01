@@ -9,13 +9,14 @@ Booting from Hard Disk..Kernel command line: -q run alarm-negative
 Pintos booting with: 
 	base_mem: 0x0 ~ 0x100000 (Usable: 704 kB)
 	ext_mem: 0x100000 ~ 0x100000000 (Usable: 261,376 kB)
-Calibrating timer...  107,929,600 loops/s.
+Calibrating timer...  111,206,400 loops/s.
 Boot complete.
 Executing 'alarm-negative':
 (alarm-negative) begin
 (alarm-negative) PASS
 (alarm-negative) end
 Execution of 'alarm-negative' complete.
+<<<<<<< HEAD
 <<<<<<< HEAD
 Timer: 27 ticks
 Thread: 0 idle ticks, 27 kernel ticks, 0 user ticks
@@ -26,3 +27,8 @@ Thread: 1 idle ticks, 27 kernel ticks, 0 user ticks
 Console: 422 characters output
 Keyboard: 0 keys pressed
 Powering off...
+=======
+Timer: 26 ticks
+Thread: 0 idle ticks, 26 kernel ticks, 0 user ticks
+Console: 
+>>>>>>> 5aa83c8be049c0f90ebf08053c271604118dfe44

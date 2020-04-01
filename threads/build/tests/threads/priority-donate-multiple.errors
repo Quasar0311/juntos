@@ -1,21 +1,11 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 WARNING: Image format was not specified for '/tmp/tmpg02jhw5o.dsk' and probing guessed raw.
 =======
 WARNING: Image format was not specified for '/tmp/tmpy81s0765.dsk' and probing guessed raw.
 >>>>>>> 5222d5cfd04680765785f2a736f661533a4d8c6e
+=======
+WARNING: Image format was not specified for '/tmp/tmp7futtswi.dsk' and probing guessed raw.
+>>>>>>> 5aa83c8be049c0f90ebf08053c271604118dfe44
          Automatically detecting the format is dangerous for raw images, write operations on block 0 will be restricted.
          Specify the 'raw' format explicitly to remove the restrictions.
-Traceback (most recent call last):
-  File "/home/team25/juntos/utils/pintos", line 172, in <module>
-    hostfns=[f.split(':') for f in args.HOSTFNS]).run()
-  File "/home/team25/juntos/utils/pintos", line 133, in run
-    subprocess.run(cmd, **args)
-  File "/usr/lib/python3.5/subprocess.py", line 695, in run
-    stdout, stderr = process.communicate(input, timeout=timeout)
-  File "/usr/lib/python3.5/subprocess.py", line 1072, in communicate
-    stdout, stderr = self._communicate(input, endtime, timeout)
-  File "/usr/lib/python3.5/subprocess.py", line 1741, in _communicate
-    self.wait(timeout=self._remaining_time(endtime))
-  File "/usr/lib/python3.5/subprocess.py", line 1652, in wait
-    time.sleep(delay)
-KeyboardInterrupt

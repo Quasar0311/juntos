@@ -29,9 +29,9 @@
    that are ready to run but not actually running. */
 static struct list ready_list;
 
-static struct list sleep_list;
+struct list sleep_list;
 
-static int64_t earliest_wake_up_tick = INT64_MAX;
+int64_t earliest_wake_up_tick = INT64_MAX;
 
 /* Idle thread. */
 static struct thread *idle_thread;
@@ -88,24 +88,37 @@ static uint64_t gdt[3] = { 0, 0x00af9a000000ffff, 0x00cf92000000ffff };
 /*** list_less_func parameter in list_insert_ordered() function. ***/
 static bool timer_comparator (const struct list_elem *x, 
 const struct list_elem *y, void *aux UNUSED) {
-	return list_entry(x, struct thread, elem) -> alarm <= 
+	return list_entry(x, struct thread, elem) -> alarm > 
 			list_entry(y, struct thread, elem) -> alarm;
 }
 
-/*** Sleep thread : save interrupt history -> update wake-up time 
-	 -> put into sleep_list -> block until unblock() called ->
-	 	restore interrupt history ***/
+
 void
 thread_sleep (int64_t ticks) {
 	
 	struct thread *sleeper = thread_current();
+	if (sleeper != idle_thread) {
+		return;
+	}
 	enum intr_level old_level;
 	old_level = intr_disable();
 
+	ASSERT(thread_current() != idle_thread);
+
+	if (ticks <= 0) {
+		return;
+	}
+
 	sleeper -> alarm = ticks;
 	earliest_time(sleeper -> alarm);
+
+	printf("inserted : %d and", sleeper -> alarm);
 	list_insert_ordered(&sleep_list, &sleeper -> elem, timer_comparator, NULL);
+	
+	
+	printf("blocked\n");
 	thread_block();
+	printf("hi\n");
 	
 	intr_set_level(old_level);
 }
@@ -118,11 +131,10 @@ thread_wakeup (int64_t ticks) {
 		earliest_wake_up_tick = INT64_MAX;
 	}
 	else {
-		/*** Wake up every threads which have to wake up using while loop. ***/
 		while (ticks >= earliest_wake_up_tick) {
-			struct thread *thread = list_entry(list_begin(&sleep_list), struct thread, elem);
+			printf("%d\n", earliest_wake_up_tick);
+			thread_unblock(list_entry(list_begin(&sleep_list), struct thread, elem));
 			list_pop_front(&sleep_list);
-			thread_unblock(thread);
 			earliest_wake_up_tick = list_entry(list_begin(&sleep_list), struct thread, elem) -> alarm;
 		}
 
