@@ -9,7 +9,7 @@ Booting from Hard Disk..Kernel command line: -q run alarm-multiple
 Pintos booting with: 
 	base_mem: 0x0 ~ 0x100000 (Usable: 704 kB)
 	ext_mem: 0x100000 ~ 0x100000000 (Usable: 261,376 kB)
-Calibrating timer...  65,433,600 loops/s.
+Calibrating timer...  107,929,600 loops/s.
 Boot complete.
 Executing 'alarm-multiple':
 (alarm-multiple) begin
@@ -24,6 +24,6 @@ Call stack: 0x800420e35d 0x80042107b5 0x8004210b7b 0x80042106a9 0x8004206036 0x8
 The `backtrace' program can make call stacks useful.
 Read "Backtraces" in the "Debugging Tools" chapter
 of the Pintos documentation for more information.
-Timer: 26 ticks
-Thread: 0 idle ticks, 26 kernel ticks, 0 user ticks
+Timer: 29 ticks
+Thread: 0 idle ticks, 29 kernel ticks, 0 user ticks
 Console: 1
