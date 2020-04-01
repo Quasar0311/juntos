@@ -2,7 +2,8 @@
 
 
 iPXE (http://ipxe.org) 00:03.0 C980 PCI2.10 PnP PMM+0FF915A0+0FEF15A0 C980
-Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
+Press Ctrl-B to configure iPXE (PCI 00:03.0)...
+                                                                               
 
 
 Booting from Hard Disk..Kernel command line: -q run alarm-priority
