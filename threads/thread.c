@@ -34,6 +34,10 @@ int load_avg;
    that are ready to run but not actually running. */
 static struct list ready_list;
 
+static struct list sleep_list;
+
+static int64_t earliest_wake_up_tick = INT64_MAX;
+
 /*** list of all processes, proceeses are added to this list
 when they are first scheduled and removed when they exit ***/
 static struct list all_list;
@@ -89,6 +93,63 @@ static tid_t allocate_tid (void);
 // setup temporal gdt first.
 static uint64_t gdt[3] = { 0, 0x00af9a000000ffff, 0x00cf92000000ffff };
 
+/*** list_less_func parameter in list_insert_ordered() function. ***/
+static bool timer_comparator (const struct list_elem *x, 
+const struct list_elem *y, void *aux UNUSED) {
+	return list_entry(x, struct thread, elem) -> alarm <= 
+			list_entry(y, struct thread, elem) -> alarm;
+}
+
+/*** Sleep thread : save interrupt history -> update wake-up time 
+	 -> put into sleep_list -> block until unblock() called ->
+	 	restore interrupt history ***/
+void
+thread_sleep (int64_t ticks) {
+	
+	struct thread *sleeper = thread_current();
+	enum intr_level old_level;
+	old_level = intr_disable();
+
+	sleeper -> alarm = ticks;
+	earliest_time(sleeper -> alarm);
+	list_insert_ordered(&sleep_list, &sleeper -> elem, timer_comparator, NULL);
+	thread_block();
+	
+	intr_set_level(old_level);
+}
+
+/*** Waking up sleeping thread. ***/
+void
+thread_wakeup (int64_t ticks) {
+	
+	if (list_empty(&sleep_list)) {
+		earliest_wake_up_tick = INT64_MAX;
+		//return;
+	}
+	else {
+		/*** Wake up every threads which have to wake up using while loop. ***/
+		while (ticks >= earliest_wake_up_tick) {
+			if (list_empty(&sleep_list)) {
+				return;
+			}
+			struct thread *thread = list_entry(list_begin(&sleep_list), struct thread, elem);
+			list_pop_front(&sleep_list);
+			thread_unblock(thread);
+			earliest_wake_up_tick = list_entry(list_begin(&sleep_list), struct thread, elem) -> alarm;
+		}
+
+	}
+	
+}
+
+/*** update the tick of earliest thread to wake up. ***/
+void
+earliest_time (int64_t ticks) {
+	if (earliest_wake_up_tick > ticks) {
+		earliest_wake_up_tick = ticks;
+	}
+}
+
 /* Initializes the threading system by transforming the code
    that's currently running into a thread.  This can't work in
    general and it is possible in this case only because loader.S
@@ -120,6 +181,9 @@ thread_init (void) {
 	list_init (&ready_list);
 	list_init (&destruction_req);
 	list_init(&all_list);
+
+	/*** Init the sleep_list (timer_sleep()).***/
+	list_init (&sleep_list);
 
 	/* Set up a thread structure for the running thread. */
 	initial_thread = running_thread ();
@@ -220,13 +284,13 @@ thread_create (const char *name, int priority,
 	/* Add to run queue. */
 	thread_unblock (t);
 
+	list_insert_ordered(&all_list, &t->all_elem, priority_less_func, NULL);
+
 	/*** if new thread's priority is higher than current thread's priority, 
 	yield CPU ***/
 	if(priority>thread_get_priority()){
 		thread_yield();
 	}
-
-	list_insert_ordered(&all_list, &t->elem, priority_less_func, NULL);
 
 	return tid;
 }
@@ -311,9 +375,6 @@ void
 thread_exit (void) {
 	ASSERT (!intr_context ());
 
-	list_sort(&all_list, priority_less_func, NULL);
-	list_pop_front(&all_list);
-
 #ifdef USERPROG
 	process_cleanup ();
 #endif
@@ -321,6 +382,7 @@ thread_exit (void) {
 	/* Just set our status to dying and schedule another process.
 	   We will be destroyed during the call to schedule_tail(). */
 	intr_disable ();
+	if(!list_empty(&all_list)) list_remove(&thread_current() -> all_elem);
 	do_schedule (THREAD_DYING);
 	NOT_REACHED ();
 }
@@ -360,6 +422,7 @@ cmp_max_priority(void){
 	if(list_empty(&ready_list)) return;
 
 	if(list_entry(list_max(&ready_list, priority_less_func, NULL), struct thread, elem)->priority
+	//if(list_entry(list_front(&ready_list), struct thread, elem)->priority
 	> thread_get_priority())
 		thread_yield();
 }
