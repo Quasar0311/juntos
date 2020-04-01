@@ -1,12 +1,10 @@
 FAIL
-Kernel panic in run: PANIC at ../../lib/kernel/list.c:270 in list_front(): assertion `!list_empty (list)' failed.
-Call stack: 0x800420e30c 0x800420eb51 0x800420eb6b 0x800420a9e6 0x800420aa91 0x800420792f 0x8004207afb 0x8004206436
+Kernel panic in run: PANIC at ../../threads/thread.c:301 in thread_unblock(): assertion `is_thread (t)' failed.
+Call stack: 0x800420e2e2 0x8004206a72 0x8004206b2a 0x8004207a8f 0x8004207c5b 0x8004207152
 Translation of call stack:
-0x000000800420e30c: debug_panic (lib/kernel/debug.c:32)
-0x000000800420eb51: list_front (lib/kernel/list.c:271)
-0x000000800420eb6b: list_pop_front (lib/kernel/list.c:252)
-0x000000800420a9e6: timer_wakeup (devices/timer.c:133)
-0x000000800420aa91: timer_interrupt (devices/timer.c:182)
-0x000000800420792f: intr_handler (threads/interrupt.c:352)
-0x0000008004207afb: intr_entry (threads/intr-stubs.o:?)
-0x0000008004206436: main (threads/init.c:111)
+0x000000800420e2e2: debug_panic (lib/kernel/debug.c:23)
+0x0000008004206a72: thread_unblock (threads/thread.c:318)
+0x0000008004206b2a: thread_wakeup (threads/thread.c:136)
+0x0000008004207a8f: intr_handler (threads/interrupt.c:340)
+0x0000008004207c5b: pic_end_of_interrupt (threads/interrupt.c:316)
+0x0000008004207152: thread_exit (threads/thread.c:357 (discriminator 1))

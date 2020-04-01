@@ -1,3 +1,24 @@
+<<<<<<< HEAD
+<<<<<<< HEAD
+WARNING: Image format was not specified for '/tmp/tmp15cynvdi.dsk' and probing guessed raw.
+=======
 WARNING: Image format was not specified for '/tmp/tmp02x3zfa9.dsk' and probing guessed raw.
+>>>>>>> 5222d5cfd04680765785f2a736f661533a4d8c6e
          Automatically detecting the format is dangerous for raw images, write operations on block 0 will be restricted.
          Specify the 'raw' format explicitly to remove the restrictions.
+=======
+Traceback (most recent call last):
+  File "/home/team25/juntos/utils/pintos", line 139, in <module>
+    import argparse
+  File "/usr/lib/python3.5/argparse.py", line 94, in <module>
+    from gettext import gettext as _, ngettext
+  File "/usr/lib/python3.5/gettext.py", line 49, in <module>
+    import locale, copy, io, os, re, struct, sys
+  File "<frozen importlib._bootstrap>", line 969, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 958, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 673, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 661, in exec_module
+  File "<frozen importlib._bootstrap_external>", line 765, in get_code
+  File "<frozen importlib._bootstrap_external>", line 476, in _compile_bytecode
+KeyboardInterrupt
+>>>>>>> 5aa83c8be049c0f90ebf08053c271604118dfe44
