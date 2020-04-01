@@ -91,6 +91,7 @@ struct thread {
 	/*** Save initial priority for donation. ***/
 	int init_priority;
 	struct list donations;
+	struct list_elem donation_elem;
 	struct lock *lock_waiting;
 	
 

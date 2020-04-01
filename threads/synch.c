@@ -195,18 +195,18 @@ lock_acquire (struct lock *lock) {
 	ASSERT (!lock_held_by_current_thread (lock));
 
 	struct thread *curr = thread_current();
+	struct list curr_donation = curr -> donations;
 	//msg("current thread : %d\n", curr -> priority);
 	/*** doing!!! ***/
 
 	if (lock -> holder != NULL) {
 		struct thread *hold = lock -> holder;
 		struct list hold_donation = hold -> donations;
-		//msg("holder prior : %d\n", hold -> priority);
-		//msg("current thread : %d\n", curr -> priority);
 		thread_current() -> lock_waiting = lock;
 		//list_insert_ordered(&hold_donation, &curr -> elem, donation_comparator, NULL);
-		list_push_back(&hold_donation, &curr -> elem);
-		//msg("inserted! : %d\n", list_entry(list_front(&hold_donation), struct thread, elem) -> priority);
+		list_push_front(&curr_donation, &hold -> donation_elem);
+		//msg("pri : %d\n", curr -> priority);
+		// msg("inserted! : %d\n", list_entry(list_front(&hold_donation), struct thread, donation_elem) -> priority);
 		priority_donation(lock);
 	}
 
@@ -250,12 +250,12 @@ lock_release (struct lock *lock) {
 	enum intr_level old_level;
 	old_level = intr_disable();
 
-	//printf("release curr pri : %d\n", curr -> priority);
+	printf("release curr pri : %d\n", curr -> priority);
 	/*** priority donation ***/
 	//printf("curr pri :%d\n", thread_get_priority());
 	restore_priority();
 	//thread_set_priority(curr -> init_priority);
-	//remove_lock(lock);
+	remove_lock(lock);
 	lock -> holder = NULL;
 	sema_up (&lock->semaphore);
 	// msg("released\n");

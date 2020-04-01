@@ -34,9 +34,11 @@ test_priority_donate_one (void)
   thread_create ("acquire1", PRI_DEFAULT + 1, acquire1_thread_func, &lock);
   msg ("This thread should have priority %d.  Actual priority: %d.",
        PRI_DEFAULT + 1, thread_get_priority ());
+  //msg("list : %d\n", list_entry(list_front(&thread_current()->donations), struct thread, donation_elem));
   thread_create ("acquire2", PRI_DEFAULT + 2, acquire2_thread_func, &lock);
   msg ("This thread should have priority %d.  Actual priority: %d.",
        PRI_DEFAULT + 2, thread_get_priority ());
+  //msg("list2 : %d\n", list_entry(list_front(&thread_current()->donations), struct thread, donation_elem));
   lock_release (&lock);
   msg ("acquire2, acquire1 must already have finished, in that order.");
   msg ("This should be the last line before finishing this test.");

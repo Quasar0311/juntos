@@ -360,10 +360,10 @@ cmp_donation_priority (void) {
 	}
 	// msg("donation prior : %d\n", list_entry(list_back(&donation), struct thread, elem) -> priority);
 	// msg("current pri : %d\n", thread_get_priority());
-	if (list_entry(list_front(&donation), struct thread, elem) -> priority
-	 > thread_get_priority()) {
-		 thread_yield();
-	 }
+	// if (list_entry(list_front(&donation), struct thread, elem) -> priority
+	//  > thread_get_priority()) {
+	// 	 thread_yield();
+	//  }
 	 thread_yield();
 }
 
@@ -372,7 +372,9 @@ void
 priority_donation (struct lock *lock) {
 	struct thread *curr = thread_current();
 	struct thread *holder = lock -> holder;
-
+	struct list curr_donation = curr -> donations;
+	//msg("curr pr : %d\n", holder -> priority);
+	msg("inserted! : %d\n", list_entry(list_front(&curr_donation), struct thread, donation_elem) -> priority);
 	//msg("holder priority : %d\n", holder -> init_priority);
 	if (holder -> priority < curr -> priority) {
 		holder -> priority = curr -> priority;
@@ -393,52 +395,27 @@ priority_donation (struct lock *lock) {
 void
 remove_lock (struct lock *lock) {
 	struct thread *curr = thread_current();
+	struct list curr_donation = curr -> donations;
 	struct list_elem *e;
-	struct list donation = curr -> donations;
-	struct list new_donation;
 
-	list_init(&new_donation);
-	//msg("holder priority : %d\n", curr -> init_priority);
-	/*** Iterate through donation list. We have to pop out 
-	thread which lock is just released. ***/
-	for (e = list_begin(&donation); e != list_end(&donation); e = list_next(e)) {
-		//printf("iterating...\n");
-		if (list_entry(e, struct thread, elem) -> lock_waiting == lock) {
-			continue;
-		}
-		else {
-			list_push_front(&new_donation, e);
-		}
-	}
-	while (!list_empty(&curr -> donations)) {
-		list_pop_front(&curr -> donations);
-	}
-	for (e = list_begin(&new_donation); e != list_end(&new_donation); e = list_next(e)) {
-		list_push_front(&curr -> donations, e);
-	}
+	
 }
 
 void
 restore_priority (void) {
 	struct thread *curr = thread_current();
+	struct list curr_donation = curr -> donations;
+	struct lock *lock = curr -> lock_waiting;
+	struct thread *holder = &lock -> holder;
+	struct list_elem *e;
+
+	//printf("curr pr : %d\n", curr -> priority);
+	if (list_empty(&curr_donation)) {
+		thread_set_priority(curr -> init_priority);
+	}
+
 	
-	struct list donation = curr -> donations;
-	// msg("holder priority : %d\n", curr -> init_priority);
-	// : %d\n", curr -> priority);
-	// curr -> priority = curr -> init_priority;
-	//msg("list pr : %d\n", list_entry(list_begin(&donation), struct thread, elem) -> priority);
-	thread_set_priority(curr -> init_priority);
-	// if (list_empty(&donation)) {
-	// 	msg("hi");
-	// 	return;
-	// }
-	//thread_yield();
-	// if (curr -> priority < list_entry(list_begin(&donation), struct thread, elem) -> priority) {
-	// 	curr -> priority = list_entry(list_begin(&donation), struct thread, elem) -> priority;
-	// }
-	//msg("list pr : %d\n", list_entry(list_begin(&donation), struct thread, elem) -> priority);
-	// msg("current pr : %d\n", curr -> priority);
-	
+
 }
 
 /* Returns the current thread's priority. */
@@ -535,7 +512,7 @@ init_thread (struct thread *t, const char *name, int priority) {
 	/*** Initialization for priority donation ***/
 	t -> init_priority = priority;
 	t -> lock_waiting = NULL;
-	list_init(&(t -> donations));
+	list_init(&t -> donations);
 	// lock_init((t -> lock_waiting));
 	
 
