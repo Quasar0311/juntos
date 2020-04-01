@@ -1,1 +1,63 @@
+<<<<<<< HEAD
+<<<<<<< HEAD
+FAIL
+Test output failed to match any acceptable form.
+
+Acceptable output:
+  (alarm-simultaneous) begin
+  (alarm-simultaneous) Creating 3 threads to sleep 5 times each.
+  (alarm-simultaneous) Each thread sleeps 10 ticks each time.
+  (alarm-simultaneous) Within an iteration, all threads should wake up on the same tick.
+  (alarm-simultaneous) iteration 0, thread 0: woke up after 10 ticks
+  (alarm-simultaneous) iteration 0, thread 1: woke up 0 ticks later
+  (alarm-simultaneous) iteration 0, thread 2: woke up 0 ticks later
+  (alarm-simultaneous) iteration 1, thread 0: woke up 10 ticks later
+  (alarm-simultaneous) iteration 1, thread 1: woke up 0 ticks later
+  (alarm-simultaneous) iteration 1, thread 2: woke up 0 ticks later
+  (alarm-simultaneous) iteration 2, thread 0: woke up 10 ticks later
+  (alarm-simultaneous) iteration 2, thread 1: woke up 0 ticks later
+  (alarm-simultaneous) iteration 2, thread 2: woke up 0 ticks later
+  (alarm-simultaneous) iteration 3, thread 0: woke up 10 ticks later
+  (alarm-simultaneous) iteration 3, thread 1: woke up 0 ticks later
+  (alarm-simultaneous) iteration 3, thread 2: woke up 0 ticks later
+  (alarm-simultaneous) iteration 4, thread 0: woke up 10 ticks later
+  (alarm-simultaneous) iteration 4, thread 1: woke up 0 ticks later
+  (alarm-simultaneous) iteration 4, thread 2: woke up 0 ticks later
+  (alarm-simultaneous) end
+Differences in `diff -u' format:
+  (alarm-simultaneous) begin
+  (alarm-simultaneous) Creating 3 threads to sleep 5 times each.
+  (alarm-simultaneous) Each thread sleeps 10 ticks each time.
+  (alarm-simultaneous) Within an iteration, all threads should wake up on the same tick.
+- (alarm-simultaneous) iteration 0, thread 0: woke up after 10 ticks
+- (alarm-simultaneous) iteration 0, thread 1: woke up 0 ticks later
+- (alarm-simultaneous) iteration 0, thread 2: woke up 0 ticks later
+- (alarm-simultaneous) iteration 1, thread 0: woke up 10 ticks later
+- (alarm-simultaneous) iteration 1, thread 1: woke up 0 ticks later
+- (alarm-simultaneous) iteration 1, thread 2: woke up 0 ticks later
+- (alarm-simultaneous) iteration 2, thread 0: woke up 10 ticks later
+- (alarm-simultaneous) iteration 2, thread 1: woke up 0 ticks later
+- (alarm-simultaneous) iteration 2, thread 2: woke up 0 ticks later
+- (alarm-simultaneous) iteration 3, thread 0: woke up 10 ticks later
+- (alarm-simultaneous) iteration 3, thread 1: woke up 0 ticks later
+- (alarm-simultaneous) iteration 3, thread 2: woke up 0 ticks later
+- (alarm-simultaneous) iteration 4, thread 0: woke up 10 ticks later
+- (alarm-simultaneous) iteration 4, thread 1: woke up 0 ticks later
+- (alarm-simultaneous) iteration 4, thread 2: woke up 0 ticks later
++ (alarm-simultaneous) iteration 0, thread 0: woke up after 69311760 ticks
+  (alarm-simultaneous) end
+=======
 PASS
+>>>>>>> 5222d5cfd04680765785f2a736f661533a4d8c6e
+=======
+FAIL
+Kernel panic in run: PANIC at ../../threads/thread.c:243 in thread_unblock(): assertion `t->status == THREAD_BLOCKED' failed.
+Call stack: 0x800420e301 0x8004206a3d 0x800420aab4 0x800420792f 0x8004207afb 0x8004206ff2
+Translation of call stack:
+0x000000800420e301: debug_panic (lib/kernel/debug.c:32)
+0x0000008004206a3d: thread_unblock (threads/thread.c:244)
+0x000000800420aab4: timer_interrupt (devices/timer.c:191)
+0x000000800420792f: intr_handler (threads/interrupt.c:352)
+0x0000008004207afb: intr_entry (threads/intr-stubs.o:?)
+0x0000008004206ff2: kernel_thread (threads/thread.c:395)
+>>>>>>> 5aa83c8be049c0f90ebf08053c271604118dfe44
