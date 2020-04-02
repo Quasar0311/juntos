@@ -109,7 +109,8 @@ void
 timer_sleep (int64_t ticks) {
 	int64_t start = timer_ticks ();
 	ticks = start + ticks;
-<<<<<<< HEAD
+	ASSERT (intr_get_level () == INTR_ON);
+
 	/*** alarm-clock ***/
 	thread_sleep(ticks);
 }

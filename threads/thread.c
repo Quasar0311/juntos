@@ -93,18 +93,18 @@ static uint64_t gdt[3] = { 0, 0x00af9a000000ffff, 0x00cf92000000ffff };
 /*** list_less_func parameter in list_insert_ordered() function. ***/
 static bool timer_comparator (const struct list_elem *x, 
 const struct list_elem *y, void *aux UNUSED) {
-	return list_entry(x, struct thread, elem) -> alarm > 
+	return list_entry(x, struct thread, elem) -> alarm <= 
 			list_entry(y, struct thread, elem) -> alarm;
 }
 
 
+/*** Sleep thread : save interrupt history -> update wake-up time 
+	 -> put into sleep_list -> block until unblock() called ->
+	 	restore interrupt history ***/
 void
 thread_sleep (int64_t ticks) {
 	
 	struct thread *sleeper = thread_current();
-	if (sleeper != idle_thread) {
-		return;
-	}
 	enum intr_level old_level;
 	old_level = intr_disable();
 
@@ -125,12 +125,14 @@ thread_wakeup (int64_t ticks) {
 		return;
 	}
 	else {
+		/*** Wake up every threads which have to wake up using while loop. ***/
 		while (ticks >= earliest_wake_up_tick) {
 			if (list_empty(&sleep_list)) {
 				return;
 			}
 			struct thread *thread = list_entry(list_begin(&sleep_list), struct thread, elem);
 			list_pop_front(&sleep_list);
+			thread_unblock(thread);
 			earliest_wake_up_tick = list_entry(list_begin(&sleep_list), struct thread, elem) -> alarm;
 		}
 
