@@ -9,11 +9,21 @@ Booting from Hard Disk..Kernel command line: -q run priority-donate-sema
 Pintos booting with: 
 	base_mem: 0x0 ~ 0x100000 (Usable: 704 kB)
 	ext_mem: 0x100000 ~ 0x100000000 (Usable: 261,376 kB)
-Calibrating timer...  Kernel PANIC at ../../lib/kernel/list.c:270 in list_front(): assertion `!list_empty (list)' failed.
-Call stack: 0x800420e30c 0x800420eb51 0x800420eb6b 0x800420a9e6 0x800420aa91 0x800420792f 0x8004207afb 0x8004206436.
-The `backtrace' program can make call stacks useful.
-Read "Backtraces" in the "Debugging Tools" chapter
-of the Pintos documentation for more information.
-Timer: 1 ticks
-Thread: 0 idle ticks, 1 kernel ticks, 0 user ticks
-Console: 
+Calibrating timer...  107,110,400 loops/s.
+Boot complete.
+Executing 'priority-donate-sema':
+(priority-donate-sema) begin
+(priority-donate-sema) Thread L acquired lock.
+(priority-donate-sema) Thread L downed semaphore.
+(priority-donate-sema) Thread H acquired lock.
+(priority-donate-sema) Thread H finished.
+(priority-donate-sema) Thread M finished.
+(priority-donate-sema) Thread L finished.
+(priority-donate-sema) Main thread finished.
+(priority-donate-sema) end
+Execution of 'priority-donate-sema' complete.
+Timer: 30 ticks
+Thread: 0 idle ticks, 30 kernel ticks, 0 user ticks
+Console: 745 characters output
+Keyboard: 0 keys pressed
+Powering off...

@@ -89,6 +89,12 @@ struct thread {
 	int priority;                       /* Priority. */
 	int64_t alarm;						/* Used for alarm ticks. */
 
+	int init_priority;
+	//int priority_saver;
+	struct list donations;
+	struct list_elem donation_elem;
+	struct lock *lock_waiting;
+
 	/* Shared between thread.c and synch.c. */
 	struct list_elem elem;              /* List element. */
 
@@ -125,6 +131,9 @@ tid_t thread_create (const char *name, int priority, thread_func *, void *);
 void thread_block (void);
 void thread_unblock (struct thread *);
 
+/*** compares the priority of two threads A and B ***/
+bool priority_less_func(const struct list_elem *a, const struct list_elem *b, void *aux UNUSED);
+
 struct thread *thread_current (void);
 tid_t thread_tid (void);
 const char *thread_name (void);
@@ -134,6 +143,16 @@ void thread_yield (void);
 
 int thread_get_priority (void);
 void thread_set_priority (int);
+
+/*** scheduling by comparing current thread's priority 
+and highest thread's priority ***/
+void cmp_max_priority(void);
+void cmp_donation_priority (void);
+
+/*** priority donation function. ***/
+void priority_donation (struct lock *lock);
+void remove_lock (struct lock *lock);
+void restore_priority (void);
 
 int thread_get_nice (void);
 void thread_set_nice (int);

@@ -66,7 +66,8 @@ sema_down (struct semaphore *sema) {
 
 	old_level = intr_disable ();
 	while (sema->value == 0) {
-		list_push_back (&sema->waiters, &thread_current ()->elem);
+		/*** operation on waiters list with priority ordered threads ***/
+		list_insert_ordered(&sema->waiters, &thread_current()->elem, priority_less_func, NULL);
 		thread_block ();
 	}
 	sema->value--;
@@ -109,11 +110,20 @@ sema_up (struct semaphore *sema) {
 	ASSERT (sema != NULL);
 
 	old_level = intr_disable ();
-	if (!list_empty (&sema->waiters))
+	if (!list_empty (&sema->waiters)){
+		/*** considering priority change while thread in the waiters list,
+		 * sort the waiters list as a priority ***/
+		list_sort(&sema->waiters, priority_less_func, NULL);
 		thread_unblock (list_entry (list_pop_front (&sema->waiters),
 					struct thread, elem));
+	}
 	sema->value++;
+
+	/*** priority preemption ***/
+	cmp_max_priority();
+	//thread_yield();
 	intr_set_level (old_level);
+	
 }
 
 static void sema_test_helper (void *sema_);
@@ -188,8 +198,23 @@ lock_acquire (struct lock *lock) {
 	ASSERT (!intr_context ());
 	ASSERT (!lock_held_by_current_thread (lock));
 
+	struct thread *curr = thread_current();
+	struct list curr_donation = curr -> donations;
+	//msg("current thread : %d\n", curr -> priority);
+	/*** doing!!! ***/
+
+	if (lock -> holder != NULL) {
+		struct thread *hold = lock -> holder;
+		thread_current() -> lock_waiting = lock;
+		list_push_front(&hold -> donations, &curr -> donation_elem);
+		priority_donation(lock);
+	}
+
 	sema_down (&lock->semaphore);
 	lock->holder = thread_current ();
+	//msg("holder pr : %d\n", thread_current() -> priority);
+
+	thread_current() -> lock_waiting = NULL;
 }
 
 /* Tries to acquires LOCK and returns true if successful or false
@@ -222,8 +247,23 @@ lock_release (struct lock *lock) {
 	ASSERT (lock != NULL);
 	ASSERT (lock_held_by_current_thread (lock));
 
+	struct thread *curr = thread_current();
+	enum intr_level old_level;
+	old_level = intr_disable();
+
+	//printf("release curr pri : %d\n", curr -> priority);
+	/*** priority donation ***/
+	//printf("curr pri :%d\n", thread_get_priority());
+	remove_lock(lock);
+	
+	//thread_set_priority(curr -> init_priority);
+
 	lock->holder = NULL;
 	sema_up (&lock->semaphore);
+	
+	restore_priority();
+
+	intr_set_level(old_level);
 }
 
 /* Returns true if the current thread holds LOCK, false
