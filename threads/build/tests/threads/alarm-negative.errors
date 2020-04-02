@@ -1,3 +1,15 @@
+<<<<<<< HEAD
 WARNING: Image format was not specified for '/tmp/tmps4zbbwia.dsk' and probing guessed raw.
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+WARNING: Image format was not specified for '/tmp/tmpuvdhyvb2.dsk' and probing guessed raw.
+=======
+WARNING: Image format was not specified for '/tmp/tmp6zvmiily.dsk' and probing guessed raw.
+>>>>>>> 5222d5cfd04680765785f2a736f661533a4d8c6e
+=======
+WARNING: Image format was not specified for '/tmp/tmp3dy7tif3.dsk' and probing guessed raw.
+>>>>>>> 5aa83c8be049c0f90ebf08053c271604118dfe44
+>>>>>>> b98f93f42d6b7e87f667c864f7274793fc79f558
          Automatically detecting the format is dangerous for raw images, write operations on block 0 will be restricted.
          Specify the 'raw' format explicitly to remove the restrictions.

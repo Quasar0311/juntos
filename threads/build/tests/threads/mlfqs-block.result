@@ -1,0 +1,10 @@
+FAIL
+Kernel panic in run: PANIC at ../../threads/thread.c:301 in thread_unblock(): assertion `is_thread (t)' failed.
+Call stack: 0x800420e2e2 0x8004206a72 0x8004206b2a 0x8004207a8f 0x8004207c5b 0x8004207152
+Translation of call stack:
+0x000000800420e2e2: debug_panic (lib/kernel/debug.c:23)
+0x0000008004206a72: thread_unblock (threads/thread.c:318)
+0x0000008004206b2a: thread_wakeup (threads/thread.c:136)
+0x0000008004207a8f: intr_handler (threads/interrupt.c:340)
+0x0000008004207c5b: pic_end_of_interrupt (threads/interrupt.c:316)
+0x0000008004207152: thread_exit (threads/thread.c:357 (discriminator 1))

@@ -10,6 +10,7 @@ Kernel command line: -q run priority-donate-lower
 Pintos booting with: 
 	base_mem: 0x0 ~ 0x100000 (Usable: 704 kB)
 	ext_mem: 0x100000 ~ 0x100000000 (Usable: 261,376 kB)
+<<<<<<< HEAD
 Calibrating timer...  107,929,600 loops/s.
 Boot complete.
 Executing 'priority-donate-lower':
@@ -22,10 +23,25 @@ Executing 'priority-donate-lower':
 (priority-donate-lower) acquire: done
 (priority-donate-lower) acquire must already have finished.
 (priority-donate-lower) Main thread should have priority 21.  Actual priority: 31.
+=======
+Calibrating timer...  107,520,000 loops/s.
+Boot complete.
+Executing 'priority-donate-lower':
+(priority-donate-lower) begin
+(priority-donate-lower) Main thread should have priority 41.  Actual priority: 31.
+(priority-donate-lower) Lowering base priority...
+(priority-donate-lower) Main thread should have priority 41.  Actual priority: 21.
+(priority-donate-lower) acquire must already have finished.
+(priority-donate-lower) Main thread should have priority 21.  Actual priority: 21.
+>>>>>>> b98f93f42d6b7e87f667c864f7274793fc79f558
 (priority-donate-lower) end
 Execution of 'priority-donate-lower' complete.
 Timer: 30 ticks
 Thread: 0 idle ticks, 30 kernel ticks, 0 user ticks
+<<<<<<< HEAD
 Console: 911 characters output
+=======
+Console: 794 characters output
+>>>>>>> b98f93f42d6b7e87f667c864f7274793fc79f558
 Keyboard: 0 keys pressed
 Powering off...
