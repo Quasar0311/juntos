@@ -107,64 +107,13 @@ timer_elapsed (int64_t then) {
 /* Suspends execution for approximately TICKS timer ticks. */
 void
 timer_sleep (int64_t ticks) {
-	// int64_t start = timer_ticks ();
-	// struct thread *sleeper = thread_current();
-	// enum intr_level old_level;
-	// old_level = intr_disable();
-
-	// if (sleeper == idle_thread) {
-	// 	return;
-	// }
-
-	// if (start + ticks <= 0) {
-	// 	return;
-	// }
-
-	// sleeper -> alarm = start + ticks;
-	// earliest_time(sleeper -> alarm);
-
-	// printf("inserted : %d and", sleeper -> alarm);
-	// list_insert_ordered(&sleep_list, &sleeper -> elem, timer_comparator, NULL);
-	
-	
-	// printf("blocked\n");
-	// thread_block();
-	// printf("hi\n");
-	
-	// intr_set_level(old_level);
 	int64_t start = timer_ticks ();
 	ticks = start + ticks;
 <<<<<<< HEAD
 	/*** alarm-clock ***/
-=======
->>>>>>> b98f93f42d6b7e87f667c864f7274793fc79f558
 	thread_sleep(ticks);
 }
 
-// /*** Waking up sleeping thread. ***/
-// void
-// timer_wakeup (void) {
-	
-// 	if (list_empty(&sleep_list)) {
-// 		earliest_wake_up_tick = INT64_MAX;
-// 	}
-// 	else {
-// 		printf("%d\n", earliest_wake_up_tick);
-// 		thread_unblock(list_entry(list_begin(&sleep_list), struct thread, elem));
-// 		list_pop_front(&sleep_list);
-// 		earliest_wake_up_tick = list_entry(list_begin(&sleep_list), struct thread, elem) -> alarm;
-// 	}
-	
-// }
-
-
-// /*** update the tick of earliest thread to wake up. ***/
-// void
-// earliest_time (int64_t ticks) {
-// 	if (earliest_wake_up_tick > ticks) {
-// 		earliest_wake_up_tick = ticks;
-// 	}
-// }
 
 /* Suspends execution for approximately MS milliseconds. */
 void

@@ -108,22 +108,10 @@ thread_sleep (int64_t ticks) {
 	enum intr_level old_level;
 	old_level = intr_disable();
 
-	ASSERT(thread_current() != idle_thread);
-
-	if (ticks <= 0) {
-		return;
-	}
-
 	sleeper -> alarm = ticks;
 	earliest_time(sleeper -> alarm);
-
-	printf("inserted : %d and", sleeper -> alarm);
 	list_insert_ordered(&sleep_list, &sleeper -> elem, timer_comparator, NULL);
-	
-	
-	printf("blocked\n");
 	thread_block();
-	printf("hi\n");
 	
 	intr_set_level(old_level);
 }
@@ -138,15 +126,10 @@ thread_wakeup (int64_t ticks) {
 	}
 	else {
 		while (ticks >= earliest_wake_up_tick) {
-<<<<<<< HEAD
 			if (list_empty(&sleep_list)) {
 				return;
 			}
 			struct thread *thread = list_entry(list_begin(&sleep_list), struct thread, elem);
-=======
-			printf("%d\n", earliest_wake_up_tick);
-			thread_unblock(list_entry(list_begin(&sleep_list), struct thread, elem));
->>>>>>> b98f93f42d6b7e87f667c864f7274793fc79f558
 			list_pop_front(&sleep_list);
 			earliest_wake_up_tick = list_entry(list_begin(&sleep_list), struct thread, elem) -> alarm;
 		}
@@ -154,7 +137,6 @@ thread_wakeup (int64_t ticks) {
 	}
 	
 }
-
 
 /*** update the tick of earliest thread to wake up. ***/
 void

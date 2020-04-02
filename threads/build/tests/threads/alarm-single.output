@@ -9,15 +9,7 @@ Booting from Hard Disk..Kernel command line: -q run alarm-single
 Pintos booting with: 
 	base_mem: 0x0 ~ 0x100000 (Usable: 704 kB)
 	ext_mem: 0x100000 ~ 0x100000000 (Usable: 261,376 kB)
-<<<<<<< HEAD
-<<<<<<< HEAD
-Calibrating timer...  117,760,000 loops/s.
-=======
-Calibrating timer...  104,755,200 loops/s.
->>>>>>> 5222d5cfd04680765785f2a736f661533a4d8c6e
-=======
-Calibrating timer...  106,291,200 loops/s.
->>>>>>> 5aa83c8be049c0f90ebf08053c271604118dfe44
+Calibrating timer...  104,857,600 loops/s.
 Boot complete.
 Executing 'alarm-single':
 (alarm-single) begin
@@ -26,39 +18,14 @@ Executing 'alarm-single':
 (alarm-single) thread 1 sleeps 20 ticks each time, and so on.
 (alarm-single) If successful, product of iteration count and
 (alarm-single) sleep duration will appear in nondescending order.
-<<<<<<< HEAD
 (alarm-single) thread 0: duration=10, iteration=1, product=10
 (alarm-single) thread 1: duration=20, iteration=1, product=20
-(alarm-single) thread 2: duration=30, iteration=1, product=30
-(alarm-single) thread 3: duration=40, iteration=1, product=40
-(alarm-single) thread 4: duration=50, iteration=1, product=50
-(alarm-single) end
-Execution of 'alarm-single' complete.
-Timer: 275 ticks
-Thread: 250 idle ticks, 25 kernel ticks, 0 user ticks
-Console: 1000 characters output
-Keyboard: 0 keys pressed
-Powering off...
-=======
-(alarm-single) FAIL: thread 0 woke up 0 times instead of 1
+(alarm-single) FAIL: thread 2 woke up 0 times instead of 1
 Kernel PANIC at ../../tests/threads/tests.c:93 in fail(): test failed
-Call stack: 0x800420e35d 0x80042107b5 0x8004210b7b 0x80042106a9 0x8004206036 0x8004206474.
+Call stack: 0x800420e6ce 0x8004210b26 0x8004210eec 0x8004210a1a 0x8004206036 0x8004206474.
 The `backtrace' program can make call stacks useful.
 Read "Backtraces" in the "Debugging Tools" chapter
 of the Pintos documentation for more information.
-<<<<<<< HEAD
-<<<<<<< HEAD
-Timer: 26 ticks
-Thread: 0 idle ticks, 26 kernel ticks, 0 user ticks
+Timer: 32 ticks
+Thread: 0 idle ticks, 32 kernel ticks, 0 user ticks
 Console: 1
-=======
-Timer: 141 ticks
-Thread: 119 idle ticks, 22 kernel ticks, 0 user ticks
-Console: 
->>>>>>> 5222d5cfd04680765785f2a736f661533a4d8c6e
-=======
-Timer: 29 ticks
-Thread: 0 idle ticks, 29 kernel ticks, 0 user ticks
-Console: 1
->>>>>>> 5aa83c8be049c0f90ebf08053c271604118dfe44
->>>>>>> b98f93f42d6b7e87f667c864f7274793fc79f558
