@@ -142,7 +142,7 @@ timer_interrupt (struct intr_frame *args UNUSED) {
 			mlfqs_load_avg();
 			mlfqs_all();
 		}
-		if(ticks%4==1) mlfqs_priority(thread_current());
+		if(ticks%4==0) mlfqs_priority(thread_current());
 	}
 	intr_set_level(old_level);
 

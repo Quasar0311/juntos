@@ -128,10 +128,15 @@ sema_up (struct semaphore *sema) {
 	sema->value++;
 
 	/*** priority preemption ***/
-	if (unblocked_pr > thread_current() -> priority) {
-		thread_yield();
+	if (thread_mlfqs == false) {
+		if (unblocked_pr > thread_current() -> priority) {
+			thread_yield();
+		}
 	}
-	//cmp_max_priority();
+	else {
+		cmp_max_priority();
+	}
+	
 
 	intr_set_level (old_level);
 }
@@ -255,7 +260,6 @@ lock_release (struct lock *lock) {
 
 	enum intr_level old_level;
 	old_level = intr_disable();
-	struct thread *curr = thread_current();
 
 	if (thread_mlfqs == false) {
 		remove_lock(lock);
