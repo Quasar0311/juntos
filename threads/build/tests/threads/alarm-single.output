@@ -18,6 +18,7 @@ Executing 'alarm-single':
 (alarm-single) thread 1 sleeps 20 ticks each time, and so on.
 (alarm-single) If successful, product of iteration count and
 (alarm-single) sleep duration will appear in nondescending order.
+<<<<<<< HEAD
 (alarm-single) thread 0: duration=10, iteration=1, product=10
 (alarm-single) thread 1: duration=20, iteration=1, product=20
 (alarm-single) thread 2: duration=30, iteration=1, product=30
@@ -30,3 +31,13 @@ Thread: 250 idle ticks, 24 kernel ticks, 0 user ticks
 Console: 1000 characters output
 Keyboard: 0 keys pressed
 Powering off...
+=======
+Kernel PANIC at ../../threads/thread.c:304 in thread_unblock(): assertion `t->status == THREAD_BLOCKED' failed.
+Call stack: 0x800420e2e2 0x8004206a72 0x8004206b2a 0x8004207a8f 0x8004207c5b 0x8004207152.
+The `backtrace' program can make call stacks useful.
+Read "Backtraces" in the "Debugging Tools" chapter
+of the Pintos documentation for more information.
+Timer: 141 ticks
+Thread: 119 idle ticks, 22 kernel ticks, 0 user ticks
+Console: 
+>>>>>>> 5222d5cfd04680765785f2a736f661533a4d8c6e

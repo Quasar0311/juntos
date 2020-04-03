@@ -87,6 +87,7 @@ struct thread {
 	enum thread_status status;          /* Thread state. */
 	char name[16];                      /* Name (for debugging purposes). */
 	int priority;                       /* Priority. */
+	int64_t alarm;						/* Used for alarm ticks. */
 
 	int64_t alarm;						/*** Used for alarm ticks. ***/
 

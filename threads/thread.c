@@ -139,6 +139,17 @@ thread_wakeup (int64_t ticks) {
 }
 
 
+<<<<<<< HEAD
+=======
+/*** update the tick of earliest thread to wake up. ***/
+void
+earliest_time (int64_t ticks) {
+	if (earliest_wake_up_tick > ticks) {
+		earliest_wake_up_tick = ticks;
+	}
+}
+
+>>>>>>> 5222d5cfd04680765785f2a736f661533a4d8c6e
 /* Initializes the threading system by transforming the code
    that's currently running into a thread.  This can't work in
    general and it is possible in this case only because loader.S
@@ -172,6 +183,9 @@ thread_init (void) {
 	list_init(&all_list);
 
 	/*** Init the sleep_list (timer_sleep()).***/
+	list_init (&sleep_list);
+
+	/* Init the sleep_list (timer_sleep()). */
 	list_init (&sleep_list);
 
 	/* Set up a thread structure for the running thread. */

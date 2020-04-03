@@ -17,6 +17,12 @@
 #error TIMER_FREQ <= 1000 recommended
 #endif
 
+/*** List of processes which are sleeping. About timer_sleep()
+   function. ***/
+// extern struct list sleep_list;
+
+// extern int64_t earliest_wake_up_tick = INT64_MAX;
+
 /* Number of timer ticks since OS booted. */
 static int64_t ticks;
 
@@ -41,6 +47,9 @@ timer_init (void) {
 	outb (0x43, 0x34);    /* CW: counter 0, LSB then MSB, mode 2, binary. */
 	outb (0x40, count & 0xff);
 	outb (0x40, count >> 8);
+
+	// /* Init the sleep_list (timer_sleep()). */
+	// list_init (&sleep_list);
 
 	intr_register_ext (0x20, timer_interrupt, "8254 Timer");
 }
@@ -86,6 +95,7 @@ int64_t
 timer_elapsed (int64_t then) {
 	return timer_ticks () - then;
 }
+
 
 /* Suspends execution for approximately TICKS timer ticks. */
 void

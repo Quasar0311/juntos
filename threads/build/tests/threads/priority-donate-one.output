@@ -13,18 +13,27 @@ Calibrating timer...  104,857,600 loops/s.
 Boot complete.
 Executing 'priority-donate-one':
 (priority-donate-one) begin
+<<<<<<< HEAD
 (priority-donate-one) This thread should have priority 32.  Actual priority: 32.
 (priority-donate-one) This thread should have priority 33.  Actual priority: 33.
 (priority-donate-one) acquire2: got the lock
 (priority-donate-one) acquire2: done
 (priority-donate-one) acquire1: got the lock
 (priority-donate-one) acquire1: done
+=======
+(priority-donate-one) This thread should have priority 32.  Actual priority: 31.
+(priority-donate-one) This thread should have priority 33.  Actual priority: 31.
+>>>>>>> 5222d5cfd04680765785f2a736f661533a4d8c6e
 (priority-donate-one) acquire2, acquire1 must already have finished, in that order.
 (priority-donate-one) This should be the last line before finishing this test.
 (priority-donate-one) end
 Execution of 'priority-donate-one' complete.
 Timer: 33 ticks
 Thread: 0 idle ticks, 33 kernel ticks, 0 user ticks
+<<<<<<< HEAD
 Console: 914 characters output
+=======
+Console: 750 characters output
+>>>>>>> 5222d5cfd04680765785f2a736f661533a4d8c6e
 Keyboard: 0 keys pressed
 Powering off...

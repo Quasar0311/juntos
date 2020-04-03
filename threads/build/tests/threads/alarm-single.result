@@ -1,1 +1,14 @@
+<<<<<<< HEAD
 PASS
+=======
+FAIL
+Kernel panic in run: PANIC at ../../threads/thread.c:304 in thread_unblock(): assertion `t->status == THREAD_BLOCKED' failed.
+Call stack: 0x800420e2e2 0x8004206a72 0x8004206b2a 0x8004207a8f 0x8004207c5b 0x8004207152
+Translation of call stack:
+0x000000800420e2e2: debug_panic (lib/kernel/debug.c:32)
+0x0000008004206a72: thread_unblock (threads/thread.c:305)
+0x0000008004206b2a: thread_wakeup (threads/thread.c:125)
+0x0000008004207a8f: intr_handler (threads/interrupt.c:352)
+0x0000008004207c5b: intr_entry (threads/intr-stubs.o:?)
+0x0000008004207152: kernel_thread (threads/thread.c:456)
+>>>>>>> 5222d5cfd04680765785f2a736f661533a4d8c6e

@@ -9,6 +9,7 @@ Booting from Hard Disk..Kernel command line: -q run priority-condvar
 Pintos booting with: 
 	base_mem: 0x0 ~ 0x100000 (Usable: 704 kB)
 	ext_mem: 0x100000 ~ 0x100000000 (Usable: 261,376 kB)
+<<<<<<< HEAD
 Calibrating timer...  105,062,400 loops/s.
 Boot complete.
 Executing 'priority-condvar':
@@ -50,3 +51,13 @@ Thread: 0 idle ticks, 43 kernel ticks, 0 user ticks
 Console: 1680 characters output
 Keyboard: 0 keys pressed
 Powering off...
+=======
+Calibrating timer...  Kernel PANIC at ../../lib/kernel/list.c:270 in list_front(): assertion `!list_empty (list)' failed.
+Call stack: 0x800420e30c 0x800420eb51 0x800420eb6b 0x800420a9e6 0x800420aa91 0x800420792f 0x8004207afb 0x8004206436.
+The `backtrace' program can make call stacks useful.
+Read "Backtraces" in the "Debugging Tools" chapter
+of the Pintos documentation for more information.
+Timer: 1 ticks
+Thread: 0 idle ticks, 1 kernel ticks, 0 user ticks
+Console: 
+>>>>>>> 5222d5cfd04680765785f2a736f661533a4d8c6e
