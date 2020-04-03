@@ -90,8 +90,15 @@ struct thread {
 
 	int64_t alarm;						/*** Used for alarm ticks. ***/
 
+	int init_priority;
+	int priority_saver;					/*** Take care about when priority changes while donation.***/
+	struct list donations;
+	struct list_elem donation_elem;
+	struct lock *lock_waiting;
+
 	/* Shared between thread.c and synch.c. */
 	struct list_elem elem;              /* List element. */
+	
 	struct list_elem all_elem;			/*** all_list element ***/
 
 #ifdef USERPROG	
@@ -145,6 +152,11 @@ void thread_set_priority (int);
 and highest thread's priority ***/
 void cmp_max_priority(void);
 
+/*** priority donation function. ***/
+void priority_donation (struct lock *lock);
+void remove_lock (struct lock *lock);
+void restore_priority (void);
+
 int thread_get_nice (void);
 void thread_set_nice (int);
 int thread_get_recent_cpu (void);
@@ -155,7 +167,7 @@ void do_iret (struct intr_frame *tf);
 void mlfqs_priority(struct thread *t);
 void mlfqs_recent_cpu(struct thread *t);
 void mlfqs_load_avg(void);
-void mlfqs_increment(void);
-void mlfqs_recalc(void);
+void mlfqs_incr_cpu(void);
+void mlfqs_all(void);
 
 #endif /* threads/thread.h */

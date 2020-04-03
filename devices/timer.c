@@ -91,15 +91,13 @@ timer_elapsed (int64_t then) {
 void
 timer_sleep (int64_t ticks) {
 	int64_t start = timer_ticks ();
+	// enum intr_level old_level = intr_disable();
 	ASSERT (intr_get_level () == INTR_ON);
 	ticks = start + ticks;
+
 	/*** alarm-clock ***/
 	thread_sleep(ticks);
-	// int64_t start = timer_ticks ();
-
-	// ASSERT (intr_get_level () == INTR_ON);
-	// while (timer_elapsed (start) < ticks)
-	// 	thread_yield ();
+	// intr_set_level(old_level);
 }
 
 /* Suspends execution for approximately MS milliseconds. */
@@ -129,8 +127,24 @@ timer_print_stats (void) {
 /* Timer interrupt handler. */
 static void
 timer_interrupt (struct intr_frame *args UNUSED) {
+	enum intr_level old_level;
 	ticks++;
 	thread_tick ();
+
+	old_level=intr_disable();
+	/*** mlfqs scheduler
+	increment recent_cpu by 1
+	calculate load_avg, all thread's recent_cpu, priority every second
+	calculate current thread's priority every 4 ticks ***/
+	if(thread_mlfqs==true){
+		mlfqs_incr_cpu();
+		if(ticks%TIMER_FREQ==0){
+			mlfqs_load_avg();
+			mlfqs_all();
+		}
+		if(ticks%4==1) mlfqs_priority(thread_current());
+	}
+	intr_set_level(old_level);
 
 	thread_wakeup(ticks);
 }

@@ -5,7 +5,8 @@ iPXE (http://ipxe.org) 00:03.0 C980 PCI2.10 PnP PMM+0FF915A0+0FEF15A0 C980
 Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
 
 
-Booting from Hard Disk..Kernel command line: -q run alarm-priority
+Booting from Hard Disk...
+Kernel command line: -q run alarm-priority
 Pintos booting with: 
 	base_mem: 0x0 ~ 0x100000 (Usable: 704 kB)
 	ext_mem: 0x100000 ~ 0x100000000 (Usable: 261,376 kB)
@@ -26,7 +27,7 @@ Executing 'alarm-priority':
 (alarm-priority) end
 Execution of 'alarm-priority' complete.
 Timer: 530 ticks
-Thread: 489 idle ticks, 42 kernel ticks, 0 user ticks
+Thread: 490 idle ticks, 40 kernel ticks, 0 user ticks
 Console: 853 characters output
 Keyboard: 0 keys pressed
 Powering off...
