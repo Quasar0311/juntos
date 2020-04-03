@@ -123,7 +123,6 @@ extern bool thread_mlfqs;
 /*** Prototype for alarm functions. ***/
 void thread_sleep (int64_t ticks);
 void thread_wakeup (int64_t ticks);
-void earliest_time (int64_t ticks);
 
 void thread_init (void);
 void thread_start (void);

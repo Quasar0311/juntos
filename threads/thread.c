@@ -36,7 +36,6 @@ static struct list ready_list;
 
 static struct list sleep_list;
 
-// static int64_t earliest_wake_up_tick = INT64_MAX;
 
 /*** list of all processes, proceeses are added to this list
 when they are first scheduled and removed when they exit ***/
@@ -122,7 +121,6 @@ void
 thread_wakeup (int64_t ticks) {
 	
 	if (list_empty(&sleep_list)) {
-		//earliest_wake_up_tick = INT64_MAX;
 		return;
 	}
 	else {
@@ -132,23 +130,14 @@ thread_wakeup (int64_t ticks) {
 			}
 			if (ticks >= list_entry(list_front(&sleep_list), struct thread, elem) -> alarm) {
 				struct thread *thread = list_entry(list_front(&sleep_list), struct thread, elem);
-				//list_pop_front(&sleep_list);
 				list_remove(&thread -> elem);
 				thread_unblock(thread);
-				
 			}
 		}
 	}
 	
 }
 
-// /*** update the tick of earliest thread to wake up. ***/
-// void
-// earliest_time (int64_t ticks) {
-// 	if (earliest_wake_up_tick > ticks) {
-// 		earliest_wake_up_tick = ticks;
-// 	}
-// }
 
 /* Initializes the threading system by transforming the code
    that's currently running into a thread.  This can't work in
@@ -395,9 +384,11 @@ thread_yield (void) {
 	ASSERT (!intr_context ());
 
 	old_level = intr_disable ();
-	if (curr != idle_thread)
+	if (curr != idle_thread) {
 		/*** operation on ready_list with priority ordered threads ***/
 		list_insert_ordered(&ready_list, &curr->elem, priority_less_func, NULL);
+	}
+		
 	do_schedule (THREAD_READY);
 	intr_set_level (old_level);
 }
@@ -438,18 +429,15 @@ thread_set_priority (int new_priority) {
 void
 cmp_max_priority(void){
 	/*** ensure ready_list is not empty ***/
-	//enum intr_level old_level = intr_disable();
+	
+	if(list_empty(&ready_list)) {
+		return;
+	}
 
-	// if(list_empty(&ready_list)) {
-	// 	return;
-	// }
-
-	if (!list_empty(&ready_list) && list_entry(list_front(&ready_list), struct thread, elem) -> priority
+	if (list_entry(list_front(&ready_list), struct thread, elem) -> priority
 	 > thread_current() -> priority) {
-		 
 		 thread_yield();
 	 }
-	 //intr_set_level(old_level);
 		
 }
 
@@ -481,7 +469,6 @@ priority_donation (struct lock *lock) {
 
 void
 remove_lock (struct lock *lock) {
-	struct thread *curr = thread_current();
 	struct thread *hold = lock -> holder;
 	struct list_elem *e;
 	
@@ -502,16 +489,11 @@ remove_lock (struct lock *lock) {
 	if (!list_empty(&hold -> donations)) {
 		list_sort(&hold -> donations, priority_less_func, NULL);
 	}
-	
-
-	
 }
 
 void
 restore_priority (void) {
 	struct thread *curr = thread_current();
-	struct lock *lock = curr -> lock_waiting;
-
 	
 	if (list_empty(&curr -> donations)) {
 		if (&curr -> priority != &curr -> priority_saver) {
@@ -520,9 +502,7 @@ restore_priority (void) {
 		}
 		else {
 			curr -> priority = curr -> init_priority;
-			printf("hi\n");
 		}
-		
 	}
 	else {
 		if (curr -> init_priority < list_entry(list_front(&curr -> donations), 
@@ -533,7 +513,6 @@ restore_priority (void) {
 			curr -> priority = curr -> init_priority;
 		}
 	}
-
 }
 
 
