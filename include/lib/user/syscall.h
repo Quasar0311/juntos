@@ -22,7 +22,7 @@ typedef int mapid_t;
 /* Projects 2 and later. */
 void halt (void) NO_RETURN;
 void exit (int status) NO_RETURN;
-pid_t fork (void);
+pid_t fork (const char *thread_name);
 int exec (const char *file);
 int wait (pid_t);
 bool create (const char *file, unsigned initial_size);
@@ -35,6 +35,11 @@ void seek (int fd, unsigned position);
 unsigned tell (int fd);
 void close (int fd);
 
+<<<<<<< HEAD
+=======
+int dup2(int oldfd, int newfd);
+
+>>>>>>> 74307d309ade0e28d3f2eb4b34acaa14b9e65b33
 /* Project 3 and optionally project 4. */
 mapid_t mmap (int fd, void *addr);
 void munmap (mapid_t);

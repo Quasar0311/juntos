@@ -28,7 +28,6 @@ test_priority_sema (void)
       char name[16];
       snprintf (name, sizeof name, "priority %d", priority);
       thread_create (name, priority, priority_sema_thread, NULL);
-      
     }
 
   for (i = 0; i < 10; i++) 
@@ -41,7 +40,6 @@ test_priority_sema (void)
 static void
 priority_sema_thread (void *aux UNUSED) 
 {
-  //msg("created : %d", thread_current() -> priority);
   sema_down (&sema);
   msg ("Thread %s woke up.", thread_name ());
 }

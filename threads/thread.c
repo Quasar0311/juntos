@@ -241,7 +241,6 @@ thread_print_stats (void) {
    The code provided sets the new thread's `priority' member to
    PRIORITY, but no actual priority scheduling is implemented.
    Priority scheduling is the goal of Problem 1-3. */
-
 tid_t
 thread_create (const char *name, int priority,
 		thread_func *function, void *aux) {
