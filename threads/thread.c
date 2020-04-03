@@ -438,14 +438,18 @@ thread_set_priority (int new_priority) {
 void
 cmp_max_priority(void){
 	/*** ensure ready_list is not empty ***/
-	if(list_empty(&ready_list)) return;
+	//enum intr_level old_level = intr_disable();
 
-	list_sort(&ready_list, priority_less_func, NULL);
-	if(list_entry(list_max(&ready_list, priority_less_func, NULL), struct thread, elem)->priority
-	> thread_get_priority()) {
-		
-		thread_yield();
-	}
+	// if(list_empty(&ready_list)) {
+	// 	return;
+	// }
+
+	if (!list_empty(&ready_list) && list_entry(list_front(&ready_list), struct thread, elem) -> priority
+	 > thread_current() -> priority) {
+		 
+		 thread_yield();
+	 }
+	 //intr_set_level(old_level);
 		
 }
 
@@ -495,7 +499,10 @@ remove_lock (struct lock *lock) {
 		}
 		e = list_next(e);
 	}
-	list_sort(&hold -> donations, priority_less_func, NULL);
+	if (!list_empty(&hold -> donations)) {
+		list_sort(&hold -> donations, priority_less_func, NULL);
+	}
+	
 
 	
 }
@@ -509,9 +516,11 @@ restore_priority (void) {
 	if (list_empty(&curr -> donations)) {
 		if (&curr -> priority != &curr -> priority_saver) {
 			curr -> priority = curr -> priority_saver;
+			
 		}
 		else {
 			curr -> priority = curr -> init_priority;
+			printf("hi\n");
 		}
 		
 	}
