@@ -255,13 +255,13 @@ lock_release (struct lock *lock) {
 	/*** priority donation ***/
 	//printf("curr pri :%d\n", thread_get_priority());
 	remove_lock(lock);
-	
+	restore_priority();
 	//thread_set_priority(curr -> init_priority);
 
 	lock->holder = NULL;
 	sema_up (&lock->semaphore);
 	
-	restore_priority();
+	//restore_priority();
 
 	intr_set_level(old_level);
 }

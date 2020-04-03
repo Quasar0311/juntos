@@ -109,7 +109,7 @@ thread_sleep (int64_t ticks) {
 	old_level = intr_disable();
 
 	sleeper -> alarm = ticks;
-	earliest_time(sleeper -> alarm);
+	//earliest_time(sleeper -> alarm);
 	list_insert_ordered(&sleep_list, &sleeper -> elem, timer_comparator, NULL);
 	thread_block();
 	
@@ -119,23 +119,33 @@ thread_sleep (int64_t ticks) {
 /*** Waking up sleeping thread. ***/
 void
 thread_wakeup (int64_t ticks) {
+	struct list_elem *e;
 	
 	if (list_empty(&sleep_list)) {
-		earliest_wake_up_tick = INT64_MAX;
+		//earliest_wake_up_tick = INT64_MAX;
 		return;
 	}
 	else {
-		/*** Wake up every threads which have to wake up using while loop. ***/
-		while (ticks >= earliest_wake_up_tick) {
-			if (list_empty(&sleep_list)) {
-				return;
+		// e = list_begin(&sleep_list);
+		// /*** Wake up every threads which have to wake up using while loop. ***/
+		// while (ticks >= list_entry(e, struct thread, elem) -> alarm) {
+		// 	struct thread *thread = list_entry(list_front(&sleep_list), struct thread, elem);
+		// 	list_pop_front(&sleep_list);
+		// 	thread_unblock(thread);
+		// 	//earliest_wake_up_tick = list_entry(list_begin(&sleep_list), struct thread, elem) -> alarm;
+		// }
+		while (!list_empty(&sleep_list)) {
+			if (ticks < list_entry(list_front(&sleep_list), struct thread, elem) -> alarm) {
+				break;
 			}
-			struct thread *thread = list_entry(list_begin(&sleep_list), struct thread, elem);
-			list_pop_front(&sleep_list);
-			thread_unblock(thread);
-			earliest_wake_up_tick = list_entry(list_begin(&sleep_list), struct thread, elem) -> alarm;
+			if (ticks >= list_entry(list_front(&sleep_list), struct thread, elem) -> alarm) {
+				struct thread *thread = list_entry(list_front(&sleep_list), struct thread, elem);
+				//list_pop_front(&sleep_list);
+				list_remove(&thread -> elem);
+				thread_unblock(thread);
+				
+			}
 		}
-
 	}
 	
 }
@@ -394,7 +404,10 @@ thread_set_priority (int new_priority) {
 	struct thread *curr = thread_current();
 	int prev_priority = curr -> priority;
 
-	
+	if (!list_empty(&curr -> donations)) {
+		//msg("hi");
+		curr -> priority_saver = new_priority;
+	}
 	thread_current ()->priority = new_priority;
 
 	/*** ensure preoccupation occurs according to priority 
@@ -497,16 +510,25 @@ restore_priority (void) {
 
 	
 	if (list_empty(&curr -> donations)) {
-		thread_set_priority(curr -> init_priority);
+		//thread_set_priority(curr -> init_priority);
+		if (&curr -> priority != curr -> priority_saver) {
+			curr -> priority = curr -> priority_saver;
+		}
+		else {
+			curr -> priority = curr -> init_priority;
+		}
+		
 	}
 	else {
 		if (curr -> init_priority < list_entry(list_front(&curr -> donations), 
 		struct thread, donation_elem) -> priority) {
-			thread_set_priority(list_entry(list_front(&curr -> donations), 
-		struct thread, donation_elem) -> priority);
+			//thread_set_priority(list_entry(list_front(&curr -> donations), 
+		//struct thread, donation_elem) -> priority);
+			curr -> priority = list_entry(list_front(&curr -> donations), struct thread, donation_elem) -> priority;
 		}
 		else {
-			thread_set_priority(curr -> init_priority);
+			//thread_set_priority(curr -> init_priority);
+			curr -> priority = curr -> init_priority;
 		}
 	}
 
@@ -603,7 +625,7 @@ init_thread (struct thread *t, const char *name, int priority) {
 
 	memset (t, 0, sizeof *t);
 
-	//t -> priority_saver = priority;
+	t -> priority_saver = priority;
 	t -> init_priority = priority;
 	t -> lock_waiting = NULL;
 	list_init(&t -> donations);
