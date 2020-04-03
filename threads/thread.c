@@ -402,12 +402,19 @@ thread_yield (void) {
 void
 thread_set_priority (int new_priority) {
 	struct thread *curr = thread_current();
-	int prev_priority = curr -> priority;
+
 
 	if (!list_empty(&curr -> donations)) {
-		//msg("hi");
 		curr -> priority_saver = new_priority;
 	}
+	if (list_empty(&curr -> donations) && list_empty(&ready_list)) {
+		//printf("hi\n");
+		thread_current() -> priority = new_priority;
+		thread_current() -> init_priority = new_priority;
+		thread_current() -> priority_saver = new_priority;
+		return;
+	}
+
 	thread_current ()->priority = new_priority;
 
 	/*** ensure preoccupation occurs according to priority 
@@ -415,7 +422,15 @@ thread_set_priority (int new_priority) {
 	
 	cmp_max_priority();
 
-	cmp_donation_priority();
+	if (!list_empty(&curr -> donations)) {
+		if (curr -> priority < list_entry(list_front(&curr -> donations), 
+		struct thread, donation_elem) -> priority) {
+			curr -> priority = list_entry(list_front(&curr -> donations), 
+			struct thread, donation_elem) -> priority;
+		}
+	}
+
+	//cmp_donation_priority();
 
 
 }

@@ -90,7 +90,7 @@ struct thread {
 	int64_t alarm;						/* Used for alarm ticks. */
 
 	int init_priority;
-	int priority_saver;
+	int priority_saver;					/*** Take care about when priority changes while donation.***/
 	struct list donations;
 	struct list_elem donation_elem;
 	struct lock *lock_waiting;

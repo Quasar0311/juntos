@@ -202,12 +202,14 @@ lock_acquire (struct lock *lock) {
 	struct list curr_donation = curr -> donations;
 	//msg("current thread : %d\n", curr -> priority);
 	/*** doing!!! ***/
-
-	if (lock -> holder != NULL) {
-		struct thread *hold = lock -> holder;
-		thread_current() -> lock_waiting = lock;
-		list_push_front(&hold -> donations, &curr -> donation_elem);
-		priority_donation(lock);
+	
+	if (thread_mlfqs == false) {
+		if (lock -> holder != NULL) {
+			struct thread *hold = lock -> holder;
+			thread_current() -> lock_waiting = lock;
+			list_push_front(&hold -> donations, &curr -> donation_elem);
+			priority_donation(lock);
+		}
 	}
 
 	sema_down (&lock->semaphore);
@@ -254,8 +256,10 @@ lock_release (struct lock *lock) {
 	//printf("release curr pri : %d\n", curr -> priority);
 	/*** priority donation ***/
 	//printf("curr pri :%d\n", thread_get_priority());
-	remove_lock(lock);
-	restore_priority();
+	if (thread_mlfqs == false) {
+		remove_lock(lock);
+		restore_priority();
+	}
 	//thread_set_priority(curr -> init_priority);
 
 	lock->holder = NULL;
