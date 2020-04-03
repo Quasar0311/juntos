@@ -109,7 +109,6 @@ thread_sleep (int64_t ticks) {
 	old_level = intr_disable();
 
 	sleeper -> alarm = ticks;
-	//earliest_time(sleeper -> alarm);
 	list_insert_ordered(&sleep_list, &sleeper -> elem, timer_comparator, NULL);
 	thread_block();
 	
@@ -126,14 +125,6 @@ thread_wakeup (int64_t ticks) {
 		return;
 	}
 	else {
-		// e = list_begin(&sleep_list);
-		// /*** Wake up every threads which have to wake up using while loop. ***/
-		// while (ticks >= list_entry(e, struct thread, elem) -> alarm) {
-		// 	struct thread *thread = list_entry(list_front(&sleep_list), struct thread, elem);
-		// 	list_pop_front(&sleep_list);
-		// 	thread_unblock(thread);
-		// 	//earliest_wake_up_tick = list_entry(list_begin(&sleep_list), struct thread, elem) -> alarm;
-		// }
 		while (!list_empty(&sleep_list)) {
 			if (ticks < list_entry(list_front(&sleep_list), struct thread, elem) -> alarm) {
 				break;
@@ -408,7 +399,6 @@ thread_set_priority (int new_priority) {
 		curr -> priority_saver = new_priority;
 	}
 	if (list_empty(&curr -> donations) && list_empty(&ready_list)) {
-		//printf("hi\n");
 		thread_current() -> priority = new_priority;
 		thread_current() -> init_priority = new_priority;
 		thread_current() -> priority_saver = new_priority;
@@ -459,9 +449,6 @@ cmp_donation_priority (void) {
 		curr -> priority = curr -> init_priority;
 		return;
 	}
-	// if (list_size(&curr -> donations) >= 2) {
-	// 	list_sort(&curr -> donations, priority_less_func, NULL);
-	// }
 
 	if (curr -> priority < list_entry(list_front(&curr -> donations),
 	struct thread, donation_elem) -> priority) {
@@ -489,7 +476,6 @@ priority_donation (struct lock *lock) {
 		((holder -> lock_waiting) -> holder) -> priority = curr -> priority;
 		holder = (holder -> lock_waiting) -> holder;
 	}
-	//thread_yield();
 	
 }
 
@@ -525,7 +511,6 @@ restore_priority (void) {
 
 	
 	if (list_empty(&curr -> donations)) {
-		//thread_set_priority(curr -> init_priority);
 		if (&curr -> priority != curr -> priority_saver) {
 			curr -> priority = curr -> priority_saver;
 		}
@@ -537,12 +522,9 @@ restore_priority (void) {
 	else {
 		if (curr -> init_priority < list_entry(list_front(&curr -> donations), 
 		struct thread, donation_elem) -> priority) {
-			//thread_set_priority(list_entry(list_front(&curr -> donations), 
-		//struct thread, donation_elem) -> priority);
 			curr -> priority = list_entry(list_front(&curr -> donations), struct thread, donation_elem) -> priority;
 		}
 		else {
-			//thread_set_priority(curr -> init_priority);
 			curr -> priority = curr -> init_priority;
 		}
 	}
