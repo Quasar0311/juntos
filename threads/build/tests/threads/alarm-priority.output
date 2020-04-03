@@ -6,10 +6,12 @@ Press Ctrl-B to configure iPXE (PCI 00:03.0)...
 
 
 Booting from Hard Disk..Kernel command line: -q run alarm-priority
+0 ~ 9fc00 1
+100000 ~ ffe0000 1
 Pintos booting with: 
-	base_mem: 0x0 ~ 0x100000 (Usable: 704 kB)
-	ext_mem: 0x100000 ~ 0x100000000 (Usable: 261,376 kB)
-Calibrating timer...  57,651,200 loops/s.
+	base_mem: 0x0 ~ 0x9fc00 (Usable: 639 kB)
+	ext_mem: 0x100000 ~ 0xffe0000 (Usable: 260,992 kB)
+Calibrating timer...  104,755,200 loops/s.
 Boot complete.
 Executing 'alarm-priority':
 (alarm-priority) begin
@@ -25,8 +27,8 @@ Executing 'alarm-priority':
 (alarm-priority) Thread priority 21 woke up.
 (alarm-priority) end
 Execution of 'alarm-priority' complete.
-Timer: 530 ticks
-Thread: 489 idle ticks, 41 kernel ticks, 0 user ticks
-Console: 852 characters output
+Timer: 526 ticks
+Thread: 490 idle ticks, 37 kernel ticks, 0 user ticks
+Console: 881 characters output
 Keyboard: 0 keys pressed
 Powering off...
