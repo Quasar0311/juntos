@@ -440,10 +440,10 @@ cmp_max_priority(void){
 	/*** ensure ready_list is not empty ***/
 	if(list_empty(&ready_list)) return;
 
-	list_sort(&ready_list, priority_less_func, NULL);
-	if(list_entry(list_max(&ready_list, priority_less_func, NULL), struct thread, elem)->priority
+	// list_sort(&ready_list, priority_less_func, NULL);
+	// if(list_entry(list_max(&ready_list, priority_less_func, NULL), struct thread, elem)->priority
+	if(list_entry(list_front(&ready_list), struct thread, elem)->priority
 	> thread_get_priority()) {
-		
 		thread_yield();
 	}
 		
@@ -477,7 +477,7 @@ priority_donation (struct lock *lock) {
 
 void
 remove_lock (struct lock *lock) {
-	struct thread *curr = thread_current();
+	// struct thread *curr = thread_current();
 	struct thread *hold = lock -> holder;
 	struct list_elem *e;
 	
@@ -495,7 +495,8 @@ remove_lock (struct lock *lock) {
 		}
 		e = list_next(e);
 	}
-	list_sort(&hold -> donations, priority_less_func, NULL);
+	if(!list_empty(&hold->donations))
+		list_sort(&hold -> donations, priority_less_func, NULL);
 
 	
 }
@@ -503,7 +504,7 @@ remove_lock (struct lock *lock) {
 void
 restore_priority (void) {
 	struct thread *curr = thread_current();
-	struct lock *lock = curr -> lock_waiting;
+	// struct lock *lock = curr -> lock_waiting;
 
 	
 	if (list_empty(&curr -> donations)) {

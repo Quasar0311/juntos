@@ -72,7 +72,7 @@ sema_down (struct semaphore *sema) {
 	old_level = intr_disable ();
 	while (sema->value == 0) {
 		/*** operation on waiters list with priority ordered threads ***/
-		list_insert_ordered(&sema->waiters, &thread_current()->elem, priority_less_func, NULL);
+		list_insert_ordered(&sema->waiters, &thread_current()->elem, sema_less_func, NULL);
 		thread_block ();
 	}
 	sema->value--;
@@ -126,6 +126,7 @@ sema_up (struct semaphore *sema) {
 
 	/*** priority preemption ***/
 	cmp_max_priority();
+	// thread_yield();
 
 	intr_set_level (old_level);
 }
@@ -249,7 +250,7 @@ lock_release (struct lock *lock) {
 
 	enum intr_level old_level;
 	old_level = intr_disable();
-	struct thread *curr = thread_current();
+	// struct thread *curr = thread_current();
 
 	if (thread_mlfqs == false) {
 		remove_lock(lock);
@@ -336,7 +337,7 @@ cond_wait (struct condition *cond, struct lock *lock) {
 
 	sema_init (&waiter.semaphore, 0);
 	/*** operation on waiters list with priority ordered threads ***/
-	list_insert_ordered(&cond->waiters, &waiter.elem, sema_less_func, NULL);
+	list_insert_ordered(&cond->waiters, &waiter.elem, priority_less_func, NULL);
 	lock_release (lock);
 	sema_down (&waiter.semaphore);
 	lock_acquire (lock);
