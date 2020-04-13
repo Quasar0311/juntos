@@ -128,10 +128,10 @@ sema_up (struct semaphore *sema) {
 	sema->value++;
 
 	/*** priority preemption ***/
-	if (unblocked_pr > thread_current() -> priority) {
-		thread_yield();
-	}
-	//cmp_max_priority();
+	// if (unblocked_pr > thread_current() -> priority) {
+	// 	thread_yield();
+	// }
+	cmp_max_priority();
 
 	intr_set_level (old_level);
 }
