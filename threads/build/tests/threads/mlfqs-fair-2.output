@@ -9,7 +9,11 @@ Booting from Hard Disk..Kernel command line: -q -mlfqs run mlfqs-fair-2
 Pintos booting with: 
 	base_mem: 0x0 ~ 0x100000 (Usable: 704 kB)
 	ext_mem: 0x100000 ~ 0x100000000 (Usable: 261,376 kB)
+<<<<<<< HEAD
 Calibrating timer...  104,755,200 loops/s.
+=======
+Calibrating timer...  107,110,400 loops/s.
+>>>>>>> 104fc2f7bfe45308897a3b9709b133656911d2fe
 Boot complete.
 Executing 'mlfqs-fair-2':
 (mlfqs-fair-2) begin
@@ -17,11 +21,19 @@ Executing 'mlfqs-fair-2':
 (mlfqs-fair-2) Starting threads took 0 ticks.
 (mlfqs-fair-2) Sleeping 40 seconds to let threads run, please wait...
 (mlfqs-fair-2) Thread 0 received 1501 ticks.
+<<<<<<< HEAD
 (mlfqs-fair-2) Thread 1 received 1501 ticks.
 (mlfqs-fair-2) end
 Execution of 'mlfqs-fair-2' complete.
 Timer: 4022 ticks
 Thread: 1000 idle ticks, 3022 kernel ticks, 0 user ticks
+=======
+(mlfqs-fair-2) Thread 1 received 1500 ticks.
+(mlfqs-fair-2) end
+Execution of 'mlfqs-fair-2' complete.
+Timer: 4029 ticks
+Thread: 1000 idle ticks, 3029 kernel ticks, 0 user ticks
+>>>>>>> 104fc2f7bfe45308897a3b9709b133656911d2fe
 Console: 647 characters output
 Keyboard: 0 keys pressed
 Powering off...

@@ -431,10 +431,21 @@ cmp_max_priority(void){
 	/*** ensure ready_list is not empty ***/
 	if(list_empty(&ready_list)) return;
 
+<<<<<<< HEAD
+=======
+	// if (list_entry(list_front(&ready_list), struct thread, elem) -> priority
+	//  > thread_current() -> priority) {
+	// 	 thread_yield();
+	//  }
+>>>>>>> 104fc2f7bfe45308897a3b9709b133656911d2fe
 	if(list_entry(list_max(&ready_list, priority_less_func, NULL), struct thread, elem)->priority
 	//if(list_entry(list_front(&ready_list), struct thread, elem)->priority
 	> thread_get_priority())
 		thread_yield();
+<<<<<<< HEAD
+=======
+
+>>>>>>> 104fc2f7bfe45308897a3b9709b133656911d2fe
 }
 
 /* Returns the current thread's priority. */

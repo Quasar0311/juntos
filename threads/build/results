@@ -9,13 +9,21 @@ pass tests/threads/priority-donate-one
 pass tests/threads/priority-donate-multiple
 pass tests/threads/priority-donate-multiple2
 pass tests/threads/priority-donate-nest
+<<<<<<< HEAD
 FAIL tests/threads/priority-donate-sema
+=======
+pass tests/threads/priority-donate-sema
+>>>>>>> 104fc2f7bfe45308897a3b9709b133656911d2fe
 pass tests/threads/priority-donate-lower
 pass tests/threads/priority-fifo
 pass tests/threads/priority-preempt
 pass tests/threads/priority-sema
 pass tests/threads/priority-condvar
+<<<<<<< HEAD
 FAIL tests/threads/priority-donate-chain
+=======
+pass tests/threads/priority-donate-chain
+>>>>>>> 104fc2f7bfe45308897a3b9709b133656911d2fe
 pass tests/threads/mlfqs-load-1
 pass tests/threads/mlfqs-load-60
 pass tests/threads/mlfqs-load-avg

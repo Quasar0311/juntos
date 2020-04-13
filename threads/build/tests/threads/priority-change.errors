@@ -1,3 +1,7 @@
+<<<<<<< HEAD
 WARNING: Image format was not specified for '/tmp/tmpp6zya0eo.dsk' and probing guessed raw.
+=======
+WARNING: Image format was not specified for '/tmp/tmp_m1wpp1p.dsk' and probing guessed raw.
+>>>>>>> 104fc2f7bfe45308897a3b9709b133656911d2fe
          Automatically detecting the format is dangerous for raw images, write operations on block 0 will be restricted.
          Specify the 'raw' format explicitly to remove the restrictions.

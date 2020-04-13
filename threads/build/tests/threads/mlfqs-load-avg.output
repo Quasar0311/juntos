@@ -9,7 +9,11 @@ Booting from Hard Disk..Kernel command line: -q -mlfqs run mlfqs-load-avg
 Pintos booting with: 
 	base_mem: 0x0 ~ 0x100000 (Usable: 704 kB)
 	ext_mem: 0x100000 ~ 0x100000000 (Usable: 261,376 kB)
+<<<<<<< HEAD
 Calibrating timer...  104,755,200 loops/s.
+=======
+Calibrating timer...  39,270,400 loops/s.
+>>>>>>> 104fc2f7bfe45308897a3b9709b133656911d2fe
 Boot complete.
 Executing 'mlfqs-load-avg':
 (mlfqs-load-avg) begin
@@ -46,6 +50,7 @@ Executing 'mlfqs-load-avg':
 (mlfqs-load-avg) After 56 seconds, load average=20.02.
 (mlfqs-load-avg) After 58 seconds, load average=21.26.
 (mlfqs-load-avg) After 60 seconds, load average=22.52.
+<<<<<<< HEAD
 (mlfqs-load-avg) After 62 seconds, load average=23.76.
 (mlfqs-load-avg) After 64 seconds, load average=24.86.
 (mlfqs-load-avg) After 66 seconds, load average=25.85.
@@ -110,5 +115,71 @@ Execution of 'mlfqs-load-avg' complete.
 Timer: 18821 ticks
 Thread: 6891 idle ticks, 11931 kernel ticks, 0 user ticks
 Console: 5474 characters output
+=======
+(mlfqs-load-avg) After 62 seconds, load average=23.74.
+(mlfqs-load-avg) After 64 seconds, load average=24.89.
+(mlfqs-load-avg) After 66 seconds, load average=25.87.
+(mlfqs-load-avg) After 68 seconds, load average=26.78.
+(mlfqs-load-avg) After 70 seconds, load average=27.58.
+(mlfqs-load-avg) After 72 seconds, load average=28.31.
+(mlfqs-load-avg) After 74 seconds, load average=28.96.
+(mlfqs-load-avg) After 76 seconds, load average=29.49.
+(mlfqs-load-avg) After 78 seconds, load average=29.95.
+(mlfqs-load-avg) After 80 seconds, load average=30.33.
+(mlfqs-load-avg) After 82 seconds, load average=30.64.
+(mlfqs-load-avg) After 84 seconds, load average=30.88.
+(mlfqs-load-avg) After 86 seconds, load average=31.02.
+(mlfqs-load-avg) After 88 seconds, load average=31.10.
+(mlfqs-load-avg) After 90 seconds, load average=31.08.
+(mlfqs-load-avg) After 92 seconds, load average=31.01.
+(mlfqs-load-avg) After 94 seconds, load average=30.86.
+(mlfqs-load-avg) After 96 seconds, load average=30.67.
+(mlfqs-load-avg) After 98 seconds, load average=30.40.
+(mlfqs-load-avg) After 100 seconds, load average=30.07.
+(mlfqs-load-avg) After 102 seconds, load average=29.69.
+(mlfqs-load-avg) After 104 seconds, load average=29.25.
+(mlfqs-load-avg) After 106 seconds, load average=28.78.
+(mlfqs-load-avg) After 108 seconds, load average=28.24.
+(mlfqs-load-avg) After 110 seconds, load average=27.65.
+(mlfqs-load-avg) After 112 seconds, load average=27.02.
+(mlfqs-load-avg) After 114 seconds, load average=26.34.
+(mlfqs-load-avg) After 116 seconds, load average=25.62.
+(mlfqs-load-avg) After 118 seconds, load average=24.86.
+(mlfqs-load-avg) After 120 seconds, load average=24.05.
+(mlfqs-load-avg) After 122 seconds, load average=23.25.
+(mlfqs-load-avg) After 124 seconds, load average=22.49.
+(mlfqs-load-avg) After 126 seconds, load average=21.74.
+(mlfqs-load-avg) After 128 seconds, load average=21.02.
+(mlfqs-load-avg) After 130 seconds, load average=20.33.
+(mlfqs-load-avg) After 132 seconds, load average=19.66.
+(mlfqs-load-avg) After 134 seconds, load average=19.01.
+(mlfqs-load-avg) After 136 seconds, load average=18.38.
+(mlfqs-load-avg) After 138 seconds, load average=17.77.
+(mlfqs-load-avg) After 140 seconds, load average=17.18.
+(mlfqs-load-avg) After 142 seconds, load average=16.62.
+(mlfqs-load-avg) After 144 seconds, load average=16.07.
+(mlfqs-load-avg) After 146 seconds, load average=15.54.
+(mlfqs-load-avg) After 148 seconds, load average=15.02.
+(mlfqs-load-avg) After 150 seconds, load average=14.52.
+(mlfqs-load-avg) After 152 seconds, load average=14.04.
+(mlfqs-load-avg) After 154 seconds, load average=13.58.
+(mlfqs-load-avg) After 156 seconds, load average=13.13.
+(mlfqs-load-avg) After 158 seconds, load average=12.70.
+(mlfqs-load-avg) After 160 seconds, load average=12.28.
+(mlfqs-load-avg) After 162 seconds, load average=11.87.
+(mlfqs-load-avg) After 164 seconds, load average=11.48.
+(mlfqs-load-avg) After 166 seconds, load average=11.10.
+(mlfqs-load-avg) After 168 seconds, load average=10.73.
+(mlfqs-load-avg) After 170 seconds, load average=10.38.
+(mlfqs-load-avg) After 172 seconds, load average=10.03.
+(mlfqs-load-avg) After 174 seconds, load average=9.70.
+(mlfqs-load-avg) After 176 seconds, load average=9.38.
+(mlfqs-load-avg) After 178 seconds, load average=9.07.
+(mlfqs-load-avg) end
+Execution of 'mlfqs-load-avg' complete.
+Timer: 18822 ticks
+Thread: 6893 idle ticks, 11930 kernel ticks, 0 user ticks
+Console: 5473 characters output
+>>>>>>> 104fc2f7bfe45308897a3b9709b133656911d2fe
 Keyboard: 0 keys pressed
 Powering off...

@@ -5,11 +5,15 @@ iPXE (http://ipxe.org) 00:03.0 C980 PCI2.10 PnP PMM+0FF915A0+0FEF15A0 C980
 Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
 
 
-Booting from Hard Disk..Kernel command line: -q run priority-donate-sema
+Booting from Hard Disk...Kernel command line: -q run priority-donate-sema
 Pintos booting with: 
 	base_mem: 0x0 ~ 0x100000 (Usable: 704 kB)
 	ext_mem: 0x100000 ~ 0x100000000 (Usable: 261,376 kB)
+<<<<<<< HEAD
 Calibrating timer...  106,086,400 loops/s.
+=======
+Calibrating timer...  78,540,800 loops/s.
+>>>>>>> 104fc2f7bfe45308897a3b9709b133656911d2fe
 Boot complete.
 Executing 'priority-donate-sema':
 (priority-donate-sema) begin
@@ -22,8 +26,14 @@ Executing 'priority-donate-sema':
 (priority-donate-sema) Main thread finished.
 (priority-donate-sema) end
 Execution of 'priority-donate-sema' complete.
+<<<<<<< HEAD
 Timer: 29 ticks
 Thread: 0 idle ticks, 29 kernel ticks, 0 user ticks
 Console: 745 characters output
+=======
+Timer: 23 ticks
+Thread: 0 idle ticks, 23 kernel ticks, 0 user ticks
+Console: 744 characters output
+>>>>>>> 104fc2f7bfe45308897a3b9709b133656911d2fe
 Keyboard: 0 keys pressed
 Powering off...

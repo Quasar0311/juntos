@@ -9,7 +9,11 @@ Booting from Hard Disk..Kernel command line: -q -mlfqs run mlfqs-load-1
 Pintos booting with: 
 	base_mem: 0x0 ~ 0x100000 (Usable: 704 kB)
 	ext_mem: 0x100000 ~ 0x100000000 (Usable: 261,376 kB)
+<<<<<<< HEAD
 Calibrating timer...  106,291,200 loops/s.
+=======
+Calibrating timer...  104,857,600 loops/s.
+>>>>>>> 104fc2f7bfe45308897a3b9709b133656911d2fe
 Boot complete.
 Executing 'mlfqs-load-1':
 (mlfqs-load-1) begin
