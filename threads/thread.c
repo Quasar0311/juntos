@@ -362,7 +362,7 @@ thread_exit (void) {
 	ASSERT (!intr_context ());
 
 #ifdef USERPROG
-	process_cleanup ();
+	//process_cleanup ();
 #endif
 
 	/* Just set our status to dying and schedule another process.

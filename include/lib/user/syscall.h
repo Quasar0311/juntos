@@ -36,11 +36,8 @@ void seek (int fd, unsigned position);
 unsigned tell (int fd);
 void close (int fd);
 
-<<<<<<< HEAD
-=======
 int dup2(int oldfd, int newfd);
 
->>>>>>> 74307d309ade0e28d3f2eb4b34acaa14b9e65b33
 /* Project 3 and optionally project 4. */
 void *mmap (void *addr, size_t length, int writable, int fd, off_t offset);
 void munmap (void *addr);
