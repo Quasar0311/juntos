@@ -1,0 +1,29 @@
+c[?7l[2J[0mSeaBIOS (version rel-1.11.0-0-g63451fca13-prebuilt.qemu-project.org)
+
+
+iPXE (http://ipxe.org) 00:03.0 C980 PCI2.10 PnP PMM+0FF915A0+0FEF15A0 C980
+Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
+
+
+Booting from Hard Disk..Kernel command line: -q -f put args-none run args-none
+0 ~ 9fc00 1
+100000 ~ ffe0000 1
+Pintos booting with: 
+	base_mem: 0x0 ~ 0x9fc00 (Usable: 639 kB)
+	ext_mem: 0x100000 ~ 0xffe0000 (Usable: 260,992 kB)
+Calibrating timer...  88,371,200 loops/s.
+hd0:0: detected 305 sector (152 kB) disk, model "QEMU HARDDISK", serial "QM00001"
+hd0:1: detected 20,160 sector (9 MB) disk, model "QEMU HARDDISK", serial "QM00002"
+hd1:0: detected 99 sector (49 kB) disk, model "QEMU HARDDISK", serial "QM00003"
+Formatting file system...Kernel PANIC at ../../threads/thread.c:383 in thread_yield(): assertion `!intr_context ()' failed.
+Call stack: 0x80042185c6 0x8004207587 0x800420a800 0x8004214c82 0x80042095a4 0x80042099c2 0x8004207ca2.
+The `backtrace' program can make call stacks useful.
+Read "Backtraces" in the "Debugging Tools" chapter
+of the Pintos documentation for more information.
+Timer: 55 ticks
+Thread: 30 idle ticks, 25 kernel ticks, 0 user ticks
+hd0:0: 0 reads, 0 writes
+hd0:1: 0 reads, 1 writes
+hd1:0: 0 reads, 0 writes
+Console: 1015 characters output
+Key
