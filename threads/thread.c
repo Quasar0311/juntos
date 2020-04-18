@@ -362,7 +362,7 @@ thread_exit (void) {
 	ASSERT (!intr_context ());
 
 #ifdef USERPROG
-	//process_cleanup ();
+	process_exit ();
 #endif
 
 	/* Just set our status to dying and schedule another process.
@@ -433,12 +433,7 @@ cmp_max_priority(void){
 		return;
 	}
 
-	// if (list_entry(list_front(&ready_list), struct thread, elem) -> priority
-	//  > thread_current() -> priority) {
-	// 	 thread_yield();
-	//  }
 	if(list_entry(list_max(&ready_list, priority_less_func, NULL), struct thread, elem)->priority
-	//if(list_entry(list_front(&ready_list), struct thread, elem)->priority
 	> thread_get_priority())
 		thread_yield();
 
