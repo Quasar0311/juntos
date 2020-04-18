@@ -362,11 +362,7 @@ thread_exit (void) {
 	ASSERT (!intr_context ());
 
 #ifdef USERPROG
-<<<<<<< HEAD
 	//process_cleanup ();
-=======
-	process_exit ();
->>>>>>> b46ca9cc4482373394fb607778febb9a140d8f39
 #endif
 
 	/* Just set our status to dying and schedule another process.
@@ -776,7 +772,7 @@ thread_launch (struct thread *th) {
 static void
 do_schedule(int status) {
 	ASSERT (intr_get_level () == INTR_OFF);
-	ASSERT (thread_current()->status == THREAD_RUNNING);
+	ASSERT (thread_current() ->status == THREAD_RUNNING);
 	while (!list_empty (&destruction_req)) {
 		struct thread *victim =
 			list_entry (list_pop_front (&destruction_req), struct thread, elem);
