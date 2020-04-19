@@ -130,7 +130,10 @@ sema_up (struct semaphore *sema) {
 	/*** priority preemption ***/
 	if (thread_mlfqs == false) {
 		if (unblocked_pr > thread_current() -> priority) {
-			thread_yield();
+			if (!intr_context()) {
+				thread_yield();
+			}
+			
 		}
 	}
 	else {
