@@ -47,6 +47,8 @@ process_create_initd (const char *file_name) {
 	tid_t tid;
 	char *token, *save_ptr;
 	size_t token_len;
+	char *file_copy = malloc(strlen(file_name) + 1);
+	strlcpy(file_copy, file_name, strlen(file_name) + 1);
 
 	/* Make a copy of FILE_NAME.
 	 * Otherwise there's a race between the caller and load(). */
@@ -55,18 +57,18 @@ process_create_initd (const char *file_name) {
 		return TID_ERROR;
 
 	/*** give proper file name to FILE_NAME ***/
-	for (token = strtok_r(file_name, " ", &save_ptr); token != NULL;
+	for (token = strtok_r(file_copy, " ", &save_ptr); token != NULL;
 			token = strtok_r(NULL, " ", &save_ptr)) {
 				/*** if token == NULL? ***/
 				token_len = strlen(token);
-				strlcpy(file_name, token, token_len + 1);
+				strlcpy(file_copy, token, token_len + 1);
 				break;
 	}
 
-	strlcpy (fn_copy, file_name, PGSIZE);
+	strlcpy (fn_copy, file_copy, PGSIZE);
 
 	/* Create a new thread to execute FILE_NAME. */
-	tid = thread_create (file_name, PRI_DEFAULT, initd, fn_copy);
+	tid = thread_create (file_copy, PRI_DEFAULT, initd, fn_copy);
 	if (tid == TID_ERROR)
 		palloc_free_page (fn_copy);
 	return tid;
@@ -183,6 +185,9 @@ process_exec (void *f_name) {
 	char *token, *save_ptr;
 	size_t token_len;
 
+	char *file_copy = malloc(strlen(f_name) + 1);
+	strlcpy(file_copy, f_name, strlen(f_name) + 1);
+
 	/* We cannot use the intr_frame in the thread structure.
 	 * This is because when current thread rescheduled,
 	 * it stores the execution information to the member. */
@@ -194,17 +199,18 @@ process_exec (void *f_name) {
 	/* We first kill the current context */
 	process_cleanup ();
 
-	/*** give proper file name to FILE_NAME ***/
-	for (token = strtok_r(file_name, " ", &save_ptr); token != NULL;
-			token = strtok_r(NULL, " ", &save_ptr)) {
-				/*** if token == NULL? ***/
-				token_len = strlen(token);
-				strlcpy(file_name, token, token_len + 1);
-				break;
-	}
+	// /*** give proper file name to FILE_NAME ***/
+	// for (token = strtok_r(file_name, " ", &save_ptr); token != NULL;
+	// 		token = strtok_r(NULL, " ", &save_ptr)) {
+	// 			/*** if token == NULL? ***/
+	// 			token_len = strlen(token);
+	// 			strlcpy(file_name, token, token_len + 1);
+	// 			break;
+	// }
 
 
 	/* And then load the binary */
+	//printf("%s!\n", file_name);
 	success = load (file_name, &_if);
 
 	/* If load failed, quit. */
@@ -375,6 +381,7 @@ load (const char *file_name, struct intr_frame *if_) {
 		goto done;
 	process_activate (thread_current ());
 
+	//printf("file name : %s\n", file_name);
 	/* Open executable file. */
 	file = filesys_open (file_name);
 	if (file == NULL) {
@@ -457,11 +464,11 @@ load (const char *file_name, struct intr_frame *if_) {
 	/* TODO: Your code goes here.
 	 * TODO: Implement argument passing (see project2/argument_passing.html). */
 		
-	
 	for (token = strtok_r(file_copy, " ", &save_ptr); token != NULL;
 			token = strtok_r(NULL, " ", &save_ptr)) {
 			argc++;
 	}
+	//printf("argc : %d\n", argc);
 
 	char **argv = malloc(argc * sizeof(char*));
 
@@ -472,7 +479,9 @@ load (const char *file_name, struct intr_frame *if_) {
 				strlcpy((char *) if_ -> rsp, token, strlen(token) + 1);
 				argv[argc] = (char *) if_ -> rsp;
 				argc++;
+				printf("%s\n", token);
 	}
+	printf("argc1 : %p\n", if_ -> rsp);
 
 	argv[argc] = 0;
 
@@ -480,20 +489,22 @@ load (const char *file_name, struct intr_frame *if_) {
 		if_ -> rsp -= 1;
 		strlcpy((char *) if_ -> rsp, &zero, 1);
 	}
+	printf("argc2 : %p\n", if_ -> rsp);
 
 	for (i = argc; i >= 0; i--) {
 		if_ -> rsp -= sizeof(char*);
 		strlcpy((char *) if_ -> rsp, (char *) &argv[i], sizeof(char*));
 	}
+	printf("argc3 : %d\n", argc);
 
 	if_ -> rsp -= sizeof(void*);
 	strlcpy((char *) if_ -> rsp, (char *) &argv[argc], sizeof(void*));
-
-	strlcpy((char *) if_ -> R.rdi, (char *) argc, sizeof(uint64_t));
-	strlcpy((char *) if_ -> R.rsi, (char *) &argv[0], sizeof(char*));
-
+	printf("argc5 : %d\n", argc);
+	memcpy((char *) if_ -> R.rdi, (char *) &argv[0], sizeof(int));
+	memcpy((char *) if_ -> R.rsi, (char *) &argv[0], sizeof(char*));
+	printf("argc6 : %d\n", argc);
 	hex_dump(if_ -> rsp, (void *) if_ -> rsp, 0x47470000 - (if_ -> rsp), 1);
-
+	printf("argc4 : %d\n", argc);
 	success = true;
 
 done:
