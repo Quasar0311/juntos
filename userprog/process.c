@@ -17,6 +17,9 @@
 #include "threads/thread.h"
 #include "threads/mmu.h"
 #include "threads/vaddr.h"
+/*** for malloc ***/
+#include "threads/malloc.h"
+
 #include "intrinsic.h"
 #ifdef VM
 #include "vm/vm.h"
@@ -42,12 +45,24 @@ tid_t
 process_create_initd (const char *file_name) {
 	char *fn_copy;
 	tid_t tid;
+	char *token, *save_ptr;
+	size_t token_len;
 
 	/* Make a copy of FILE_NAME.
 	 * Otherwise there's a race between the caller and load(). */
 	fn_copy = palloc_get_page (0);
 	if (fn_copy == NULL)
 		return TID_ERROR;
+
+	/*** give proper file name to FILE_NAME ***/
+	for (token = strtok_r(file_name, " ", &save_ptr); token != NULL;
+			token = strtok_r(NULL, " ", &save_ptr)) {
+				/*** if token == NULL? ***/
+				token_len = strlen(token);
+				strlcpy(file_name, token, token_len + 1);
+				break;
+	}
+
 	strlcpy (fn_copy, file_name, PGSIZE);
 
 	/* Create a new thread to execute FILE_NAME. */
@@ -165,6 +180,9 @@ process_exec (void *f_name) {
 	char *file_name = f_name;
 	bool success;
 
+	char *token, *save_ptr;
+	size_t token_len;
+
 	/* We cannot use the intr_frame in the thread structure.
 	 * This is because when current thread rescheduled,
 	 * it stores the execution information to the member. */
@@ -175,6 +193,16 @@ process_exec (void *f_name) {
 
 	/* We first kill the current context */
 	process_cleanup ();
+
+	/*** give proper file name to FILE_NAME ***/
+	for (token = strtok_r(file_name, " ", &save_ptr); token != NULL;
+			token = strtok_r(NULL, " ", &save_ptr)) {
+				/*** if token == NULL? ***/
+				token_len = strlen(token);
+				strlcpy(file_name, token, token_len + 1);
+				break;
+	}
+
 
 	/* And then load the binary */
 	success = load (file_name, &_if);
@@ -204,6 +232,11 @@ process_wait (tid_t child_tid UNUSED) {
 	/* XXX: Hint) The pintos exit if process_wait (initd), we recommend you
 	 * XXX:       to add infinite loop here before
 	 * XXX:       implementing the process_wait. */
+
+	while (1) {
+		;
+	}
+	
 	return -1;
 }
 
@@ -329,6 +362,13 @@ load (const char *file_name, struct intr_frame *if_) {
 	bool success = false;
 	int i;
 
+	/*** Arguments passing ***/
+	char *token, *save_ptr;
+	uint64_t argc = 0;
+	char zero = 0;
+	char *file_copy = malloc(strlen(file_name) + 1);
+	strlcpy(file_copy, file_name, strlen(file_name) + 1);
+
 	/* Allocate and activate page directory. */
 	t->pml4 = pml4_create ();
 	if (t->pml4 == NULL)
@@ -416,6 +456,43 @@ load (const char *file_name, struct intr_frame *if_) {
 
 	/* TODO: Your code goes here.
 	 * TODO: Implement argument passing (see project2/argument_passing.html). */
+		
+	
+	for (token = strtok_r(file_copy, " ", &save_ptr); token != NULL;
+			token = strtok_r(NULL, " ", &save_ptr)) {
+			argc++;
+	}
+
+	char **argv = malloc(argc * sizeof(char*));
+
+	argc = 0;
+	for (token = strtok_r(file_copy, " ", &save_ptr); token != NULL;
+			token = strtok_r(NULL, " ", &save_ptr)) {
+				if_ -> rsp -= strlen(token) + 1;
+				strlcpy((char *) if_ -> rsp, token, strlen(token) + 1);
+				argv[argc] = (char *) if_ -> rsp;
+				argc++;
+	}
+
+	argv[argc] = 0;
+
+	while (if_ -> rsp % 8 != 0) {
+		if_ -> rsp -= 1;
+		strlcpy((char *) if_ -> rsp, &zero, 1);
+	}
+
+	for (i = argc; i >= 0; i--) {
+		if_ -> rsp -= sizeof(char*);
+		strlcpy((char *) if_ -> rsp, (char *) &argv[i], sizeof(char*));
+	}
+
+	if_ -> rsp -= sizeof(void*);
+	strlcpy((char *) if_ -> rsp, (char *) &argv[argc], sizeof(void*));
+
+	strlcpy((char *) if_ -> R.rdi, (char *) argc, sizeof(uint64_t));
+	strlcpy((char *) if_ -> R.rsi, (char *) &argv[0], sizeof(char*));
+
+	hex_dump(if_ -> rsp, (void *) if_ -> rsp, 0x47470000 - (if_ -> rsp), 1);
 
 	success = true;
 
