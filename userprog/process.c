@@ -18,6 +18,7 @@
 #include "threads/mmu.h"
 #include "threads/vaddr.h"
 #include "intrinsic.h"
+#include "threads/malloc.h"
 #ifdef VM
 #include "vm/vm.h"
 #endif
@@ -42,6 +43,9 @@ tid_t
 process_create_initd (const char *file_name) {
 	char *fn_copy;
 	tid_t tid;
+	char *file_title = malloc(strlen(file_name) + 1);
+	strlcpy(file_title, file_name, strlen(file_name) + 1);
+	char *token, *save_ptr;
 
 	/* Make a copy of FILE_NAME.
 	 * Otherwise there's a race between the caller and load(). */
@@ -50,8 +54,14 @@ process_create_initd (const char *file_name) {
 		return TID_ERROR;
 	strlcpy (fn_copy, file_name, PGSIZE);
 
+	for (token = strtok_r(file_title, " ", &save_ptr); token != NULL;
+	token = strtok_r(NULL, " ", &save_ptr)) {
+		strlcpy(file_title, token, strlen(token) + 1);
+		break;
+	}	
+
 	/* Create a new thread to execute FILE_NAME. */
-	tid = thread_create (file_name, PRI_DEFAULT, initd, fn_copy);
+	tid = thread_create (file_title, PRI_DEFAULT, initd, fn_copy);
 	if (tid == TID_ERROR)
 		palloc_free_page (fn_copy);
 	return tid;
@@ -204,6 +214,10 @@ process_wait (tid_t child_tid UNUSED) {
 	/* XXX: Hint) The pintos exit if process_wait (initd), we recommend you
 	 * XXX:       to add infinite loop here before
 	 * XXX:       implementing the process_wait. */
+	
+	while(1) {
+		;
+	}
 	return -1;
 }
 
@@ -329,16 +343,38 @@ load (const char *file_name, struct intr_frame *if_) {
 	bool success = false;
 	int i;
 
+	/*** Arguments passing ***/
+	char *token, *save_ptr;
+	uint64_t argc = 0;
+	char zero = 0;
+	size_t token_len;
+	char *file_copy_argc = malloc(strlen(file_name) + 1);
+	char *file_copy_argv = malloc(strlen(file_name) + 1);
+	char *file_title = malloc(strlen(file_name) + 1);
+	strlcpy(file_copy_argc, file_name, strlen(file_name) + 1);
+	strlcpy(file_copy_argv, file_name, strlen(file_name) + 1);
+	strlcpy(file_title, file_name, strlen(file_name) + 1);
+
 	/* Allocate and activate page directory. */
 	t->pml4 = pml4_create ();
 	if (t->pml4 == NULL)
 		goto done;
 	process_activate (thread_current ());
 
+	//printf("file name : %s\n", file_title);
+		/*** give proper file name to FILE_NAME ***/
+	for (token = strtok_r(file_title, " ", &save_ptr); token != NULL;
+			token = strtok_r(NULL, " ", &save_ptr)) {
+				/*** if token == NULL? ***/
+				token_len = strlen(token);
+				strlcpy(file_title, token, token_len + 1);
+				break;
+	}	
+
 	/* Open executable file. */
-	file = filesys_open (file_name);
+	file = filesys_open (file_title);
 	if (file == NULL) {
-		printf ("load: %s: open failed\n", file_name);
+		printf ("load: %s: open failed\n", file_title);
 		goto done;
 	}
 
@@ -416,7 +452,54 @@ load (const char *file_name, struct intr_frame *if_) {
 
 	/* TODO: Your code goes here.
 	 * TODO: Implement argument passing (see project2/argument_passing.html). */
+	for (token = strtok_r(file_copy_argc, " ", &save_ptr); token != NULL;
+			token = strtok_r(NULL, " ", &save_ptr)) {
+			argc++;
+	}
+	//printf("argc : %d\n", argc);
 
+	char **argv = malloc(argc * sizeof(char*));
+
+	argc = 0;
+	//printf("file name!! : %s\n", file_copy_argv);
+	for (token = strtok_r(file_copy_argv, " ", &save_ptr); token != NULL;
+			token = strtok_r(NULL, " ", &save_ptr)) {
+				if_ -> rsp -= strlen(token) + 1;
+				strlcpy((char *) if_ -> rsp, token, strlen(token) + 1);
+				argv[argc] = (char *) if_ -> rsp;
+				argc++;
+				//printf("%s\n", token);
+	}
+	//printf("argc1 : %p\n", if_ -> rsp);
+	//printf("argv address : %p\n", argv[1]);
+
+	argv[argc] = 0;
+
+	while (if_ -> rsp % 8 != 0) {
+		if_ -> rsp -= 1;
+		strlcpy((char *) if_ -> rsp, &zero, 1);
+	}
+	//printf("argc2 : %p\n", if_ -> rsp);
+
+	for (i = argc; i >= 0; i--) {
+		//printf("argv : %p\n", argv[i-1]);
+		if_ -> rsp -= sizeof(char*);
+		strlcpy((char *) if_ -> rsp, (char *) &argv[i], sizeof(char*));
+	}
+	//printf("argc3 : %p\n", if_ -> rsp);
+
+	if_ -> rsp -= sizeof(void*);
+	argc -= 1;
+	//printf("arg4 : %p\n", if_ -> rsp);
+	//printf("argcheck : %p\n", argv[0]);
+	strlcpy((char *) if_ -> rsp, (char *) &argc, sizeof(void*));
+	//printf("argc5 : %p\n", if_ -> rsp);
+	
+	strlcpy((char *) &if_ -> R.rdi, (char *) &argc, sizeof(int));
+	strlcpy((char *) &if_ -> R.rsi, (char *) &argv[0], sizeof(char*));
+	//printf("argc6 : %d\n", argc);
+	hex_dump(if_ -> rsp, (void *) if_ -> rsp, 0x47480000 - (if_ -> rsp), 1);
+	//printf("file title : %s\n", file_title);
 	success = true;
 
 done:
