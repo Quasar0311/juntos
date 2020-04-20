@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "/home/team25/juntos/utils/pintos", line 183, in <module>
+    hostfns=[f[0].split(':') for f in args.HOSTFNS]).run()
+  File "/home/team25/juntos/utils/pintos", line 124, in run
+    self.bdevs = self.__scan_dir()
+  File "/home/team25/juntos/utils/pintos", line 48, in __scan_dir
+    f.write(bytes('\0' * (0xfc000 * size), 'utf-8'))
+KeyboardInterrupt

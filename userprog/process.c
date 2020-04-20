@@ -33,7 +33,7 @@ static void __do_fork (void *);
 /* General process initializer for initd and other process. */
 static void
 process_init (void) {
-	struct thread *current = thread_current ();
+	struct thread *gitcurrent = thread_current ();
 }
 
 /* Starts the first userland program, called "initd", loaded from FILE_NAME.
@@ -489,8 +489,8 @@ load (const char *file_name, struct intr_frame *if_) {
 	if_ -> rsp -= sizeof(void*);
 	strlcpy((char *) if_ -> rsp, (char *) &argv[argc], sizeof(void*));
 
-	strlcpy((char *) if_ -> R.rdi, (char *) argc, sizeof(uint64_t));
-	strlcpy((char *) if_ -> R.rsi, (char *) &argv[0], sizeof(char*));
+	memcpy((char *) if_ -> R.rdi, (char *) argc, sizeof(uint64_t));
+	memcpy((char *) if_ -> R.rsi, (char *) &argv[0], sizeof(char*));
 
 	hex_dump(if_ -> rsp, (void *) if_ -> rsp, 0x47470000 - (if_ -> rsp), 1);
 
