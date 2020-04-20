@@ -56,14 +56,14 @@ process_create_initd (const char *file_name) {
 	if (fn_copy == NULL)
 		return TID_ERROR;
 
-	/*** give proper file name to FILE_NAME ***/
-	for (token = strtok_r(file_copy, " ", &save_ptr); token != NULL;
-			token = strtok_r(NULL, " ", &save_ptr)) {
-				/*** if token == NULL? ***/
-				token_len = strlen(token);
-				strlcpy(file_copy, token, token_len + 1);
-				break;
-	}
+	// /*** give proper file name to FILE_NAME ***/
+	// for (token = strtok_r(file_copy, " ", &save_ptr); token != NULL;
+	// 		token = strtok_r(NULL, " ", &save_ptr)) {
+	// 			/*** if token == NULL? ***/
+	// 			token_len = strlen(token);
+	// 			strlcpy(file_copy, token, token_len + 1);
+	// 			break;
+	// }
 
 	strlcpy (fn_copy, file_copy, PGSIZE);
 
@@ -182,11 +182,11 @@ process_exec (void *f_name) {
 	char *file_name = f_name;
 	bool success;
 
-	char *token, *save_ptr;
-	size_t token_len;
+	// char *token, *save_ptr;
+	// size_t token_len;
 
-	char *file_copy = malloc(strlen(f_name) + 1);
-	strlcpy(file_copy, f_name, strlen(f_name) + 1);
+	// char *file_copy = malloc(strlen(f_name) + 1);
+	// strlcpy(file_copy, f_name, strlen(f_name) + 1);
 
 	/* We cannot use the intr_frame in the thread structure.
 	 * This is because when current thread rescheduled,
@@ -210,7 +210,7 @@ process_exec (void *f_name) {
 
 
 	/* And then load the binary */
-	//printf("%s!\n", file_name);
+	// printf("%s!\n", file_name);
 	success = load (file_name, &_if);
 
 	/* If load failed, quit. */
@@ -372,8 +372,13 @@ load (const char *file_name, struct intr_frame *if_) {
 	char *token, *save_ptr;
 	uint64_t argc = 0;
 	char zero = 0;
-	char *file_copy = malloc(strlen(file_name) + 1);
-	strlcpy(file_copy, file_name, strlen(file_name) + 1);
+	size_t token_len;
+	char *file_copy_argc = malloc(strlen(file_name) + 1);
+	char *file_copy_argv = malloc(strlen(file_name) + 1);
+	char *file_title = malloc(strlen(file_name) + 1);
+	strlcpy(file_copy_argc, file_name, strlen(file_name) + 1);
+	strlcpy(file_copy_argv, file_name, strlen(file_name) + 1);
+	strlcpy(file_title, file_name, strlen(file_name) + 1);
 
 	/* Allocate and activate page directory. */
 	t->pml4 = pml4_create ();
@@ -381,11 +386,20 @@ load (const char *file_name, struct intr_frame *if_) {
 		goto done;
 	process_activate (thread_current ());
 
-	//printf("file name : %s\n", file_name);
+	//printf("file name : %s\n", file_title);
+		/*** give proper file name to FILE_NAME ***/
+	for (token = strtok_r(file_title, " ", &save_ptr); token != NULL;
+			token = strtok_r(NULL, " ", &save_ptr)) {
+				/*** if token == NULL? ***/
+				token_len = strlen(token);
+				strlcpy(file_title, token, token_len + 1);
+				break;
+	}
+
 	/* Open executable file. */
-	file = filesys_open (file_name);
+	file = filesys_open (file_title);
 	if (file == NULL) {
-		printf ("load: %s: open failed\n", file_name);
+		printf ("load: %s: open failed\n", file_title);
 		goto done;
 	}
 
@@ -463,8 +477,9 @@ load (const char *file_name, struct intr_frame *if_) {
 
 	/* TODO: Your code goes here.
 	 * TODO: Implement argument passing (see project2/argument_passing.html). */
-		
-	for (token = strtok_r(file_copy, " ", &save_ptr); token != NULL;
+	//printf("file name : %s\n", file_copy_argc);
+
+	for (token = strtok_r(file_copy_argc, " ", &save_ptr); token != NULL;
 			token = strtok_r(NULL, " ", &save_ptr)) {
 			argc++;
 	}
@@ -473,15 +488,17 @@ load (const char *file_name, struct intr_frame *if_) {
 	char **argv = malloc(argc * sizeof(char*));
 
 	argc = 0;
-	for (token = strtok_r(file_copy, " ", &save_ptr); token != NULL;
+	//printf("file name!! : %s\n", file_copy_argv);
+	for (token = strtok_r(file_copy_argv, " ", &save_ptr); token != NULL;
 			token = strtok_r(NULL, " ", &save_ptr)) {
 				if_ -> rsp -= strlen(token) + 1;
 				strlcpy((char *) if_ -> rsp, token, strlen(token) + 1);
 				argv[argc] = (char *) if_ -> rsp;
 				argc++;
-				printf("%s\n", token);
+				//printf("%s\n", token);
 	}
-	printf("argc1 : %p\n", if_ -> rsp);
+	//printf("argc1 : %p\n", if_ -> rsp);
+	//printf("argv address : %p\n", argv[1]);
 
 	argv[argc] = 0;
 
@@ -489,22 +506,27 @@ load (const char *file_name, struct intr_frame *if_) {
 		if_ -> rsp -= 1;
 		strlcpy((char *) if_ -> rsp, &zero, 1);
 	}
-	printf("argc2 : %p\n", if_ -> rsp);
+	//printf("argc2 : %p\n", if_ -> rsp);
 
-	for (i = argc; i >= 0; i--) {
+	for (i = argc; i > 0; i--) {
+		//printf("argv : %p\n", argv[i-1]);
 		if_ -> rsp -= sizeof(char*);
-		strlcpy((char *) if_ -> rsp, (char *) &argv[i], sizeof(char*));
+		strlcpy((char *) if_ -> rsp, (char *) &argv[i - 1], sizeof(char*));
 	}
-	printf("argc3 : %d\n", argc);
+	//printf("argc3 : %p\n", if_ -> rsp);
 
 	if_ -> rsp -= sizeof(void*);
-	strlcpy((char *) if_ -> rsp, (char *) &argv[argc], sizeof(void*));
-	printf("argc5 : %d\n", argc);
-	memcpy((char *) if_ -> R.rdi, (char *) &argv[0], sizeof(int));
-	memcpy((char *) if_ -> R.rsi, (char *) &argv[0], sizeof(char*));
-	printf("argc6 : %d\n", argc);
-	hex_dump(if_ -> rsp, (void *) if_ -> rsp, 0x47470000 - (if_ -> rsp), 1);
-	printf("argc4 : %d\n", argc);
+	argc -= 1;
+	//printf("arg4 : %p\n", if_ -> rsp);
+	//printf("argcheck : %p\n", argv[0]);
+	strlcpy((char *) if_ -> rsp, (char *) &argc, sizeof(void*));
+	//printf("argc5 : %p\n", if_ -> rsp);
+	
+	strlcpy((char *) &if_ -> R.rdi, (char *) &argc, sizeof(int));
+	strlcpy((char *) &if_ -> R.rsi, (char *) &argv[0], sizeof(char*));
+	//printf("argc6 : %d\n", argc);
+	hex_dump(if_ -> rsp, (void *) if_ -> rsp, 0x47480000 - (if_ -> rsp), 1);
+	
 	success = true;
 
 done:

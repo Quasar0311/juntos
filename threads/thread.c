@@ -275,7 +275,10 @@ thread_create (const char *name, int priority,
 	/*** if new thread's priority is higher than current thread's priority, 
 	yield CPU ***/
 	if (priority > thread_get_priority()){
-		thread_yield();
+		if (!intr_context()) {
+			thread_yield();
+		}
+		
 	}
 
 	return tid;
@@ -438,9 +441,13 @@ cmp_max_priority(void){
 	// 	 thread_yield();
 	//  }
 	if(list_entry(list_max(&ready_list, priority_less_func, NULL), struct thread, elem)->priority
-	//if(list_entry(list_front(&ready_list), struct thread, elem)->priority
-	> thread_get_priority())
-		thread_yield();
+	> thread_get_priority()) {
+		if (!intr_context()) {
+			thread_yield();
+		}
+		
+	}
+		
 
 }
 
