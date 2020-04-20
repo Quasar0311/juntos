@@ -217,17 +217,15 @@ lock_acquire (struct lock *lock) {
 	ASSERT (!lock_held_by_current_thread (lock));
 	
 	struct thread *curr = thread_current();
-	if (!intr_context()) {
-		if (thread_mlfqs == false) {
-			if (lock -> holder != NULL) {
-				struct thread *hold = lock -> holder;
-				thread_current() -> lock_waiting = lock;
-				list_push_front(&hold -> donations, &curr -> donation_elem);
-				priority_donation(lock);
-			}
+
+	if (thread_mlfqs == false) {
+		if (lock -> holder != NULL) {
+			struct thread *hold = lock -> holder;
+			thread_current() -> lock_waiting = lock;
+			list_push_front(&hold -> donations, &curr -> donation_elem);
+			priority_donation(lock);
 		}
 	}
-	
 
 	sema_down (&lock->semaphore);
 	lock->holder = thread_current ();

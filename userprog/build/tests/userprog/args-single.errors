@@ -1,3 +1,0 @@
-usage: pintos [-h] [-v] [-k] [-T TIMEOUT] [-m MEMORY] [--fs-disk FS_DISK]
-              [--swap-disk SWAP_DISK] [-p HOSTFNS] [-g GUESTFNS] [--gdb] [-t]
-pintos: error: unrecognized arguments: —fs-disk=10 — -q -f run args-single

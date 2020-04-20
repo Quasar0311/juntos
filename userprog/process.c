@@ -45,30 +45,26 @@ tid_t
 process_create_initd (const char *file_name) {
 	char *fn_copy;
 	tid_t tid;
+	char *file_title = malloc(strlen(file_name) + 1);
+	strlcpy(file_title, file_name, strlen(file_name) + 1);
 	char *token, *save_ptr;
-	size_t token_len;
-	char *file_copy = malloc(strlen(file_name) + 1);
-	strlcpy(file_copy, file_name, strlen(file_name) + 1);
+
+	for (token = strtok_r(file_title, " ", &save_ptr); token != NULL;
+	token = strtok_r(NULL, " ", &save_ptr)) {
+		strlcpy(file_title, token, strlen(token) + 1);
+		break;
+	}
 
 	/* Make a copy of FILE_NAME.
 	 * Otherwise there's a race between the caller and load(). */
 	fn_copy = palloc_get_page (0);
 	if (fn_copy == NULL)
 		return TID_ERROR;
+	strlcpy (fn_copy, file_name, PGSIZE);
 
-	// /*** give proper file name to FILE_NAME ***/
-	// for (token = strtok_r(file_copy, " ", &save_ptr); token != NULL;
-	// 		token = strtok_r(NULL, " ", &save_ptr)) {
-	// 			/*** if token == NULL? ***/
-	// 			token_len = strlen(token);
-	// 			strlcpy(file_copy, token, token_len + 1);
-	// 			break;
-	// }
-
-	strlcpy (fn_copy, file_copy, PGSIZE);
-
+	//printf("title : %s\n", file_title);
 	/* Create a new thread to execute FILE_NAME. */
-	tid = thread_create (file_copy, PRI_DEFAULT, initd, fn_copy);
+	tid = thread_create (file_title, PRI_DEFAULT, initd, fn_copy);
 	if (tid == TID_ERROR)
 		palloc_free_page (fn_copy);
 	return tid;
@@ -182,12 +178,6 @@ process_exec (void *f_name) {
 	char *file_name = f_name;
 	bool success;
 
-	// char *token, *save_ptr;
-	// size_t token_len;
-
-	// char *file_copy = malloc(strlen(f_name) + 1);
-	// strlcpy(file_copy, f_name, strlen(f_name) + 1);
-
 	/* We cannot use the intr_frame in the thread structure.
 	 * This is because when current thread rescheduled,
 	 * it stores the execution information to the member. */
@@ -199,18 +189,7 @@ process_exec (void *f_name) {
 	/* We first kill the current context */
 	process_cleanup ();
 
-	// /*** give proper file name to FILE_NAME ***/
-	// for (token = strtok_r(file_name, " ", &save_ptr); token != NULL;
-	// 		token = strtok_r(NULL, " ", &save_ptr)) {
-	// 			/*** if token == NULL? ***/
-	// 			token_len = strlen(token);
-	// 			strlcpy(file_name, token, token_len + 1);
-	// 			break;
-	// }
-
-
 	/* And then load the binary */
-	// printf("%s!\n", file_name);
 	success = load (file_name, &_if);
 
 	/* If load failed, quit. */
@@ -508,10 +487,10 @@ load (const char *file_name, struct intr_frame *if_) {
 	}
 	//printf("argc2 : %p\n", if_ -> rsp);
 
-	for (i = argc; i > 0; i--) {
+	for (i = argc; i >= 0; i--) {
 		//printf("argv : %p\n", argv[i-1]);
 		if_ -> rsp -= sizeof(char*);
-		strlcpy((char *) if_ -> rsp, (char *) &argv[i - 1], sizeof(char*));
+		strlcpy((char *) if_ -> rsp, (char *) &argv[i], sizeof(char*));
 	}
 	//printf("argc3 : %p\n", if_ -> rsp);
 
@@ -526,11 +505,12 @@ load (const char *file_name, struct intr_frame *if_) {
 	strlcpy((char *) &if_ -> R.rsi, (char *) &argv[0], sizeof(char*));
 	//printf("argc6 : %d\n", argc);
 	hex_dump(if_ -> rsp, (void *) if_ -> rsp, 0x47480000 - (if_ -> rsp), 1);
-	
+	//printf("file title : %s\n", file_title);
 	success = true;
 
 done:
 	/* We arrive here whether the load is successful or not. */
+	//printf("file title : %s\n", file_title);
 	file_close (file);
 	return success;
 }
