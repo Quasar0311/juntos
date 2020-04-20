@@ -41,8 +41,88 @@ syscall_init (void) {
 void
 syscall_handler (struct intr_frame *f UNUSED) {
 	// TODO: Your implementation goes here.
-	printf ("system call!\n");
-	thread_exit ();
+
+	/*** pseudo code ***/
+	// get stack pointer from interrupt intr_frame *f
+	// get system call number from stack
+	// switch(system call number){
+	// 	case the number is halt:
+	// 		call halt function;
+	// 		break;
+	// 	case the number is exit:
+	// 		call exit function;
+	// 		break;
+	// 	default
+	// 		call thread_exit function;
+	// }
+	
+	/*** implement syscall_handler using 
+	system call number stored in the user stack ***/
+	switch(*(int *)(if_->R.rax)){
+		case 0:
+			halt();
+			break;
+
+		case 1:
+			exit();
+			break;
+
+		case 2:
+			fork();
+			break;
+
+		case 3:
+			exec();
+			break;
+
+		case 4:
+			wait();
+			break;
+
+		case 5:
+			create();
+			break;
+
+		case 6:
+			remove();
+			break;
+
+		case 7:
+			open();
+			break;
+
+		case 8:
+			filesize();
+			break;
+
+		case 9:
+			read();
+			break;
+
+		case 10:
+			write();
+			break;
+
+		case 11:
+			seek();
+			break;
+
+		case 12:
+			tell();
+			break;
+
+		case 13:	
+			close();
+			break;
+
+		default:
+			thread_exit();
+	}
+	/*** check if stack pointer is user virtual address
+	check if argument pointer is user virtual address ***/
+	
+	// printf ("system call!\n");
+	// thread_exit ();
 }
 
 void
@@ -53,6 +133,12 @@ check_address(void *addr){
 }
 
 void
-get_argument(void *rsp, int *arg, int count){
-	
+get_argument(struct intr_frame *_if, int *arg, int count){
+	/*** push arguments stored in user stack to kernel 
+	check if addr is in user virtual address ***/
+	for(int i=count; i>=0; i--){
+		if_rsp-=sizeof(char *);
+		check_address(if_->rsp);
+		strlcpy((char *)&argv[i], (char *)if_->rsp, sizeof(char *));
+	}
 }

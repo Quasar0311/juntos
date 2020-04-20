@@ -472,6 +472,7 @@ load (const char *file_name, struct intr_frame *if_) {
 
 	char **argv = malloc(argc * sizeof(char*));
 
+	/*** push arguments ***/
 	argc = 0;
 	for (token = strtok_r(file_copy, " ", &save_ptr); token != NULL;
 			token = strtok_r(NULL, " ", &save_ptr)) {
@@ -491,6 +492,7 @@ load (const char *file_name, struct intr_frame *if_) {
 	}
 	printf("argc2 : %p\n", if_ -> rsp);
 
+	/*** push arguments address ***/
 	for (i = argc; i >= 0; i--) {
 		if_ -> rsp -= sizeof(char*);
 		strlcpy((char *) if_ -> rsp, (char *) &argv[i], sizeof(char*));
