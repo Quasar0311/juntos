@@ -44,3 +44,15 @@ syscall_handler (struct intr_frame *f UNUSED) {
 	printf ("system call!\n");
 	thread_exit ();
 }
+
+void
+check_address(void *addr){
+	/*** check if addr is user virtual address
+	else process terminates with exit state -1 ***/
+	if(!is_user_vaddr(addr)) exit(-1);
+}
+
+void
+get_argument(void *rsp, int *arg, int count){
+	
+}
