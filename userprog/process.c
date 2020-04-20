@@ -456,7 +456,7 @@ load (const char *file_name, struct intr_frame *if_) {
 
 	/* TODO: Your code goes here.
 	 * TODO: Implement argument passing (see project2/argument_passing.html). */
-	//printf("file name : %s\n", file_copy_argc);
+	
 
 	for (token = strtok_r(file_copy_argc, " ", &save_ptr); token != NULL;
 			token = strtok_r(NULL, " ", &save_ptr)) {
@@ -467,28 +467,30 @@ load (const char *file_name, struct intr_frame *if_) {
 	char **argv = malloc(argc * sizeof(char*));
 
 	argc = 0;
-	//printf("file name!! : %s\n", file_copy_argv);
+
 	for (token = strtok_r(file_copy_argv, " ", &save_ptr); token != NULL;
 			token = strtok_r(NULL, " ", &save_ptr)) {
-				if_ -> rsp -= strlen(token) + 1;
+				token_len = strlen(token);
+				//printf("strlen : %d\n", strlen(token));
+				if_ -> rsp -= token_len + 1;
 				strlcpy((char *) if_ -> rsp, token, strlen(token) + 1);
 				argv[argc] = (char *) if_ -> rsp;
 				argc++;
-				//printf("%s\n", token);
 	}
-	//printf("argc1 : %p\n", if_ -> rsp);
-	//printf("argv address : %p\n", argv[1]);
 
-	argv[argc] = 0;
+	//argv[argc] = zero;
 
 	while (if_ -> rsp % 8 != 0) {
 		if_ -> rsp -= 1;
-		strlcpy((char *) if_ -> rsp, &zero, 1);
+		strlcpy((char *) if_ -> rsp, &zero, 2);
 	}
-	//printf("argc2 : %p\n", if_ -> rsp);
 
 	for (i = argc; i >= 0; i--) {
-		//printf("argv : %p\n", argv[i-1]);
+		if (i == argc) {
+			if_ -> rsp -= sizeof(char*);
+			strlcpy((char *) if_ -> rsp, &zero, sizeof(char*));
+			continue;
+		}
 		if_ -> rsp -= sizeof(char*);
 		strlcpy((char *) if_ -> rsp, (char *) &argv[i], sizeof(char*));
 	}
@@ -496,16 +498,14 @@ load (const char *file_name, struct intr_frame *if_) {
 
 	if_ -> rsp -= sizeof(void*);
 	argc -= 1;
-	//printf("arg4 : %p\n", if_ -> rsp);
-	//printf("argcheck : %p\n", argv[0]);
+	
 	strlcpy((char *) if_ -> rsp, (char *) &argc, sizeof(void*));
-	//printf("argc5 : %p\n", if_ -> rsp);
 	
 	strlcpy((char *) &if_ -> R.rdi, (char *) &argc, sizeof(int));
 	strlcpy((char *) &if_ -> R.rsi, (char *) &argv[0], sizeof(char*));
-	//printf("argc6 : %d\n", argc);
-	hex_dump(if_ -> rsp, (void *) if_ -> rsp, 0x47480000 - (if_ -> rsp), 1);
-	//printf("file title : %s\n", file_title);
+	
+	hex_dump(if_ -> rsp, (void *) if_ -> rsp, 0x47480000 - (if_ -> rsp), true);
+	
 	success = true;
 
 done:
