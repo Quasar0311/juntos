@@ -5,6 +5,10 @@
 #include <list.h>
 #include <stdint.h>
 #include "threads/interrupt.h"
+#ifdef VM
+#include "vm/vm.h"
+#endif
+
 
 /* States in a thread's life cycle. */
 enum thread_status {
@@ -87,7 +91,6 @@ struct thread {
 	enum thread_status status;          /* Thread state. */
 	char name[16];                      /* Name (for debugging purposes). */
 	int priority;                       /* Priority. */
-	int64_t alarm;						/* Used for alarm ticks. */
 
 	/* Shared between thread.c and synch.c. */
 	struct list_elem elem;              /* List element. */
@@ -95,6 +98,10 @@ struct thread {
 #ifdef USERPROG
 	/* Owned by userprog/process.c. */
 	uint64_t *pml4;                     /* Page map level 4 */
+#endif
+#ifdef VM
+	/* Table for whole virtual memory owned by thread. */
+	struct supplemental_page_table spt;
 #endif
 
 	/* Owned by thread.c. */
@@ -106,12 +113,6 @@ struct thread {
    If true, use multi-level feedback queue scheduler.
    Controlled by kernel command-line option "-o mlfqs". */
 extern bool thread_mlfqs;
-
-/*** Prototype for alarm functions. ***/
-void thread_sleep (int64_t ticks);
-void thread_wakeup (int64_t ticks);
-void earliest_time (int64_t ticks);
-
 
 void thread_init (void);
 void thread_start (void);
