@@ -66,15 +66,15 @@ syscall_handler (struct intr_frame *f UNUSED) {
 	/*** implement syscall_handler using 
 	system call number stored in the user stack ***/
 	
-	switch(*(int *)(f->R.rax)){
-		case 10:
-			printf("here\n");
-			halt();
-			break;
+	// switch(*(int *)(f->R.rax)){
+	// 	case 10:
+	// 		printf("here\n");
+	// 		halt();
+	// 		break;
 
-		default:
-			thread_exit();
-	}
+	// 	default:
+	// 		thread_exit();
+	// }
 
 	/*** check if stack pointer is user virtual address
 	check if argument pointer is user virtual address ***/
