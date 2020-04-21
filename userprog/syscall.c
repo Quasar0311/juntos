@@ -4,12 +4,19 @@
 #include "threads/interrupt.h"
 #include "threads/thread.h"
 #include "threads/loader.h"
+#include "threads/init.h"
 #include "userprog/gdt.h"
 #include "threads/flags.h"
 #include "intrinsic.h"
 
 void syscall_entry (void);
 void syscall_handler (struct intr_frame *);
+
+void get_argument (struct intr_frame *f, int *arg, int count);
+void check_address (void *addr);
+void syscall_halt (void);
+void syscall_exit (int status);
+
 
 /* System call.
  *
@@ -42,11 +49,23 @@ void
 syscall_handler (struct intr_frame *f UNUSED) {
 	// TODO: Your implementation goes here.
 	int *number = (int *) &f -> R.rax;
-	//int sysno = *number;
+	int arg[5];
+	
+	
 	printf("syscall no : %d\n", *number);
+
+	
+
 	switch (*number) {
+		case SYS_HALT:
+			syscall_halt();
+			break;
+
+		case SYS_EXIT:
+
+
 		case 10:
-			printf("hi\n");
+			syscall_halt();
 			break;
 	}
 	
@@ -54,3 +73,38 @@ syscall_handler (struct intr_frame *f UNUSED) {
 	
 	thread_exit ();
 }
+
+void
+check_address (void *addr) {
+	if (!is_user_vaddr(addr)) {
+		syscall_exit(-1);
+	}
+}
+
+void
+get_argument (struct intr_frame *f, int *arg, int count) {
+	int i;
+	void *addr;
+
+	for (i = 0; i < count; i++) {
+		addr = (void *) f -> rsp;
+		addr += 1;
+		check_address(addr);
+		arg[i] = *(int *) addr;
+	}
+}
+
+void
+syscall_halt (void) {
+	power_off();
+}
+
+void
+syscall_exit (int status) {
+	struct thread *curr = thread_current();
+
+	printf("%s: exit(%d)\n", curr -> name, status);
+	thread_exit();
+}
+
+

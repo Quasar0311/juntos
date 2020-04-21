@@ -121,6 +121,12 @@ struct thread {
 	/*** advanced scheduler ***/
 	int nice;
 	int recent_cpu;
+
+
+	/*** file descriptor ***/
+	struct list fd_table;
+	int fd;
+
 };
 
 /* If false (default), use round-robin scheduler.
