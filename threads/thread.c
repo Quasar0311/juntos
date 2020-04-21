@@ -269,6 +269,11 @@ thread_create (const char *name, int priority,
 	t->tf.cs = SEL_KCSEG;
 	t->tf.eflags = FLAG_IF;
 
+	/*** initialize fd ***/
+	list_init(t->fd_table);
+	
+	/*** allocate memory to fd table ***/
+
 	/* Add to run queue. */
 	thread_unblock (t);
 

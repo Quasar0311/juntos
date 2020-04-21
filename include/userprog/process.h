@@ -10,4 +10,12 @@ int process_wait (tid_t);
 void process_exit (void);
 void process_activate (struct thread *next);
 
+/*** create file descriptor for a file object ***/
+int process_add_file(struct file *f_name);
+/*** return file object address by searching process 
+file descriptor talbe***/
+struct file *process_get_file(int fd);
+/*** close the file of file descriptor and initialize entry***/
+void process_close_file(int fd);
+
 #endif /* userprog/process.h */
