@@ -41,6 +41,16 @@ syscall_init (void) {
 void
 syscall_handler (struct intr_frame *f UNUSED) {
 	// TODO: Your implementation goes here.
+	int *number = (int *) &f -> R.rax;
+	//int sysno = *number;
+	printf("syscall no : %d\n", *number);
+	switch (*number) {
+		case 10:
+			printf("hi\n");
+			break;
+	}
+	
 	printf ("system call!\n");
+	
 	thread_exit ();
 }
