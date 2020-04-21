@@ -468,6 +468,7 @@ load (const char *file_name, struct intr_frame *if_) {
 
 	argc = 0;
 
+	/*** push argument ***/
 	for (token = strtok_r(file_copy_argv, " ", &save_ptr); token != NULL;
 			token = strtok_r(NULL, " ", &save_ptr)) {
 				token_len = strlen(token);
@@ -485,6 +486,7 @@ load (const char *file_name, struct intr_frame *if_) {
 		strlcpy((char *) if_ -> rsp, &zero, 2);
 	}
 
+	/*** push argument address ***/
 	for (i = argc; i >= 0; i--) {
 		if (i == argc) {
 			if_ -> rsp -= sizeof(char*);
