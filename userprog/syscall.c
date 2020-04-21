@@ -1,4 +1,5 @@
 #include "userprog/syscall.h"
+#include "lib/user/syscall.h"
 #include <stdio.h>
 #include <syscall-nr.h>
 #include "threads/interrupt.h"
@@ -64,22 +65,21 @@ syscall_handler (struct intr_frame *f UNUSED) {
 
 	/*** implement syscall_handler using 
 	system call number stored in the user stack ***/
-
-	// int number;
-	// memcpy(&number, f->R.rax, sizeof(int));
 	
-	// switch(number){
-	// 	case 0:
-	// 		halt();
-	// 		break;
+	switch(*(int *)(f->R.rax)){
+		case 10:
+			printf("here\n");
+			halt();
+			break;
 
-	// 	default:
-	// 		thread_exit();
-	// }
+		default:
+			thread_exit();
+	}
+
 	/*** check if stack pointer is user virtual address
 	check if argument pointer is user virtual address ***/
 	
-	printf("syscall num : %d\n", *(char *)(f->R.rax));
+	// printf("syscall num : %d\n", (int *)(f->R.rax));
 	printf ("system call!\n");
 	thread_exit ();
 }
