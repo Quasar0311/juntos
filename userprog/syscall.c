@@ -9,6 +9,8 @@
 #include "intrinsic.h"
 
 void syscall_entry (void);
+void check_address(void *addr);
+void get_argument(struct intr_frame *_if, int *arg, int count);
 void syscall_handler (struct intr_frame *);
 
 /* System call.
@@ -37,10 +39,47 @@ syscall_init (void) {
 			FLAG_IF | FLAG_TF | FLAG_DF | FLAG_IOPL | FLAG_AC | FLAG_NT);
 }
 
+// void
+// check_address(void *addr){
+// 	/*** check if addr is user virtual address
+// 	else process terminates with exit state -1 ***/
+// 	if(!is_user_vaddr(addr)) exit(-1);
+// }
+
+// void
+// get_argument(struct intr_frame *_if, int *arg, int count){
+// 	/*** push arguments stored in user stack to kernel 
+// 	check if addr is in user virtual address ***/
+// 	for(int i=count; i>=0; i--){
+// 		if_rsp-=sizeof(char *);
+// 		check_address(if_->rsp);
+// 		strlcpy((char *)&argv[i], (char *)if_->rsp, sizeof(char *));
+// 	}
+// }
+
 /* The main system call interface */
 void
 syscall_handler (struct intr_frame *f UNUSED) {
 	// TODO: Your implementation goes here.
+
+	/*** implement syscall_handler using 
+	system call number stored in the user stack ***/
+
+	// int number;
+	// memcpy(&number, f->R.rax, sizeof(int));
+	
+	// switch(number){
+	// 	case 0:
+	// 		halt();
+	// 		break;
+
+	// 	default:
+	// 		thread_exit();
+	// }
+	/*** check if stack pointer is user virtual address
+	check if argument pointer is user virtual address ***/
+	
+	printf("syscall num : %d\n", *(int *)(f->R.rax));
 	printf ("system call!\n");
 	thread_exit ();
 }
