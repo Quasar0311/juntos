@@ -62,20 +62,6 @@ void
 syscall_handler (struct intr_frame *f UNUSED) {
 	// TODO: Your implementation goes here.
 
-	/*** pseudo code ***/
-	// get stack pointer from interrupt intr_frame *f
-	// get system call number from stack
-	// switch(system call number){
-	// 	case the number is halt:
-	// 		call halt function;
-	// 		break;
-	// 	case the number is exit:
-	// 		call exit function;
-	// 		break;
-	// 	default
-	// 		call thread_exit function;
-	// }
-
 	/*** implement syscall_handler using 
 	system call number stored in the user stack ***/
 
@@ -85,58 +71,6 @@ syscall_handler (struct intr_frame *f UNUSED) {
 	switch(number){
 		case 0:
 			halt();
-			break;
-
-		case 1:
-			exit();
-			break;
-
-		case 2:
-			fork();
-			break;
-
-		case 3:
-			exec();
-			break;
-
-		case 4:
-			wait();
-			break;
-
-		case 5:
-			create();
-			break;
-
-		case 6:
-			remove();
-			break;
-
-		case 7:
-			open();
-			break;
-
-		case 8:
-			filesize();
-			break;
-
-		case 9:
-			read();
-			break;
-
-		case 10:
-			write();
-			break;
-
-		case 11:
-			seek();
-			break;
-
-		case 12:
-			tell();
-			break;
-
-		case 13:	
-			close();
 			break;
 
 		default:
