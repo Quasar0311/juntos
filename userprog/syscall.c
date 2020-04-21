@@ -10,7 +10,7 @@
 
 void syscall_entry (void);
 void check_address(void *addr);
-void get_argument(struct intr_frame *_if, int *arg, int count);
+void get_argument(struct intr_frame *_if);
 void syscall_handler (struct intr_frame *);
 
 /* System call.
@@ -47,13 +47,13 @@ syscall_init (void) {
 // }
 
 // void
-// get_argument(struct intr_frame *_if, int *arg, int count){
+// get_argument(struct intr_frame *_if){
 // 	/*** push arguments stored in user stack to kernel 
 // 	check if addr is in user virtual address ***/
 // 	for(int i=count; i>=0; i--){
-// 		if_rsp-=sizeof(char *);
+// 		if_->rsp-=sizeof(char *);
 // 		check_address(if_->rsp);
-// 		strlcpy((char *)&argv[i], (char *)if_->rsp, sizeof(char *));
+// 		strlcpy((char *)&argv[i], (char *)if_->rsp, sizeof(char*));
 // 	}
 // }
 
@@ -79,7 +79,7 @@ syscall_handler (struct intr_frame *f UNUSED) {
 	/*** check if stack pointer is user virtual address
 	check if argument pointer is user virtual address ***/
 	
-	printf("syscall num : %d\n", *(int *)(f->R.rax));
+	printf("syscall num : %d\n", *(char *)(f->R.rax));
 	printf ("system call!\n");
 	thread_exit ();
 }
