@@ -8,6 +8,7 @@
 #include "userprog/gdt.h"
 #include "threads/flags.h"
 #include "intrinsic.h"
+#include "threads/synch.h"
 
 void syscall_entry (void);
 void check_address(void *addr);
@@ -32,6 +33,9 @@ syscall_init (void) {
 	write_msr(MSR_STAR, ((uint64_t)SEL_UCSEG - 0x10) << 48  |
 			((uint64_t)SEL_KCSEG) << 32);
 	write_msr(MSR_LSTAR, (uint64_t) syscall_entry);
+
+	/*** initialize filesys_lock ***/
+	lock_init(&filesys_lock);
 
 	/* The interrupt service rountine should not serve any interrupts
 	 * until the syscall_entry swaps the userland stack to the kernel
@@ -84,7 +88,77 @@ syscall_handler (struct intr_frame *f UNUSED) {
 	thread_exit ();
 }
 
+/*** acquire lock before read(), write() access to file ***/
+
+int
+syscall_open(const char *file){
+	struct file *f;
+	int fd=-1;
+
+	// lock_acquire(&filesys_lock);
+	f=filesys_open(file);
+	fd=process_add_file(f);
+	// lock_release(&filesys_lock);
+
+	return fd;
+}
+
+int
+syscall_filesize(int fd){
+	struct file *f;
+
+	f=process_get_file(fd);
+	if(f==NULL) return -1;
+	return file_length(f);
+}
+
+int
+syscall_read(int fd, void *buffer, unsigned size){
+	struct file *f;
+	off_t bytes_read;
+
+	lock_acquire(&filesys_lock);
+
+	if(fd==0){
+		for(int i=0; i<size; i++) 
+			(uint8_t *)buffer[i]=input_getc();
+		lock_release(&filesys_lock);
+		return size;
+	}
+
+	f=process_get_file(fd);
+	if(f==NULL){
+		lock_release(&filesys_lock);
+		return -1;
+	}
+	
+	else bytes_read=file_read(f, buffer, size);
+	lock_release(&filesys_lock);
+
+	return bytes_read;
+}
+
 void
 syscall_write(int fd, void *buffer, unsigned size){
+	struct file *f;
+	off_t bytes_read;
 
+	lock_acquire(&filesys_lock);
+
+	if(fd==0){
+		putbuf((char *)buffer, size);
+		lock_release(&filesys_lock);
+		return size;
+	}
+
+	f=process_get_file(fd);
+	if(f==NULL){
+		lock_release(&filesys_lock);
+		return -1;
+	}
+	
+	else bytes_read=file_write(f, buffer, size);
+	lock_release(&filesys_lock);
+
+	return bytes_read;
 }
