@@ -649,6 +649,9 @@ init_thread (struct thread *t, const char *name, int priority) {
 	t -> lock_waiting = NULL;
 	list_init(&t -> donations);
 
+	list_init(&t -> fd_table);
+	t -> fd = 2;
+
 	t->status = THREAD_BLOCKED;
 	strlcpy (t->name, name, sizeof t->name);
 	t->tf.rsp = (uint64_t) t + PGSIZE - sizeof (void *);
