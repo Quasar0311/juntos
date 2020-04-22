@@ -6,7 +6,7 @@
 struct file_pointer{
     struct file * file;
     struct list_elem file_elem;
-}
+};
 
 /*** create file descriptor for a file object ***/
 int process_add_file(struct file *f);

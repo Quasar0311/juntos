@@ -36,8 +36,8 @@ process_add_file(struct file *f){
 
 	/*** add file to file descriptor ***/
 	struct file_pointer fp;
-	fp->file=f;
-	list_push_back(&thread_current()->fd_table, &fp->file_elem);
+	fp.file=f;
+	list_push_back(&thread_current()->fd_table, &fp.file_elem);
 
 	/*** increment by 1 of max file descriptor ***/
 	thread_current()->next_fd++;
@@ -71,7 +71,7 @@ void
 process_close_file(int fd){
 	/*** close file corressponding to file descriptor ***/
 	struct file *f;
-	struct file_ponter *fp;
+	struct list_elem *fp;
 	struct thread *curr = thread_current();
 	f = process_get_file(fd);
 
@@ -86,7 +86,7 @@ process_close_file(int fd){
 	for(int i=2; i<fd; i++){
 		fp=list_next(&fp);
 	}
-	list_remove(&fp -> file_elem);
+	list_remove(fp);
 	curr -> next_fd--;
 
 }

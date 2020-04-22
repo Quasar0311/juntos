@@ -9,11 +9,24 @@
 #include "threads/flags.h"
 #include "intrinsic.h"
 #include "threads/synch.h"
+#include "threads/init.h"
+#include "include/filesys/filesys.h"
+#include "include/userprog/process.h"
+#include "include/filesys/file.h"
+#include "include/devices/input.h"
+
+struct lock filesys_lock;
 
 void syscall_entry (void);
-void check_address(void *addr);
-void get_argument(struct intr_frame *_if);
 void syscall_handler (struct intr_frame *);
+void get_argument (struct intr_frame *f, int *arg, int count);
+void check_address (void *addr);
+void syscall_halt (void);
+void syscall_exit (int status);
+int syscall_open(const char *file);
+int syscall_filesize(int fd);
+int syscall_read(int fd, void *buffer, unsigned size);
+int syscall_write(int fd, void *buffer, unsigned size);
 
 /* System call.
  *
@@ -44,37 +57,22 @@ syscall_init (void) {
 			FLAG_IF | FLAG_TF | FLAG_DF | FLAG_IOPL | FLAG_AC | FLAG_NT);
 }
 
-// void
-// check_address(void *addr){
-// 	/*** check if addr is user virtual address
-// 	else process terminates with exit state -1 ***/
-// 	if(!is_user_vaddr(addr)) exit(-1);
-// }
-
-// void
-// get_argument(struct intr_frame *_if){
-// 	/*** push arguments stored in user stack to kernel 
-// 	check if addr is in user virtual address ***/
-// 	for(int i=count; i>=0; i--){
-// 		if_->rsp-=sizeof(char *);
-// 		check_address(if_->rsp);
-// 		strlcpy((char *)&argv[i], (char *)if_->rsp, sizeof(char*));
-// 	}
-// }
-
 /* The main system call interface */
 void
 syscall_handler (struct intr_frame *f UNUSED) {
 	// TODO: Your implementation goes here.
 
+	int arg[5];
 	/*** implement syscall_handler using 
 	system call number stored in the user stack ***/
 	int *number=(int *)&f->R.rax;
 
 	switch(*number){
 		case 10:
-			syscall_write();
-			break;
+			get_argument(f, arg, 3);
+			printf("%d, %d, %d", arg[0], arg[1], arg[2]);
+			syscall_write(arg[0], (void *)&arg[1], (unsigned)arg[2]);
+			break; 
 
 		default:
 			thread_exit();
@@ -88,7 +86,38 @@ syscall_handler (struct intr_frame *f UNUSED) {
 	thread_exit ();
 }
 
-/*** acquire lock before read(), write() access to file ***/
+void
+check_address (void *addr) {
+	if (!is_user_vaddr(addr)) {
+		syscall_exit(-1);
+	}
+}
+
+void
+get_argument (struct intr_frame *f, int *arg, int count) {
+	int i;
+	void *addr;
+
+	for (i = 0; i < count; i++) {
+		addr = (void *) f -> rsp;
+		addr += 1;
+		check_address(addr);
+		arg[i] = *(int *) addr;
+	}
+}
+
+void
+syscall_halt (void) {
+	power_off();
+}
+
+void
+syscall_exit (int status) {
+	struct thread *curr = thread_current();
+
+	printf("%s: exit(%d)\n", curr -> name, status);
+	thread_exit();
+}
 
 int
 syscall_open(const char *file){
@@ -120,8 +149,10 @@ syscall_read(int fd, void *buffer, unsigned size){
 	lock_acquire(&filesys_lock);
 
 	if(fd==0){
-		for(int i=0; i<size; i++) 
-			(uint8_t *)buffer[i]=input_getc();
+		/*** invalid use of void expression ***/
+		uint8_t *buf=(uint8_t *)buffer;
+		for(unsigned i=0; i<size; i++) 
+			buf[i]=input_getc();
 		lock_release(&filesys_lock);
 		return size;
 	}
@@ -138,7 +169,7 @@ syscall_read(int fd, void *buffer, unsigned size){
 	return bytes_read;
 }
 
-void
+int
 syscall_write(int fd, void *buffer, unsigned size){
 	struct file *f;
 	off_t bytes_read;
