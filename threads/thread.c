@@ -270,9 +270,9 @@ thread_create (const char *name, int priority,
 	t->tf.eflags = FLAG_IF;
 
 	/*** initialize fd ***/
-	list_init(t->fd_table);
-	
 	/*** allocate memory to fd table ***/
+	list_init(&t->fd_table);
+	t->next_fd=2;
 
 	/* Add to run queue. */
 	thread_unblock (t);
@@ -448,7 +448,7 @@ cmp_max_priority(void){
 	if(list_entry(list_max(&ready_list, priority_less_func, NULL), struct thread, elem)->priority
 	> thread_get_priority()) {
 		if (!intr_context()) {
-			thread_yield();
+			thread_yield(); 
 		}
 		
 	}

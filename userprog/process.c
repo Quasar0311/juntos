@@ -30,6 +30,67 @@ static bool load (const char *file_name, struct intr_frame *if_);
 static void initd (void *f_name);
 static void __do_fork (void *);
 
+int 
+process_add_file(struct file *f){
+	if(f==NULL) return -1;
+
+	/*** add file to file descriptor ***/
+	struct file_pointer fp;
+	fp->file=f;
+	list_push_back(&thread_current()->fd_table, &fp->file_elem);
+
+	/*** increment by 1 of max file descriptor ***/
+	thread_current()->next_fd++;
+
+	/*** return file descriptor ***/
+	return thread_current()->next_fd; 
+}
+
+struct file
+*process_get_file(int fd){
+	/*** return file corresponding to a file descriptor ***/
+	struct list_elem *fp;
+	struct file_pointer *f;
+
+	if(list_empty(&thread_current()->fd_table)) return NULL;
+
+	fp = list_begin(&thread_current()->fd_table);
+	for(int i=2; i<fd; i++){
+		fp=list_next(&fp);
+	}
+
+	if (fp != NULL) {
+		f = list_entry(fp, struct file_pointer, file_elem);
+		return f -> file;
+	}
+	/*** if not return NULL ***/
+	else return NULL;
+}
+
+void
+process_close_file(int fd){
+	/*** close file corressponding to file descriptor ***/
+	struct file *f;
+	struct file_ponter *fp;
+	struct thread *curr = thread_current();
+	f = process_get_file(fd);
+
+	if (f == NULL) return;
+
+	file_close(f);
+
+	/*** delete entry of corresponding file descriptor ***/
+	if(list_empty(&thread_current()->fd_table)) return NULL;
+
+	fp = list_begin(&thread_current()->fd_table);
+	for(int i=2; i<fd; i++){
+		fp=list_next(&fp);
+	}
+	list_remove(&fp -> file_elem);
+	curr -> next_fd--;
+
+}
+
 /* General process initializer for initd and other process. */
 static void
 process_init (void) {
@@ -229,11 +290,21 @@ process_wait (tid_t child_tid UNUSED) {
 void
 process_exit (void) {
 	struct thread *curr = thread_current ();
+	uint64_t *pd;
+	int fd=curr->next_fd;
+
 	/* TODO: Your code goes here.
 	 * TODO: Implement process termination message (see
 	 * TODO: project2/process_termination.html).
 	 * TODO: We recommend you to implement process resource cleanup here. */
+	
+	/*** close all files of process ***/
+	while(fd!=2){
+		process_close_file(fd);
+		fd--;
+	}
 
+	/*** release file descriptor ***/
 	process_cleanup ();
 }
 
