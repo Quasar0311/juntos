@@ -56,7 +56,7 @@ struct file
 
 	fp = list_begin(&thread_current()->fd_table);
 	for(int i=2; i<fd; i++){
-		fp=list_next(&fp);
+		fp=list_next(fp);
 	}
 
 	if (fp != NULL) {
@@ -84,7 +84,7 @@ process_close_file(int fd){
 
 	fp = list_begin(&thread_current()->fd_table);
 	for(int i=2; i<fd; i++){
-		fp=list_next(&fp);
+		fp=list_next(fp);
 	}
 	list_remove(fp);
 	curr -> next_fd--;
@@ -290,7 +290,7 @@ process_wait (tid_t child_tid UNUSED) {
 void
 process_exit (void) {
 	struct thread *curr = thread_current ();
-	uint64_t *pd;
+	// uint64_t *pd;
 	int fd=curr->next_fd;
 
 	/* TODO: Your code goes here.
@@ -437,7 +437,7 @@ load (const char *file_name, struct intr_frame *if_) {
 	process_activate (thread_current ());
 
 	//printf("file name : %s\n", file_title);
-		/*** give proper file name to FILE_NAME ***/
+	/*** give proper file name to FILE_NAME ***/
 	for (token = strtok_r(file_title, " ", &save_ptr); token != NULL;
 			token = strtok_r(NULL, " ", &save_ptr)) {
 				/*** if token == NULL? ***/
@@ -559,7 +559,7 @@ load (const char *file_name, struct intr_frame *if_) {
 
 	/*** push argument address ***/
 	for (i = argc; i >= 0; i--) {
-		if (i == argc) {
+		if (i == (int)argc) {
 			if_ -> rsp -= sizeof(char*);
 			strlcpy((char *) if_ -> rsp, &zero, sizeof(char*));
 			continue;

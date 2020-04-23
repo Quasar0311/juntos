@@ -68,9 +68,14 @@ syscall_handler (struct intr_frame *f UNUSED) {
 	int *number=(int *)&f->R.rax;
 
 	switch(*number){
+		case 1:
+			get_argument(f, arg, 1);
+			syscall_exit(arg[0]);
+			break;
+
 		case 10:
 			get_argument(f, arg, 3);
-			printf("%d, %d, %d", arg[0], arg[1], arg[2]);
+			printf("%d, %p, %d", (int)arg[0], (void *)&arg[1], (unsigned)arg[2]);
 			syscall_write(arg[0], (void *)&arg[1], (unsigned)arg[2]);
 			break; 
 
@@ -99,8 +104,8 @@ get_argument (struct intr_frame *f, int *arg, int count) {
 	void *addr;
 
 	for (i = 0; i < count; i++) {
+		f->rsp-=sizeof(char *);
 		addr = (void *) f -> rsp;
-		addr += 1;
 		check_address(addr);
 		arg[i] = *(int *) addr;
 	}
@@ -176,13 +181,14 @@ syscall_write(int fd, void *buffer, unsigned size){
 
 	lock_acquire(&filesys_lock);
 
-	if(fd==0){
+	if(fd==1){
 		putbuf((char *)buffer, size);
 		lock_release(&filesys_lock);
 		return size;
 	}
 
 	f=process_get_file(fd);
+
 	if(f==NULL){
 		lock_release(&filesys_lock);
 		return -1;
