@@ -108,6 +108,12 @@ struct thread {
 #ifdef USERPROG	
 	/* Owned by userprog/process.c. */
 	uint64_t *pml4;                     /* Page map level 4 */
+
+	/*** file descriptor table ***/
+	struct list fd_table;
+	/*** max fd of current table+ 1 ***/
+	int next_fd;
+
 #endif
 #ifdef VM
 	/* Table for whole virtual memory owned by thread. */

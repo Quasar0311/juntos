@@ -1,4 +1,5 @@
 #include "userprog/syscall.h"
+#include "lib/user/syscall.h"
 #include <stdio.h>
 #include <syscall-nr.h>
 #include "threads/interrupt.h"
@@ -8,9 +9,25 @@
 #include "userprog/gdt.h"
 #include "threads/flags.h"
 #include "intrinsic.h"
+#include "threads/synch.h"
+#include "threads/init.h"
+#include "include/filesys/filesys.h"
+#include "include/userprog/process.h"
+#include "include/filesys/file.h"
+#include "include/devices/input.h"
+
+struct lock filesys_lock;
 
 void syscall_entry (void);
 void syscall_handler (struct intr_frame *);
+void get_argument (struct intr_frame *f, int *arg, int count);
+void check_address (void *addr);
+void syscall_halt (void);
+void syscall_exit (int status);
+int syscall_open(const char *file);
+int syscall_filesize(int fd);
+int syscall_read(int fd, void *buffer, unsigned size);
+int syscall_write(int fd, void *buffer, unsigned size);
 
 void get_argument (struct intr_frame *f, int *arg, int count);
 void check_address (void *addr);
@@ -37,6 +54,9 @@ syscall_init (void) {
 			((uint64_t)SEL_KCSEG) << 32);
 	write_msr(MSR_LSTAR, (uint64_t) syscall_entry);
 
+	/*** initialize filesys_lock ***/
+	lock_init(&filesys_lock);
+
 	/* The interrupt service rountine should not serve any interrupts
 	 * until the syscall_entry swaps the userland stack to the kernel
 	 * mode stack. Therefore, we masked the FLAG_FL. */
@@ -48,27 +68,27 @@ syscall_init (void) {
 void
 syscall_handler (struct intr_frame *f UNUSED) {
 	// TODO: Your implementation goes here.
-	int *number = (int *) &f -> R.rax;
+
 	int arg[5];
-	
-	
-	printf("syscall no : %d\n", *number);
+	/*** implement syscall_handler using 
+	system call number stored in the user stack ***/
+	int *number=(int *)&f->R.rax;
 
-	
-
-	switch (*number) {
-		case SYS_HALT:
-			syscall_halt();
-			break;
-
-		case SYS_EXIT:
-
-
+	switch(*number){
 		case 10:
-			syscall_halt();
-			break;
+			get_argument(f, arg, 3);
+			printf("%d, %d, %d", arg[0], arg[1], arg[2]);
+			syscall_write(arg[0], (void *)&arg[1], (unsigned)arg[2]);
+			break; 
+
+		default:
+			thread_exit();
 	}
+
+	/*** check if stack pointer is user virtual address
+	check if argument pointer is user virtual address ***/
 	
+	// printf("syscall num : %d\n", (int *)(f->R.rax));
 	printf ("system call!\n");
 	
 	thread_exit ();
@@ -107,4 +127,77 @@ syscall_exit (int status) {
 	thread_exit();
 }
 
+int
+syscall_open(const char *file){
+	struct file *f;
+	int fd=-1;
 
+	// lock_acquire(&filesys_lock);
+	f=filesys_open(file);
+	fd=process_add_file(f);
+	// lock_release(&filesys_lock);
+
+	return fd;
+}
+
+int
+syscall_filesize(int fd){
+	struct file *f;
+
+	f=process_get_file(fd);
+	if(f==NULL) return -1;
+	return file_length(f);
+}
+
+int
+syscall_read(int fd, void *buffer, unsigned size){
+	struct file *f;
+	off_t bytes_read;
+
+	lock_acquire(&filesys_lock);
+
+	if(fd==0){
+		/*** invalid use of void expression ***/
+		uint8_t *buf=(uint8_t *)buffer;
+		for(unsigned i=0; i<size; i++) 
+			buf[i]=input_getc();
+		lock_release(&filesys_lock);
+		return size;
+	}
+
+	f=process_get_file(fd);
+	if(f==NULL){
+		lock_release(&filesys_lock);
+		return -1;
+	}
+	
+	else bytes_read=file_read(f, buffer, size);
+	lock_release(&filesys_lock);
+
+	return bytes_read;
+}
+
+int
+syscall_write(int fd, void *buffer, unsigned size){
+	struct file *f;
+	off_t bytes_read;
+
+	lock_acquire(&filesys_lock);
+
+	if(fd==0){
+		putbuf((char *)buffer, size);
+		lock_release(&filesys_lock);
+		return size;
+	}
+
+	f=process_get_file(fd);
+	if(f==NULL){
+		lock_release(&filesys_lock);
+		return -1;
+	}
+	
+	else bytes_read=file_write(f, buffer, size);
+	lock_release(&filesys_lock);
+
+	return bytes_read;
+}
