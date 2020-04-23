@@ -11,9 +11,9 @@ struct file_pointer{
 /*** create file descriptor for a file object ***/
 int process_add_file(struct file *f);
 /*** return file object address by searching process 
-file descriptor talbe***/
+file descriptor talbe ***/
 struct file *process_get_file(int fd);
-/*** close the file of file descriptor and initialize entry***/
+/*** close the file of file descriptor and initialize entry ***/
 void process_close_file(int fd);
 
 tid_t process_create_initd (const char *file_name);

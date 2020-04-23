@@ -28,11 +28,9 @@ int syscall_open(const char *file);
 int syscall_filesize(int fd);
 int syscall_read(int fd, void *buffer, unsigned size);
 int syscall_write(int fd, void *buffer, unsigned size);
-
-void get_argument (struct intr_frame *f, int *arg, int count);
-void check_address (void *addr);
-void syscall_halt (void);
-void syscall_exit (int status);
+void syscall_seek(int fd, unsigned position);
+unsigned syscall_tell(int fd);
+void syscall_close(int fd);
 
 
 /* System call.
@@ -69,19 +67,46 @@ void
 syscall_handler (struct intr_frame *f UNUSED) {
 	// TODO: Your implementation goes here.
 
-	int arg[5];
-	/*** implement syscall_handler using 
+	/*** implement syscall_handgler using 
 	system call number stored in the user stack ***/
 	int *number=(int *)&f->R.rax;
 
 	switch(*number){
+		case 0:
+			syscall_halt();
+			break;
+
+		case 1:
+			syscall_exit((int)f->R.rdi);
+			break;
+
+		case 7:
+			syscall_open((char *)f->R.rdi);
+			break;
+
+		case 8:
+			syscall_filesize((int)f->R.rdi);
+			break;
+
+		case 9:
+			syscall_read((int)f->R.rdi, (void *)f->R.rsi, (unsigned)f->R.rdx);
+			break;
+
 		case 10:
-			//get_argument(f, arg, 3);
-			//printf("%d, %d, %d\n", arg[0], arg[1], arg[2]);
-			//syscall_write(arg[0], (void *)&arg[1], (unsigned)arg[2]);
-			//printf("size : %d\n", f -> R.rdx);
 			syscall_write((int) f -> R.rdi, (void *) f -> R.rsi, (unsigned) f -> R.rdx);
 			break; 
+		
+		case 11:
+			syscall_seek((int)f->R.rdi, (unsigned)f->R.rsi);
+			break;
+		
+		case 12:
+			syscall_tell((int)f->R.rdi);
+			break;
+		
+		case 13:
+			syscall_close((int)f->R.rdi);
+			break;
 
 		default:
 			printf ("system call!\n");
@@ -100,49 +125,11 @@ syscall_handler (struct intr_frame *f UNUSED) {
 
 void
 check_address (void *addr) {
+	/*** check if the address is in user address ***/
 	if (!is_user_vaddr(addr)) {
 		printf("bad address for address : %p\n", addr);
 		syscall_exit(-1);
 	}
-}
-
-void
-get_argument (struct intr_frame *f, int *arg, int count) {
-	
-	printf("original addr : %d\n", (int *) f -> R.rdi);
-	// hex_dump(f -> rsp, (void *) f -> rsp, 300, 1);
-	// for (i = 0; i < count; i++) {
-	// 	// 0x158 + 8
-	// 	addr = (void *) f -> rsp + 1 + i;
-	// 	//addr += i * sizeof(char *);
-	// 	check_address(addr);
-	// 	printf("addr pointing : %d\n", f -> R.rdx);
-	// 	arg[i] = *(int *) addr;
-	// }
-	if ((int *) f -> R.rdi != NULL) {
-		int rdi;
-		rdi = * (int *) f -> R.rdi;
-		check_address((void *) f -> R.rdi);
-		printf("arg0 : %d\n", rdi);
-		arg[0] = *(int *) f -> R.rdi;
-	}
-	if ((int *) f -> R.rsi != NULL) {
-		arg[1] = *(int *) f -> R.rsi;
-	}
-	if ((int *) f -> R.rdx != NULL) {
-		arg[2] = *(int *) f -> R.rdx;
-	}
-	if ((int *) f -> R.r10 != NULL) {
-		arg[3] = *(int *) f -> R.r10;
-	}
-	if ((int *) f -> R.r8 != NULL) {
-		arg[4] = *(int *) f -> R.r8;
-	}
-	if ((int *) f -> R.r9 != NULL) {
-		arg[5] = *(int *) f -> R.r9;
-	}
-
-
 }
 
 void
@@ -164,8 +151,10 @@ syscall_open(const char *file){
 	int fd=-1;
 
 	// lock_acquire(&filesys_lock);
+	printf("file name: %s\n", file);
 	f=filesys_open(file);
 	fd=process_add_file(f);
+	printf("fd: %d, file open : %d\n", fd, thread_current() -> next_fd);
 	// lock_release(&filesys_lock);
 
 	return fd;
@@ -212,15 +201,16 @@ int
 syscall_write(int fd, void *buffer, unsigned size){
 	struct file *f;
 	off_t bytes_read;
-	// printf("write : %d\n", fd);
+
 	lock_acquire(&filesys_lock);
-	// printf("hi\n");
+
 	if(fd==1){
 		putbuf((char *)buffer, size);
 		lock_release(&filesys_lock);
 		return size;
 	}
 
+	/*** get file by using file descriptor ***/
 	f=process_get_file(fd);
 	if(f==NULL){
 		lock_release(&filesys_lock);
@@ -231,4 +221,27 @@ syscall_write(int fd, void *buffer, unsigned size){
 	lock_release(&filesys_lock);
 
 	return bytes_read;
+}
+
+void
+syscall_seek(int fd, unsigned position){
+	/*** get file by using file descriptor ***/
+	struct file *f=process_get_file(fd);
+
+	/*** move offset of file by position ***/
+	file_seek(f, position);
+}
+
+unsigned syscall_tell(int fd){
+	/*** get file by using file descriptor ***/
+	struct file *f=process_get_file(fd);
+
+	/*** return file offset ***/
+	return file_tell(f);
+}
+
+void syscall_close(int fd){
+	/*** close file by using file descriptor 
+	and initialize entry ***/
+	process_close_file(fd);
 }

@@ -32,8 +32,10 @@ static void __do_fork (void *);
 
 int 
 process_add_file(struct file *f){
-	if(f==NULL) return -1;
-
+	if(f==NULL) {
+		printf("file is null\n");
+		return -1;
+	}
 	/*** add file to file descriptor ***/
 	struct file_pointer fp;
 	fp.file=f;
@@ -279,7 +281,9 @@ process_wait (tid_t child_tid UNUSED) {
 	 * XXX:       to add infinite loop here before
 	 * XXX:       implementing the process_wait. */
 
-	while (1) {
+	int i;
+
+	for (i = 0; i <= 500000000; i++) {
 		;
 	}
 	
@@ -289,9 +293,7 @@ process_wait (tid_t child_tid UNUSED) {
 /* Exit the process. This function is called by thread_exit (). */
 void
 process_exit (void) {
-	struct thread *curr = thread_current ();
-	uint64_t *pd;
-	int fd=curr->next_fd;
+	struct thread *curr = thread_current ();	
 
 	/* TODO: Your code goes here.
 	 * TODO: Implement process termination message (see
@@ -299,9 +301,9 @@ process_exit (void) {
 	 * TODO: We recommend you to implement process resource cleanup here. */
 	
 	/*** close all files of process ***/
-	while(fd!=2){
-		process_close_file(fd);
-		fd--;
+	while(curr -> next_fd != 2){
+		process_close_file(curr -> next_fd);
+		curr -> next_fd--;
 	}
 
 	/*** release file descriptor ***/
@@ -423,6 +425,7 @@ load (const char *file_name, struct intr_frame *if_) {
 	uint64_t argc = 0;
 	char zero = 0;
 	size_t token_len;
+	char *argv_addr;
 	char *file_copy_argc = malloc(strlen(file_name) + 1);
 	char *file_copy_argv = malloc(strlen(file_name) + 1);
 	char *file_title = malloc(strlen(file_name) + 1);
@@ -568,14 +571,14 @@ load (const char *file_name, struct intr_frame *if_) {
 		strlcpy((char *) if_ -> rsp, (char *) &argv[i], sizeof(char*));
 	}
 	//printf("argc3 : %p\n", if_ -> rsp);
-
+	argv_addr = (char *)if_ -> rsp;
 	if_ -> rsp -= sizeof(void*);
 	//argc -= 1;
 	
 	strlcpy((char *) if_ -> rsp, (char *) &argc, sizeof(void*));
 	
 	strlcpy((char *) &if_ -> R.rdi, (char *) &argc, sizeof(int));
-	strlcpy((char *) &if_ -> R.rsi, (char *) &argv, sizeof(char*));
+	strlcpy((char *) &if_ -> R.rsi, (char *) &argv_addr, sizeof(char*));
 	
 	// hex_dump(if_ -> rsp, (void *) if_ -> rsp, 0x47480000 - (if_ -> rsp), true);
 	
