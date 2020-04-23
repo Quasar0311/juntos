@@ -20,6 +20,7 @@ Boot complete.
 Putting 'create-long' into the file system...
 Executing 'create-long':
 (create-long) begin
+<<<<<<< HEAD
 system call!
 Execution of 'create-long' complete.
 Timer: 496 ticks
@@ -28,6 +29,18 @@ hd0:0: 0 reads, 0 writes
 hd0:1: 79 reads, 228 writes
 hd1:0: 100 reads, 0 writes
 Console: 833 characters output
+=======
+(create-long) create("x..."): 1
+(create-long) end
+create-long: exit(0)
+Execution of 'create-long' complete.
+Timer: 481 ticks
+Thread: 35 idle ticks, 445 kernel ticks, 2 user ticks
+hd0:0: 0 reads, 0 writes
+hd0:1: 83 reads, 244 writes
+hd1:0: 100 reads, 0 writes
+Console: 891 characters output
+>>>>>>> lab2_juntos
 Keyboard: 0 keys pressed
 Exception: 0 page faults
 Powering off...

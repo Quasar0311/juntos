@@ -20,6 +20,7 @@ Boot complete.
 Putting 'create-empty' into the file system...
 Executing 'create-empty':
 (create-empty) begin
+<<<<<<< HEAD
 system call!
 Execution of 'create-empty' complete.
 Timer: 485 ticks
@@ -28,6 +29,16 @@ hd0:0: 0 reads, 0 writes
 hd0:1: 79 reads, 228 writes
 hd1:0: 100 reads, 0 writes
 Console: 839 characters output
+=======
+create-empty: exit(-1)
+Execution of 'create-empty' complete.
+Timer: 485 ticks
+Thread: 34 idle ticks, 451 kernel ticks, 1 user ticks
+hd0:0: 0 reads, 0 writes
+hd0:1: 79 reads, 228 writes
+hd1:0: 100 reads, 0 writes
+Console: 849 characters output
+>>>>>>> lab2_juntos
 Keyboard: 0 keys pressed
 Exception: 0 page faults
 Powering off...

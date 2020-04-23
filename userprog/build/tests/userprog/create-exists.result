@@ -1,4 +1,5 @@
 FAIL
+<<<<<<< HEAD
 Test output failed to match any acceptable form.
 
 Acceptable output:
@@ -20,3 +21,6 @@ Differences in `diff -u' format:
 - (create-exists) end
 - create-exists: exit(0)
 + system call!
+=======
+run: try to re-create quux.dat: FAILED
+>>>>>>> lab2_juntos

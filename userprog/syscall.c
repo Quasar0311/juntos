@@ -2,6 +2,7 @@
 #include "lib/user/syscall.h"
 #include <stdio.h>
 #include <syscall-nr.h>
+#include <string.h>
 #include "threads/interrupt.h"
 #include "threads/thread.h"
 #include "threads/loader.h"
@@ -20,10 +21,11 @@ struct lock filesys_lock;
 
 void syscall_entry (void);
 void syscall_handler (struct intr_frame *);
-void get_argument (struct intr_frame *f, int *arg, int count);
+//void get_argument (struct intr_frame *f, int *arg, int count);
 void check_address (void *addr);
 void syscall_halt (void);
 void syscall_exit (int status);
+bool syscall_create (const char *file, unsigned initial_size);
 int syscall_open(const char *file);
 int syscall_filesize(int fd);
 int syscall_read(int fd, void *buffer, unsigned size);
@@ -70,6 +72,7 @@ syscall_handler (struct intr_frame *f UNUSED) {
 	/*** implement syscall_handgler using 
 	system call number stored in the user stack ***/
 	int *number=(int *)&f->R.rax;
+	//printf("system call no. : %d\n", *number);
 
 	switch(*number){
 		case 0:
@@ -78,6 +81,14 @@ syscall_handler (struct intr_frame *f UNUSED) {
 
 		case 1:
 			syscall_exit((int)f->R.rdi);
+			break;
+		
+		/*** SYS_CREATE ***/
+		case 5:
+			if (f -> R.rdi == NULL) {
+				syscall_exit(-1);
+			}
+			syscall_create((char *) f -> R.rdi, (unsigned) f -> R.rsi);
 			break;
 
 		case 7:
@@ -91,7 +102,7 @@ syscall_handler (struct intr_frame *f UNUSED) {
 		case 9:
 			syscall_read((int)f->R.rdi, (void *)f->R.rsi, (unsigned)f->R.rdx);
 			break;
-
+		
 		case 10:
 			syscall_write((int) f -> R.rdi, (void *) f -> R.rsi, (unsigned) f -> R.rdx);
 			break; 
@@ -143,6 +154,18 @@ syscall_exit (int status) {
 
 	printf("%s: exit(%d)\n", curr -> name, status);
 	thread_exit();
+}
+
+bool
+syscall_create (const char *file, unsigned initial_size) {
+	if (!strcmp(file, "")) {
+		syscall_exit(-1);
+		return false;
+	}
+	else {
+		return filesys_create(file, (off_t) initial_size);
+	}
+	
 }
 
 int

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 FAIL
 Test output failed to match any acceptable form.
 
@@ -12,3 +13,6 @@ Differences in `diff -u' format:
 - (create-normal) end
 - create-normal: exit(0)
 + system call!
+=======
+PASS
+>>>>>>> lab2_juntos
