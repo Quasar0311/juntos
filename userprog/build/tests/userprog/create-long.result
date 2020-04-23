@@ -9,12 +9,6 @@ Acceptable output:
 Differences in `diff -u' format:
   (create-long) begin
 - (create-long) create("x..."): 0
-<<<<<<< HEAD
-- (create-long) end
-- create-long: exit(0)
-+ system call!
-=======
 + (create-long) create("x..."): 1
   (create-long) end
   create-long: exit(0)
->>>>>>> lab2_juntos

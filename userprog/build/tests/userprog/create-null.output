@@ -20,25 +20,14 @@ Boot complete.
 Putting 'create-null' into the file system...
 Executing 'create-null':
 (create-null) begin
-<<<<<<< HEAD
-system call!
-Execution of 'create-null' complete.
-Timer: 484 ticks
-Thread: 34 idle ticks, 449 kernel ticks, 1 user ticks
-hd0:0: 0 reads, 0 writes
-hd0:1: 79 reads, 228 writes
-hd1:0: 100 reads, 0 writes
-Console: 833 characters output
-=======
 create-null: exit(-1)
 Execution of 'create-null' complete.
-Timer: 465 ticks
-Thread: 30 idle ticks, 433 kernel ticks, 2 user ticks
+Timer: 478 ticks
+Thread: 33 idle ticks, 444 kernel ticks, 1 user ticks
 hd0:0: 0 reads, 0 writes
 hd0:1: 79 reads, 228 writes
 hd1:0: 100 reads, 0 writes
 Console: 842 characters output
->>>>>>> lab2_juntos
 Keyboard: 0 keys pressed
 Exception: 0 page faults
 Powering off...

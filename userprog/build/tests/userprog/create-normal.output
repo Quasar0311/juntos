@@ -21,26 +21,15 @@ Putting 'create-normal' into the file system...
 Executing 'create-normal':
 (create-normal) begin
 (create-normal) create quux.dat
-<<<<<<< HEAD
-system call!
-Execution of 'create-normal' complete.
-Timer: 486 ticks
-Thread: 30 idle ticks, 453 kernel ticks, 3 user ticks
-hd0:0: 0 reads, 0 writes
-hd0:1: 79 reads, 228 writes
-hd1:0: 100 reads, 0 writes
-Console: 877 characters output
-=======
 (create-normal) end
 create-normal: exit(0)
 Execution of 'create-normal' complete.
 Timer: 481 ticks
-Thread: 30 idle ticks, 446 kernel ticks, 5 user ticks
+Thread: 37 idle ticks, 442 kernel ticks, 2 user ticks
 hd0:0: 0 reads, 0 writes
 hd0:1: 101 reads, 240 writes
 hd1:0: 100 reads, 0 writes
 Console: 908 characters output
->>>>>>> lab2_juntos
 Keyboard: 0 keys pressed
 Exception: 0 page faults
 Powering off...
