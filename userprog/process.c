@@ -17,8 +17,6 @@
 #include "threads/thread.h"
 #include "threads/mmu.h"
 #include "threads/vaddr.h"
-/*** for malloc ***/
-#include "threads/malloc.h"
 
 #include "intrinsic.h"
 #ifdef VM
@@ -106,7 +104,7 @@ tid_t
 process_create_initd (const char *file_name) {
 	char *fn_copy;
 	tid_t tid;
-	char *file_title = malloc(strlen(file_name) + 1);
+	char *file_title = palloc_get_page(0);
 	strlcpy(file_title, file_name, strlen(file_name) + 1);
 	char *token, *save_ptr;
 
@@ -126,6 +124,7 @@ process_create_initd (const char *file_name) {
 	//printf("title : %s\n", file_title);
 	/* Create a new thread to execute FILE_NAME. */
 	tid = thread_create (file_title, PRI_DEFAULT, initd, fn_copy);
+	palloc_free_page(file_title);
 	if (tid == TID_ERROR)
 		palloc_free_page (fn_copy);
 	return tid;
@@ -278,8 +277,9 @@ process_wait (tid_t child_tid UNUSED) {
 	/* XXX: Hint) The pintos exit if process_wait (initd), we recommend you
 	 * XXX:       to add infinite loop here before
 	 * XXX:       implementing the process_wait. */
+	int i;
 
-	while (1) {
+	for (i = 0; i <= 500000000; i++) {
 		;
 	}
 	
@@ -423,9 +423,11 @@ load (const char *file_name, struct intr_frame *if_) {
 	uint64_t argc = 0;
 	char zero = 0;
 	size_t token_len;
-	char *file_copy_argc = malloc(strlen(file_name) + 1);
-	char *file_copy_argv = malloc(strlen(file_name) + 1);
-	char *file_title = malloc(strlen(file_name) + 1);
+	char *argv_addr;
+	//char *file_copy_argc = malloc(strlen(file_name) + 1);
+	char *file_copy_argc = palloc_get_page(0);
+	char *file_copy_argv = palloc_get_page(0);
+	char *file_title = palloc_get_page(0);
 	strlcpy(file_copy_argc, file_name, strlen(file_name) + 1);
 	strlcpy(file_copy_argv, file_name, strlen(file_name) + 1);
 	strlcpy(file_title, file_name, strlen(file_name) + 1);
@@ -535,7 +537,7 @@ load (const char *file_name, struct intr_frame *if_) {
 	}
 	//printf("argc : %d\n", argc);
 
-	char **argv = malloc(argc * sizeof(char*));
+	char **argv = palloc_get_page(0);
 
 	argc = 0;
 
@@ -568,17 +570,22 @@ load (const char *file_name, struct intr_frame *if_) {
 		strlcpy((char *) if_ -> rsp, (char *) &argv[i], sizeof(char*));
 	}
 	//printf("argc3 : %p\n", if_ -> rsp);
+	//printf("if rsp : %p\n", if_ -> rsp);
+	argv_addr = (char *) if_ -> rsp;
 
 	if_ -> rsp -= sizeof(void*);
 	//argc -= 1;
-	
+	//printf("argv at argument : %p\n", argv_addr);
 	strlcpy((char *) if_ -> rsp, (char *) &argc, sizeof(void*));
 	
 	strlcpy((char *) &if_ -> R.rdi, (char *) &argc, sizeof(int));
-	strlcpy((char *) &if_ -> R.rsi, (char *) &argv, sizeof(char*));
+	strlcpy((char *) &if_ -> R.rsi, (char *) &argv_addr, sizeof(char*));
 	
 	// hex_dump(if_ -> rsp, (void *) if_ -> rsp, 0x47480000 - (if_ -> rsp), true);
-	
+	palloc_free_page(file_copy_argc);
+	palloc_free_page(file_copy_argv);
+	palloc_free_page(file_title);
+	palloc_free_page(argv);
 	success = true;
 
 done:
