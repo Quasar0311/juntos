@@ -559,7 +559,7 @@ load (const char *file_name, struct intr_frame *if_) {
 
 	/*** push argument address ***/
 	for (i = argc; i >= 0; i--) {
-		if (i == (int)argc) {
+		if (i == (int) argc) {
 			if_ -> rsp -= sizeof(char*);
 			strlcpy((char *) if_ -> rsp, &zero, sizeof(char*));
 			continue;
@@ -570,14 +570,14 @@ load (const char *file_name, struct intr_frame *if_) {
 	//printf("argc3 : %p\n", if_ -> rsp);
 
 	if_ -> rsp -= sizeof(void*);
-	argc -= 1;
+	//argc -= 1;
 	
 	strlcpy((char *) if_ -> rsp, (char *) &argc, sizeof(void*));
 	
 	strlcpy((char *) &if_ -> R.rdi, (char *) &argc, sizeof(int));
-	strlcpy((char *) &if_ -> R.rsi, (char *) &argv[0], sizeof(char*));
+	strlcpy((char *) &if_ -> R.rsi, (char *) &argv, sizeof(char*));
 	
-	hex_dump(if_ -> rsp, (void *) if_ -> rsp, 0x47480000 - (if_ -> rsp), true);
+	// hex_dump(if_ -> rsp, (void *) if_ -> rsp, 0x47480000 - (if_ -> rsp), true);
 	
 	success = true;
 

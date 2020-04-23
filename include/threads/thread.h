@@ -127,6 +127,8 @@ struct thread {
 	/*** advanced scheduler ***/
 	int nice;
 	int recent_cpu;
+
+
 };
 
 /* If false (default), use round-robin scheduler.

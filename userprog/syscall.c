@@ -5,6 +5,7 @@
 #include "threads/interrupt.h"
 #include "threads/thread.h"
 #include "threads/loader.h"
+#include "threads/init.h"
 #include "userprog/gdt.h"
 #include "threads/flags.h"
 #include "intrinsic.h"
@@ -27,6 +28,12 @@ int syscall_open(const char *file);
 int syscall_filesize(int fd);
 int syscall_read(int fd, void *buffer, unsigned size);
 int syscall_write(int fd, void *buffer, unsigned size);
+
+void get_argument (struct intr_frame *f, int *arg, int count);
+void check_address (void *addr);
+void syscall_halt (void);
+void syscall_exit (int status);
+
 
 /* System call.
  *
@@ -74,41 +81,73 @@ syscall_handler (struct intr_frame *f UNUSED) {
 			break;
 
 		case 10:
-			get_argument(f, arg, 3);
-			printf("%d, %p, %d", (int)arg[0], (void *)&arg[1], (unsigned)arg[2]);
-			syscall_write(arg[0], (void *)&arg[1], (unsigned)arg[2]);
+			//get_argument(f, arg, 3);
+			//printf("%d, %d, %d\n", arg[0], arg[1], arg[2]);
+			//syscall_write(arg[0], (void *)&arg[1], (unsigned)arg[2]);
+			//printf("size : %d\n", f -> R.rdx);
+			syscall_write((int) f -> R.rdi, (void *) f -> R.rsi, (unsigned) f -> R.rdx);
 			break; 
 
 		default:
+			printf ("system call!\n");
 			thread_exit();
+			
 	}
 
 	/*** check if stack pointer is user virtual address
 	check if argument pointer is user virtual address ***/
 	
 	// printf("syscall num : %d\n", (int *)(f->R.rax));
-	printf ("system call!\n");
-	thread_exit ();
+	// printf ("system call!\n");
+	
+	//thread_exit ();
 }
 
 void
 check_address (void *addr) {
 	if (!is_user_vaddr(addr)) {
+		printf("bad address for address : %p\n", addr);
 		syscall_exit(-1);
 	}
 }
 
 void
 get_argument (struct intr_frame *f, int *arg, int count) {
-	int i;
-	void *addr;
-
-	for (i = 0; i < count; i++) {
-		f->rsp-=sizeof(char *);
-		addr = (void *) f -> rsp;
-		check_address(addr);
-		arg[i] = *(int *) addr;
+	
+	printf("original addr : %d\n", (int *) f -> R.rdi);
+	// hex_dump(f -> rsp, (void *) f -> rsp, 300, 1);
+	// for (i = 0; i < count; i++) {
+	// 	// 0x158 + 8
+	// 	addr = (void *) f -> rsp + 1 + i;
+	// 	//addr += i * sizeof(char *);
+	// 	check_address(addr);
+	// 	printf("addr pointing : %d\n", f -> R.rdx);
+	// 	arg[i] = *(int *) addr;
+	// }
+	if ((int *) f -> R.rdi != NULL) {
+		int rdi;
+		rdi = * (int *) f -> R.rdi;
+		check_address((void *) f -> R.rdi);
+		printf("arg0 : %d\n", rdi);
+		arg[0] = *(int *) f -> R.rdi;
 	}
+	if ((int *) f -> R.rsi != NULL) {
+		arg[1] = *(int *) f -> R.rsi;
+	}
+	if ((int *) f -> R.rdx != NULL) {
+		arg[2] = *(int *) f -> R.rdx;
+	}
+	if ((int *) f -> R.r10 != NULL) {
+		arg[3] = *(int *) f -> R.r10;
+	}
+	if ((int *) f -> R.r8 != NULL) {
+		arg[4] = *(int *) f -> R.r8;
+	}
+	if ((int *) f -> R.r9 != NULL) {
+		arg[5] = *(int *) f -> R.r9;
+	}
+
+
 }
 
 void
@@ -178,9 +217,9 @@ int
 syscall_write(int fd, void *buffer, unsigned size){
 	struct file *f;
 	off_t bytes_read;
-
+	// printf("write : %d\n", fd);
 	lock_acquire(&filesys_lock);
-
+	// printf("hi\n");
 	if(fd==1){
 		putbuf((char *)buffer, size);
 		lock_release(&filesys_lock);
