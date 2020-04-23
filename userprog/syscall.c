@@ -75,11 +75,6 @@ syscall_handler (struct intr_frame *f UNUSED) {
 	int *number=(int *)&f->R.rax;
 
 	switch(*number){
-		case 1:
-			get_argument(f, arg, 1);
-			syscall_exit(arg[0]);
-			break;
-
 		case 10:
 			//get_argument(f, arg, 3);
 			//printf("%d, %d, %d\n", arg[0], arg[1], arg[2]);
@@ -227,7 +222,6 @@ syscall_write(int fd, void *buffer, unsigned size){
 	}
 
 	f=process_get_file(fd);
-
 	if(f==NULL){
 		lock_release(&filesys_lock);
 		return -1;
