@@ -75,15 +75,12 @@ syscall_handler (struct intr_frame *f UNUSED) {
 	int *number=(int *)&f->R.rax;
 
 	switch(*number){
-		case 1:
-			get_argument(f, arg, 1);
-			syscall_exit(arg[0]);
-			break;
-
 		case 10:
-			get_argument(f, arg, 3);
-			printf("%d, %p, %d", (int)arg[0], (void *)&arg[1], (unsigned)arg[2]);
-			syscall_write(arg[0], (void *)&arg[1], (unsigned)arg[2]);
+			//get_argument(f, arg, 3);
+			//printf("%d, %d, %d\n", arg[0], arg[1], arg[2]);
+			//syscall_write(arg[0], (void *)&arg[1], (unsigned)arg[2]);
+			//printf("size : %d\n", f -> R.rdx);
+			syscall_write((int) f -> R.rdi, (void *) f -> R.rsi, (unsigned) f -> R.rdx);
 			break; 
 
 		default:
@@ -111,14 +108,26 @@ check_address (void *addr) {
 
 void
 get_argument (struct intr_frame *f, int *arg, int count) {
-	int i;
-	void *addr;
-
-	for (i = 0; i < count; i++) {
-		f->rsp-=sizeof(char *);
-		addr = (void *) f -> rsp;
-		check_address(addr);
-		arg[i] = *(int *) addr;
+	
+	printf("original addr : %d\n", (int *) f -> R.rdi);
+	// hex_dump(f -> rsp, (void *) f -> rsp, 300, 1);
+	// for (i = 0; i < count; i++) {
+	// 	// 0x158 + 8
+	// 	addr = (void *) f -> rsp + 1 + i;
+	// 	//addr += i * sizeof(char *);
+	// 	check_address(addr);
+	// 	printf("addr pointing : %d\n", f -> R.rdx);
+	// 	arg[i] = *(int *) addr;
+	// }
+	if ((int *) f -> R.rdi != NULL) {
+		int rdi;
+		rdi = * (int *) f -> R.rdi;
+		check_address((void *) f -> R.rdi);
+		printf("arg0 : %d\n", rdi);
+		arg[0] = *(int *) f -> R.rdi;
+	}
+	if ((int *) f -> R.rsi != NULL) {
+		arg[1] = *(int *) f -> R.rsi;
 	}
 	if ((int *) f -> R.rdx != NULL) {
 		arg[2] = *(int *) f -> R.rdx;
@@ -205,6 +214,7 @@ syscall_write(int fd, void *buffer, unsigned size){
 	off_t bytes_read;
 	// printf("write : %d\n", fd);
 	lock_acquire(&filesys_lock);
+	// printf("hi\n");
 	if(fd==1){
 		putbuf((char *)buffer, size);
 		lock_release(&filesys_lock);
@@ -212,7 +222,6 @@ syscall_write(int fd, void *buffer, unsigned size){
 	}
 
 	f=process_get_file(fd);
-
 	if(f==NULL){
 		lock_release(&filesys_lock);
 		return -1;

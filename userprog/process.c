@@ -290,7 +290,7 @@ process_wait (tid_t child_tid UNUSED) {
 void
 process_exit (void) {
 	struct thread *curr = thread_current ();
-	// uint64_t *pd;
+	uint64_t *pd;
 	int fd=curr->next_fd;
 
 	/* TODO: Your code goes here.
@@ -437,7 +437,7 @@ load (const char *file_name, struct intr_frame *if_) {
 	process_activate (thread_current ());
 
 	//printf("file name : %s\n", file_title);
-	/*** give proper file name to FILE_NAME ***/
+		/*** give proper file name to FILE_NAME ***/
 	for (token = strtok_r(file_title, " ", &save_ptr); token != NULL;
 			token = strtok_r(NULL, " ", &save_ptr)) {
 				/*** if token == NULL? ***/
@@ -559,7 +559,7 @@ load (const char *file_name, struct intr_frame *if_) {
 
 	/*** push argument address ***/
 	for (i = argc; i >= 0; i--) {
-		if (i == (int)argc) {
+		if (i == (int) argc) {
 			if_ -> rsp -= sizeof(char*);
 			strlcpy((char *) if_ -> rsp, &zero, sizeof(char*));
 			continue;
