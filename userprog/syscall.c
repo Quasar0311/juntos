@@ -110,33 +110,6 @@ check_address (void *addr) {
 }
 
 void
-get_argument (struct intr_frame *f, int *arg, int count) {
-	int i;
-	void *addr;
-
-	for (i = 0; i < count; i++) {
-		f->rsp-=sizeof(char *);
-		addr = (void *) f -> rsp;
-		check_address(addr);
-		arg[i] = *(int *) addr;
-	}
-	if ((int *) f -> R.rdx != NULL) {
-		arg[2] = *(int *) f -> R.rdx;
-	}
-	if ((int *) f -> R.r10 != NULL) {
-		arg[3] = *(int *) f -> R.r10;
-	}
-	if ((int *) f -> R.r8 != NULL) {
-		arg[4] = *(int *) f -> R.r8;
-	}
-	if ((int *) f -> R.r9 != NULL) {
-		arg[5] = *(int *) f -> R.r9;
-	}
-
-
-}
-
-void
 syscall_halt (void) {
 	power_off();
 }
