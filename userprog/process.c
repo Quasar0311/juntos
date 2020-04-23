@@ -56,7 +56,7 @@ struct file
 
 	fp = list_begin(&thread_current()->fd_table);
 	for(int i=2; i<fd; i++){
-		fp=list_next(&fp);
+		fp=list_next(fp);
 	}
 
 	if (fp != NULL) {
@@ -84,7 +84,7 @@ process_close_file(int fd){
 
 	fp = list_begin(&thread_current()->fd_table);
 	for(int i=2; i<fd; i++){
-		fp=list_next(&fp);
+		fp=list_next(fp);
 	}
 	list_remove(fp);
 	curr -> next_fd--;
@@ -559,7 +559,7 @@ load (const char *file_name, struct intr_frame *if_) {
 
 	/*** push argument address ***/
 	for (i = argc; i >= 0; i--) {
-		if (i == argc) {
+		if (i == (int) argc) {
 			if_ -> rsp -= sizeof(char*);
 			strlcpy((char *) if_ -> rsp, &zero, sizeof(char*));
 			continue;
@@ -575,9 +575,9 @@ load (const char *file_name, struct intr_frame *if_) {
 	strlcpy((char *) if_ -> rsp, (char *) &argc, sizeof(void*));
 	
 	strlcpy((char *) &if_ -> R.rdi, (char *) &argc, sizeof(int));
-	strlcpy((char *) &if_ -> R.rsi, (char *) &argv[0], sizeof(char*));
+	strlcpy((char *) &if_ -> R.rsi, (char *) &argv, sizeof(char*));
 	
-	hex_dump(if_ -> rsp, (void *) if_ -> rsp, 0x47480000 - (if_ -> rsp), true);
+	// hex_dump(if_ -> rsp, (void *) if_ -> rsp, 0x47480000 - (if_ -> rsp), true);
 	
 	success = true;
 
