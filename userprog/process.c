@@ -570,7 +570,7 @@ load (const char *file_name, struct intr_frame *if_) {
 	//printf("argc3 : %p\n", if_ -> rsp);
 
 	if_ -> rsp -= sizeof(void*);
-	argc -= 1;
+	//argc -= 1;
 	
 	strlcpy((char *) if_ -> rsp, (char *) &argc, sizeof(void*));
 	
