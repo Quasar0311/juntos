@@ -11,7 +11,7 @@ Booting from Hard Disk..Kernel command line: -q -f put open-normal put sample.tx
 Pintos booting with: 
 	base_mem: 0x0 ~ 0x9fc00 (Usable: 639 kB)
 	ext_mem: 0x100000 ~ 0xffe0000 (Usable: 260,992 kB)
-Calibrating timer...  104,755,200 loops/s.
+Calibrating timer...  78,540,800 loops/s.
 hd0:0: detected 313 sector (156 kB) disk, model "QEMU HARDDISK", serial "QM00001"
 hd0:1: detected 20,160 sector (9 MB) disk, model "QEMU HARDDISK", serial "QM00002"
 hd1:0: detected 102 sector (51 kB) disk, model "QEMU HARDDISK", serial "QM00003"
@@ -38,10 +38,10 @@ Call stack: 0x8004218661 0x800421d4b6 0x80042095f1 0x8004209a0f 0x800421e962 0x8
 The `backtrace' program can make call stacks useful.
 Read "Backtraces" in the "Debugging Tools" chapter
 of the Pintos documentation for more information.
-Timer: 286 ticks
-Thread: 36 idle ticks, 240 kernel ticks, 10 user ticks
+Timer: 294 ticks
+Thread: 36 idle ticks, 244 kernel ticks, 14 user ticks
 hd0:0: 0 reads, 0 writes
 hd0:1: 110 reads, 242 writes
 hd1:0: 102 reads, 0 writes
-Console: 1868 characters output
+Console: 1867 characters output
 Key
