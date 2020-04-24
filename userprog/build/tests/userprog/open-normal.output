@@ -25,23 +25,23 @@ file name: sample.txt
 fd: 3, file open : 3
 (open-normal) end
 open-normal: exit(0)
-Interrupt 0x0d (#GP General Protection Exception) at rip=800421eb8f
+Interrupt 0x0d (#GP General Protection Exception) at rip=800421eb79
  cr2=0000000000000000 error=               0
 rax d0ff000000800421 rbx 0000000000000000 rcx 00000080040b8000 rdx 0000000000000001
 rsp 00000080042b8e30 rbp 00000080042b8e40 rsi 000000000000800f rdi d0ff000000800421
-rip 000000800421eb8f r8 00000080042b8df8  r9 000000800421bada r10 0000000000000000
+rip 000000800421eb79 r8 00000080042b8df8  r9 000000800421bada r10 0000000000000000
 r11 0000000000000206 r12 000000800421d7b3 r13 0000000000000000 r14 0000000000000000
 r15 0000000000000000 rflags 00000286
 es: 001b ds: 001b cs: 0008 ss: 0010
 Kernel PANIC at ../../userprog/exception.c:97 in kill(): Kernel bug - unexpected interrupt in kernel
-Call stack: 0x8004218661 0x800421d4b6 0x80042095f1 0x8004209a0f 0x800421e962 0x800421bd4b 0x800421c2ed 0x80042074c9 0x800421da32 0x800421d81d 0x800421d6dc 0x400c3c.
+Call stack: 0x8004218661 0x800421d4b6 0x80042095f1 0x8004209a0f 0x800421e94c 0x800421bd4b 0x800421c2ed 0x80042074c9 0x800421da1c 0x800421d81d 0x800421d6dc 0x400c3c.
 The `backtrace' program can make call stacks useful.
 Read "Backtraces" in the "Debugging Tools" chapter
 of the Pintos documentation for more information.
-Timer: 286 ticks
-Thread: 36 idle ticks, 240 kernel ticks, 10 user ticks
+Timer: 276 ticks
+Thread: 35 idle ticks, 234 kernel ticks, 7 user ticks
 hd0:0: 0 reads, 0 writes
 hd0:1: 110 reads, 242 writes
 hd1:0: 102 reads, 0 writes
-Console: 1868 characters output
+Console: 1867 characters output
 Key

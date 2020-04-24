@@ -26,8 +26,8 @@ Executing 'create-exists':
 (create-exists) try to re-create quux.dat: FAILED
 create-exists: exit(1)
 Execution of 'create-exists' complete.
-Timer: 480 ticks
-Thread: 35 idle ticks, 440 kernel ticks, 5 user ticks
+Timer: 476 ticks
+Thread: 33 idle ticks, 437 kernel ticks, 6 user ticks
 hd0:0: 0 reads, 0 writes
 hd0:1: 131 reads, 270 writes
 hd1:0: 101 reads, 0 writes
