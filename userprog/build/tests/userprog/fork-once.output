@@ -20,24 +20,13 @@ Boot complete.
 Putting 'fork-once' into the file system...
 Executing 'fork-once':
 (fork-once) begin
-<<<<<<< HEAD
-Execution of 'fork-once' complete.
-Timer: 484 ticks
-Thread: 36 idle ticks, 448 kernel ticks, 0 user ticks
-hd0:0: 0 reads, 0 writes
-hd0:1: 79 reads, 228 writes
-hd1:0: 100 reads, 0 writes
-Console: 808 characters output
-=======
-system call!
 Execution of 'fork-once' complete.
 Timer: 1297 ticks
-Thread: 36 idle ticks, 1260 kernel ticks, 1 user ticks
+Thread: 37 idle ticks, 1260 kernel ticks, 0 user ticks
 hd0:0: 0 reads, 0 writes
 hd0:1: 79 reads, 228 writes
 hd1:0: 100 reads, 0 writes
-Console: 823 characters output
->>>>>>> lab2_juntos
+Console: 810 characters output
 Keyboard: 0 keys pressed
 Exception: 0 page faults
 Powering off...

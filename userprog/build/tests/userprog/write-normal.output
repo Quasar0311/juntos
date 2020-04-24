@@ -23,37 +23,11 @@ Executing 'write-normal':
 (write-normal) begin
 (write-normal) create "test.txt"
 (write-normal) open "test.txt"
-<<<<<<< HEAD
-file name: test.txt
-fd: 3, file open : 3
-(write-normal) write() returned 10 instead of 373: FAILED
-write-normal: exit(1)
-Interrupt 0x0d (#GP General Protection Exception) at rip=800421ebdd
- cr2=0000000000000000 error=               0
-rax d0ff000000800421 rbx 0000000000000000 rcx 00000080040b8000 rdx 0000000000000001
-rsp 00000080042b8e30 rbp 00000080042b8e40 rsi 000000000000800f rdi d0ff000000800421
-rip 000000800421ebdd r8 00000080042b8df8  r9 000000800421bada r10 0000000000000000
-r11 0000000000000202 r12 000000800421d7bc r13 0000000000000000 r14 0000000000000000
-r15 0000000000000000 rflags 00000286
-es: 001b ds: 001b cs: 0008 ss: 0010
-Kernel PANIC at ../../userprog/exception.c:98 in kill(): Kernel bug - unexpected interrupt in kernel
-Call stack: 0x8004218661 0x800421d4b6 0x80042095f1 0x8004209a0f 0x800421e9b0 0x800421bd4b 0x800421c2ed 0x80042074c9 0x800421da7d 0x800421d826 0x800421d6e5 0x40049c 0x4001ee 0x40024c 0x400ced.
-The `backtrace' program can make call stacks useful.
-Read "Backtraces" in the "Debugging Tools" chapter
-of the Pintos documentation for more information.
-Timer: 443 ticks
-Thread: 33 idle ticks, 397 kernel ticks, 13 user ticks
-hd0:0: 0 reads, 0 writes
-hd0:1: 140 reads, 259 writes
-hd1:0: 104 reads, 0 writes
-Console: 2003 characters output
-Key
-=======
 (write-normal) end
 write-normal: exit(0)
 Execution of 'write-normal' complete.
-Timer: 1313 ticks
-Thread: 33 idle ticks, 1278 kernel ticks, 2 user ticks
+Timer: 1296 ticks
+Thread: 31 idle ticks, 1261 kernel ticks, 4 user ticks
 hd0:0: 0 reads, 0 writes
 hd0:1: 142 reads, 260 writes
 hd1:0: 104 reads, 0 writes
@@ -61,4 +35,3 @@ Console: 994 characters output
 Keyboard: 0 keys pressed
 Exception: 0 page faults
 Powering off...
->>>>>>> lab2_juntos

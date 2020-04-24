@@ -23,21 +23,12 @@ Executing 'read-stdout':
 (read-stdout) end
 read-stdout: exit(0)
 Execution of 'read-stdout' complete.
-<<<<<<< HEAD
-Timer: 469 ticks
-Thread: 35 idle ticks, 434 kernel ticks, 1 user ticks
-hd0:0: 0 reads, 0 writes
-hd0:1: 79 reads, 228 writes
-hd1:0: 100 reads, 0 writes
-Console: 859 characters output
-=======
-Timer: 1300 ticks
-Thread: 34 idle ticks, 1263 kernel ticks, 4 user ticks
+Timer: 1286 ticks
+Thread: 34 idle ticks, 1250 kernel ticks, 2 user ticks
 hd0:0: 0 reads, 0 writes
 hd0:1: 79 reads, 228 writes
 hd1:0: 100 reads, 0 writes
 Console: 861 characters output
->>>>>>> lab2_juntos
 Keyboard: 0 keys pressed
 Exception: 0 page faults
 Powering off...

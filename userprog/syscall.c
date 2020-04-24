@@ -88,10 +88,10 @@ syscall_handler (struct intr_frame *f UNUSED) {
 			break;
 		
 		/*** SYS_EXEC ***/
-		case 3:
-			check_address((uint64_t)f->R.rdi);
-			f->R.rax=syscall_exec((char *)f->R.rdi);
-			break;
+		// case 3:
+		// 	check_address((uint64_t)f->R.rdi);
+		// 	f->R.rax=syscall_exec((char *)f->R.rdi);
+		// 	break;
 		
 		/*** SYS_CREATE ***/
 		case 5:
@@ -188,13 +188,13 @@ syscall_exit (int status) {
 	thread_exit();
 }
 
-int
-syscall_exec(const char *cmd_line){
-	/*** create child process ****/
-	pid_t pid;
+// int
+// syscall_exec(const char *cmd_line){
+// 	/*** create child process ****/
+// 	pid_t pid;
 
-	process_create_initd(cmd_line);
-}
+// 	process_create_initd(cmd_line);
+// }
 
 bool
 syscall_create (const char *file, unsigned initial_size) {

@@ -21,47 +21,13 @@ Putting 'open-twice' into the file system...
 Putting 'sample.txt' into the file system...
 Executing 'open-twice':
 (open-twice) begin
-<<<<<<< HEAD
-file name: sample.txt
-fd: 3, file open : 3
-file name: sample.txt
-fd: 4, file open : 4
-(open-twice) open "sample.txt" once
-file name: sample.txt
-fd: 5, file open : 5
-(open-twice) open "sample.txt" again
-file name: sample.txt
-fd: 6, file open : 6
-(open-twice) open() returned 7 both times: FAILED
-open-twice: exit(1)
-Interrupt 0x0d (#GP General Protection Exception) at rip=80042186e0
- cr2=0000000000000000 error=               0
-rax 6b40bf48d0ff0000 rbx 0000000000000000 rcx 00000080040b8000 rdx 0000000000000001
-rsp 00000080042b8df8 rbp 00000080042b8e00 rsi 000000000000800f rdi 6b40bf48d0ff0000
-rip 00000080042186e0 r8 00000080042b8df8  r9 000000800421bada r10 0000000000000000
-r11 0000000000000202 r12 000000800421d7bc r13 0000000000000000 r14 0000000000000000
-r15 0000000000000000 rflags 00000206
-es: 001b ds: 001b cs: 0008 ss: 0010
-Kernel PANIC at ../../userprog/exception.c:98 in kill(): Kernel bug - unexpected interrupt in kernel
-Call stack: 0x8004218661 0x800421d4b6 0x80042095f1 0x8004209a0f 0x8004218883 0x800421bcc6 0x800421bd29 0x800421c2ed 0x80042074c9 0x800421da7d 0x800421d826 0x800421d6e5 0x4004a2 0x4001f4 0x400252 0x400cf3.
-The `backtrace' program can make call stacks useful.
-Read "Backtraces" in the "Debugging Tools" chapter
-of the Pintos documentation for more information.
-Timer: 324 ticks
-Thread: 37 idle ticks, 274 kernel ticks, 13 user ticks
-hd0:0: 0 reads, 0 writes
-hd0:1: 119 reads, 244 writes
-hd1:0: 103 reads, 0 writes
-Console: 2136 characters output
-Key
-=======
 (open-twice) open "sample.txt" once
 (open-twice) open "sample.txt" again
 (open-twice) end
 open-twice: exit(0)
 Execution of 'open-twice' complete.
-Timer: 1316 ticks
-Thread: 36 idle ticks, 1278 kernel ticks, 2 user ticks
+Timer: 1305 ticks
+Thread: 36 idle ticks, 1269 kernel ticks, 0 user ticks
 hd0:0: 0 reads, 0 writes
 hd0:1: 119 reads, 244 writes
 hd1:0: 103 reads, 0 writes
@@ -69,4 +35,3 @@ Console: 987 characters output
 Keyboard: 0 keys pressed
 Exception: 0 page faults
 Powering off...
->>>>>>> lab2_juntos

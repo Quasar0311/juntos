@@ -22,37 +22,11 @@ Putting 'sample.txt' into the file system...
 Executing 'write-boundary':
 (write-boundary) begin
 (write-boundary) open "sample.txt"
-<<<<<<< HEAD
-file name: sample.txt
-fd: 3, file open : 3
-(write-boundary) write() returned 10 instead of 373: FAILED
-write-boundary: exit(1)
-Interrupt 0x0d (#GP General Protection Exception) at rip=800421ebdd
- cr2=0000000000000000 error=               0
-rax d0ff000000800421 rbx 0000000000000000 rcx 00000080040b8000 rdx 0000000000000001
-rsp 00000080042b8e30 rbp 00000080042b8e40 rsi 000000000000800f rdi d0ff000000800421
-rip 000000800421ebdd r8 00000080042b8df8  r9 000000800421bada r10 0000000000000000
-r11 0000000000000202 r12 000000800421d7bc r13 0000000000000000 r14 0000000000000000
-r15 0000000000000000 rflags 00000286
-es: 001b ds: 001b cs: 0008 ss: 0010
-Kernel PANIC at ../../userprog/exception.c:98 in kill(): Kernel bug - unexpected interrupt in kernel
-Call stack: 0x8004218661 0x800421d4b6 0x80042095f1 0x8004209a0f 0x800421e9b0 0x800421bd4b 0x800421c2ed 0x80042074c9 0x800421da7d 0x800421d826 0x800421d6e5 0x400529 0x4001ad 0x4002d9 0x400d7a.
-The `backtrace' program can make call stacks useful.
-Read "Backtraces" in the "Debugging Tools" chapter
-of the Pintos documentation for more information.
-Timer: 89 ticks
-Thread: 30 idle ticks, 45 kernel ticks, 14 user ticks
-hd0:0: 0 reads, 0 writes
-hd0:1: 118 reads, 250 writes
-hd1:0: 106 reads, 0 writes
-Console: 1988 characters output
-Key
-=======
 (write-boundary) end
 write-boundary: exit(0)
 Execution of 'write-boundary' complete.
-Timer: 1300 ticks
-Thread: 42 idle ticks, 1254 kernel ticks, 4 user ticks
+Timer: 1301 ticks
+Thread: 34 idle ticks, 1264 kernel ticks, 3 user ticks
 hd0:0: 0 reads, 0 writes
 hd0:1: 119 reads, 251 writes
 hd1:0: 106 reads, 0 writes
@@ -60,4 +34,3 @@ Console: 981 characters output
 Keyboard: 0 keys pressed
 Exception: 0 page faults
 Powering off...
->>>>>>> lab2_juntos

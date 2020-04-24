@@ -15,7 +15,3 @@ Differences in `diff -u' format:
 - (fork-once) Parent: child exit status is 81
 - (fork-once) end
 - fork-once: exit(0)
-<<<<<<< HEAD
-=======
-+ system call!
->>>>>>> lab2_juntos

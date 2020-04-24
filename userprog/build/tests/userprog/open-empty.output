@@ -5,7 +5,8 @@ iPXE (http://ipxe.org) 00:03.0 C980 PCI2.10 PnP PMM+0FF915A0+0FEF15A0 C980
 Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
 
 
-Booting from Hard Disk..Kernel command line: -q -f put open-empty run open-empty
+Booting from Hard Disk...
+Kernel command line: -q -f put open-empty run open-empty
 0 ~ 9fc00 1
 100000 ~ ffe0000 1
 Pintos booting with: 
@@ -20,30 +21,15 @@ Boot complete.
 Putting 'open-empty' into the file system...
 Executing 'open-empty':
 (open-empty) begin
-<<<<<<< HEAD
-file name: 
-file is null
-fd: -1, file open : 2
-(open-empty) open() returned 7 instead of -1: FAILED
-open-empty: exit(1)
-Execution of 'open-empty' complete.
-Timer: 469 ticks
-Thread: 35 idle ticks, 432 kernel ticks, 2 user ticks
-hd0:0: 0 reads, 0 writes
-hd0:1: 96 reads, 228 writes
-hd1:0: 100 reads, 0 writes
-Console: 934 characters output
-=======
 (open-empty) end
 open-empty: exit(0)
 Execution of 'open-empty' complete.
-Timer: 1282 ticks
-Thread: 33 idle ticks, 1248 kernel ticks, 2 user ticks
+Timer: 1296 ticks
+Thread: 36 idle ticks, 1259 kernel ticks, 1 user ticks
 hd0:0: 0 reads, 0 writes
 hd0:1: 96 reads, 228 writes
 hd1:0: 100 reads, 0 writes
 Console: 853 characters output
->>>>>>> lab2_juntos
 Keyboard: 0 keys pressed
 Exception: 0 page faults
 Powering off...

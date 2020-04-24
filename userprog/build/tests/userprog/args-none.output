@@ -26,13 +26,8 @@ Executing 'args-none':
 (args) end
 args-none: exit(0)
 Execution of 'args-none' complete.
-<<<<<<< HEAD
-Timer: 470 ticks
-Thread: 34 idle ticks, 432 kernel ticks, 4 user ticks
-=======
-Timer: 1296 ticks
-Thread: 31 idle ticks, 1260 kernel ticks, 5 user ticks
->>>>>>> lab2_juntos
+Timer: 1288 ticks
+Thread: 34 idle ticks, 1250 kernel ticks, 4 user ticks
 hd0:0: 0 reads, 0 writes
 hd0:1: 79 reads, 226 writes
 hd1:0: 99 reads, 0 writes

@@ -22,13 +22,8 @@ Executing 'exit':
 (exit) begin
 exit: exit(57)
 Execution of 'exit' complete.
-<<<<<<< HEAD
-Timer: 481 ticks
-Thread: 31 idle ticks, 449 kernel ticks, 1 user ticks
-=======
-Timer: 1279 ticks
-Thread: 35 idle ticks, 1243 kernel ticks, 1 user ticks
->>>>>>> lab2_juntos
+Timer: 1292 ticks
+Thread: 31 idle ticks, 1259 kernel ticks, 2 user ticks
 hd0:0: 0 reads, 0 writes
 hd0:1: 79 reads, 228 writes
 hd1:0: 100 reads, 0 writes

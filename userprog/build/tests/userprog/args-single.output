@@ -27,13 +27,8 @@ Executing 'args-single onearg':
 (args) end
 args-single: exit(0)
 Execution of 'args-single onearg' complete.
-<<<<<<< HEAD
-Timer: 474 ticks
-Thread: 30 idle ticks, 438 kernel ticks, 6 user ticks
-=======
-Timer: 1279 ticks
-Thread: 35 idle ticks, 1241 kernel ticks, 3 user ticks
->>>>>>> lab2_juntos
+Timer: 1306 ticks
+Thread: 36 idle ticks, 1266 kernel ticks, 4 user ticks
 hd0:0: 0 reads, 0 writes
 hd0:1: 79 reads, 226 writes
 hd1:0: 99 reads, 0 writes
