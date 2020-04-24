@@ -20,16 +20,15 @@ Boot complete.
 Putting 'open-empty' into the file system...
 Executing 'open-empty':
 (open-empty) begin
-file is null
 (open-empty) end
 open-empty: exit(0)
 Execution of 'open-empty' complete.
-Timer: 1297 ticks
-Thread: 36 idle ticks, 1259 kernel ticks, 2 user ticks
+Timer: 1282 ticks
+Thread: 33 idle ticks, 1248 kernel ticks, 2 user ticks
 hd0:0: 0 reads, 0 writes
 hd0:1: 96 reads, 228 writes
 hd1:0: 100 reads, 0 writes
-Console: 866 characters output
+Console: 853 characters output
 Keyboard: 0 keys pressed
 Exception: 0 page faults
 Powering off...

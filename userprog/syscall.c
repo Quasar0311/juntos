@@ -107,12 +107,12 @@ syscall_handler (struct intr_frame *f UNUSED) {
 			break;
 
 		case 8:
-			syscall_filesize((int)f->R.rdi);
+			f -> R.rax = syscall_filesize((int)f->R.rdi);
 			break;
 
 		case 9:
 			check_address(f -> R.rsi);
-			syscall_read((int)f->R.rdi, (void *)f->R.rsi, (unsigned)f->R.rdx);
+			f -> R.rax = syscall_read((int)f->R.rdi, (void *)f->R.rsi, (unsigned)f->R.rdx);
 			break;
 		
 		case 10:
@@ -239,7 +239,7 @@ syscall_read(int fd, void *buffer, unsigned size){
 		return -1;
 	}
 	
-	else bytes_read=file_read(f, buffer, size);
+	else bytes_read=file_read(f, buffer, (off_t) size);
 	lock_release(&filesys_lock);
 
 	return bytes_read;

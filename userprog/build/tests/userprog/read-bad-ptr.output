@@ -5,8 +5,7 @@ iPXE (http://ipxe.org) 00:03.0 C980 PCI2.10 PnP PMM+0FF915A0+0FEF15A0 C980
 Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
 
 
-Booting from Hard Disk...
-Kernel command line: -q -f put read-bad-ptr put sample.txt run read-bad-ptr
+Booting from Hard Disk..Kernel command line: -q -f put read-bad-ptr put sample.txt run read-bad-ptr
 0 ~ 9fc00 1
 100000 ~ ffe0000 1
 Pintos booting with: 
@@ -29,18 +28,18 @@ Interrupt 0x0e (#PF Page-Fault Exception) at rip=800421760a
 rax 00000000c0100000 rbx 0000000000000000 rcx 00000000c0100001 rdx 0000000000000022
 rsp 00000080042b8de0 rbp 00000080042b8e10 rsi 00000080042b7018 rdi 00000000c0100000
 rip 000000800421760a r8 0000000000000000  r9 0000000000000000 r10 0000000000000000
-r11 0000000000000202 r12 000000800421d7d5 r13 0000000000000000 r14 0000000000000000
+r11 0000000000000202 r12 000000800421d7bf r13 0000000000000000 r14 0000000000000000
 r15 0000000000000000 rflags 00000206
 es: 001b ds: 001b cs: 0008 ss: 0010
 Kernel PANIC at ../../userprog/exception.c:97 in kill(): Kernel bug - unexpected interrupt in kernel
-Call stack: 0x8004218661 0x800421d4d8 0x800421d689 0x80042095f1 0x8004209a0f 0x800421faeb 0x800421ea70 0x800421dcc9 0x800421d92c 0x800421d6fe 0x400160 0x4001d6 0x400c77.
+Call stack: 0x8004218661 0x800421d4c2 0x800421d673 0x80042095f1 0x8004209a0f 0x800421fae0 0x800421ea65 0x800421dcbe 0x800421d916 0x800421d6e8 0x400160 0x4001d6 0x400c77.
 The `backtrace' program can make call stacks useful.
 Read "Backtraces" in the "Debugging Tools" chapter
 of the Pintos documentation for more information.
-Timer: 82 ticks
-Thread: 30 idle ticks, 42 kernel ticks, 10 user ticks
+Timer: 266 ticks
+Thread: 34 idle ticks, 221 kernel ticks, 11 user ticks
 hd0:0: 0 reads, 0 writes
 hd0:1: 111 reads, 242 writes
 hd1:0: 102 reads, 0 writes
-Console: 1895 characters output
+Console: 1897 characters output
 Key

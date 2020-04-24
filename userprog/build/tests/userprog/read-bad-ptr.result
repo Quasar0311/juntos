@@ -1,17 +1,17 @@
 FAIL
 Kernel panic in run: PANIC at ../../userprog/exception.c:97 in kill(): Kernel bug - unexpected interrupt in kernel
-Call stack: 0x8004218661 0x800421d4d8 0x800421d689 0x80042095f1 0x8004209a0f 0x800421faeb 0x800421ea70 0x800421dcc9 0x800421d92c 0x800421d6fe 0x400160 0x4001d6 0x400c77
+Call stack: 0x8004218661 0x800421d4c2 0x800421d673 0x80042095f1 0x8004209a0f 0x800421fae0 0x800421ea65 0x800421dcbe 0x800421d916 0x800421d6e8 0x400160 0x4001d6 0x400c77
 Translation of call stack:
 0x0000008004218661: debug_panic (lib/kernel/debug.c:32)
-0x000000800421d4d8: kill (userprog/exception.c:103)
-0x000000800421d689: page_fault (userprog/exception.c:169 (discriminator 12))
+0x000000800421d4c2: kill (userprog/exception.c:103)
+0x000000800421d673: page_fault (userprog/exception.c:169 (discriminator 12))
 0x00000080042095f1: intr_handler (threads/interrupt.c:352)
 0x0000008004209a0f: intr_entry (threads/intr-stubs.o:?)
-0x000000800421faeb: inode_read_at (filesys/inode.c:219)
-0x000000800421ea70: file_read (filesys/file.c:73)
-0x000000800421dcc9: syscall_read (userprog/syscall.c:242)
-0x000000800421d92c: syscall_handler (userprog/syscall.c:116)
-0x000000800421d6fe: no_sti (userprog/syscall-entry.o:?)
+0x000000800421fae0: inode_read_at (filesys/inode.c:219)
+0x000000800421ea65: file_read (filesys/file.c:73)
+0x000000800421dcbe: syscall_read (userprog/syscall.c:242)
+0x000000800421d916: syscall_handler (userprog/syscall.c:115)
+0x000000800421d6e8: no_sti (userprog/syscall-entry.o:?)
 0x0000000000400160: (unknown)
 0x00000000004001d6: (unknown)
 0x0000000000400c77: (unknown)

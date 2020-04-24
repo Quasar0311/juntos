@@ -20,16 +20,15 @@ Boot complete.
 Putting 'open-missing' into the file system...
 Executing 'open-missing':
 (open-missing) begin
-file is null
 (open-missing) end
 open-missing: exit(0)
 Execution of 'open-missing' complete.
-Timer: 1293 ticks
-Thread: 36 idle ticks, 1256 kernel ticks, 2 user ticks
+Timer: 1318 ticks
+Thread: 33 idle ticks, 1283 kernel ticks, 3 user ticks
 hd0:0: 0 reads, 0 writes
 hd0:1: 96 reads, 228 writes
 hd1:0: 100 reads, 0 writes
-Console: 882 characters output
+Console: 869 characters output
 Keyboard: 0 keys pressed
 Exception: 0 page faults
 Powering off...
