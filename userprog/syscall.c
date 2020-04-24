@@ -22,7 +22,8 @@ struct lock filesys_lock;
 void syscall_entry (void);
 void syscall_handler (struct intr_frame *);
 //void get_argument (struct intr_frame *f, int *arg, int count);
-void check_address (void *addr);
+// void check_address (void *addr);
+void check_address (uint64_t reg);
 void syscall_halt (void);
 void syscall_exit (int status);
 bool syscall_create (const char *file, unsigned initial_size);
@@ -68,7 +69,7 @@ syscall_init (void) {
 void
 syscall_handler (struct intr_frame *f UNUSED) {
 	// TODO: Your implementation goes here.
-
+	void *addr;
 	/*** implement syscall_handgler using 
 	system call number stored in the user stack ***/
 	int *number=(int *)&f->R.rax;
@@ -85,13 +86,19 @@ syscall_handler (struct intr_frame *f UNUSED) {
 		
 		/*** SYS_CREATE ***/
 		case 5:
-			if (f -> R.rdi == NULL) {
-				syscall_exit(-1);
-			}
-			syscall_create((char *) f -> R.rdi, (unsigned) f -> R.rsi);
+			// addr = (void *) f -> R.rdi;
+			// if (addr == NULL) {
+			// 	syscall_exit(-1);
+			// }
+			//else {
+				check_address((uint64_t) f -> R.rdi); //check_address((void *)f->R.rdi);
+				syscall_create((char *) f -> R.rdi, (unsigned) f -> R.rsi);
+			//}
+			
 			break;
 
 		case 7:
+			check_address(f -> R.rdi);
 			syscall_open((char *)f->R.rdi);
 			break;
 
@@ -100,10 +107,12 @@ syscall_handler (struct intr_frame *f UNUSED) {
 			break;
 
 		case 9:
+			check_address(f -> R.rsi);
 			syscall_read((int)f->R.rdi, (void *)f->R.rsi, (unsigned)f->R.rdx);
 			break;
 		
 		case 10:
+			check_address(f -> R.rsi);
 			syscall_write((int) f -> R.rdi, (void *) f -> R.rsi, (unsigned) f -> R.rdx);
 			break; 
 		
@@ -135,10 +144,16 @@ syscall_handler (struct intr_frame *f UNUSED) {
 }
 
 void
-check_address (void *addr) {
+check_address (uint64_t reg) {
 	/*** check if the address is in user address ***/
-	if (!is_user_vaddr(addr)) {
-		printf("bad address for address : %p\n", addr);
+	
+	if ((char *) reg == NULL) {
+		//printf("null\n");
+		syscall_exit(-1);
+	}
+	
+	if (is_user_vaddr((char *) &reg)) {
+		printf("bad address for address : %p\n", &reg);
 		syscall_exit(-1);
 	}
 }

@@ -5,8 +5,7 @@ iPXE (http://ipxe.org) 00:03.0 C980 PCI2.10 PnP PMM+0FF915A0+0FEF15A0 C980
 Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
 
 
-Booting from Hard Disk...
-Kernel command line: -q -f put args-none run args-none
+Booting from Hard Disk..Kernel command line: -q -f put args-none run args-none
 0 ~ 9fc00 1
 100000 ~ ffe0000 1
 Pintos booting with: 
@@ -20,19 +19,14 @@ Formatting file system...done.
 Boot complete.
 Putting 'args-none' into the file system...
 Executing 'args-none':
-(args) begin
-(args) argc = 1
-(args) argv[0] = 'args-none'
-(args) argv[1] = null
-(args) end
-args-none: exit(0)
+args-none: exit(-1)
 Execution of 'args-none' complete.
-Timer: 594 ticks
-Thread: 30 idle ticks, 558 kernel ticks, 7 user ticks
+Timer: 466 ticks
+Thread: 30 idle ticks, 434 kernel ticks, 2 user ticks
 hd0:0: 0 reads, 0 writes
 hd0:1: 79 reads, 226 writes
 hd1:0: 99 reads, 0 writes
-Console: 898 characters output
+Console: 808 characters output
 Keyboard: 0 keys pressed
 Exception: 0 page faults
 Powering off...
