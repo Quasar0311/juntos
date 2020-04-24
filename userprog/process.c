@@ -46,8 +46,8 @@ process_add_file(struct file *f){
 	return thread_current()->next_fd; 
 }
 
-struct file
-*process_get_file(int fd){
+struct file *
+process_get_file(int fd){
 	/*** return file corresponding to a file descriptor ***/
 	struct list_elem *fp;
 	struct file_pointer *f;
@@ -91,6 +91,14 @@ process_close_file(int fd){
 
 }
 
+struct thread *
+get_child_process(int pid){
+	
+}
+
+void
+remove_child_process(struct thread *cp){}
+
 /* General process initializer for initd and other process. */
 static void
 process_init (void) {
@@ -103,7 +111,7 @@ process_init (void) {
  * thread id, or TID_ERROR if the thread cannot be created.
  * Notice that THIS SHOULD BE CALLED ONCE. */
 tid_t
-process_create_initd (const char *file_name) {
+process_create_initd (const char *file_name) { //process_execute
 	char *fn_copy;
 	tid_t tid;
 	char *file_title = palloc_get_page(0);
@@ -236,7 +244,7 @@ error:
 /* Switch the current execution context to the f_name.
  * Returns -1 on fail. */
 int
-process_exec (void *f_name) {
+process_exec (void *f_name) { //start_process
 	char *file_name = f_name;
 	bool success;
 
@@ -251,13 +259,21 @@ process_exec (void *f_name) {
 	/* We first kill the current context */
 	process_cleanup ();
 
+	/*** if load finish resume parent process by semaphore ***/
+
 	/* And then load the binary */
 	success = load (file_name, &_if);
 
 	/* If load failed, quit. */
 	palloc_free_page (file_name);
-	if (!success)
-		return -1;
+	if (!success){
+		/*** if load fail process descriptor memory load fail ***/
+		thread_exit();
+		// return -1;
+	}
+
+	/*** if load success process descriptor memory load success ***/
+	if(success){}
 
 	/* Start switched process. */
 	do_iret (&_if);

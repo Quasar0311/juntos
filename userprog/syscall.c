@@ -25,7 +25,7 @@ void syscall_handler (struct intr_frame *);
 // void check_address (void *addr);
 void check_address (uint64_t reg);
 void syscall_halt (void);
-void syscall_exit (int status);
+void syscall_exec(const char *cmd_line);
 bool syscall_create (const char *file, unsigned initial_size);
 int syscall_open(const char *file);
 int syscall_filesize(int fd);
@@ -69,61 +69,69 @@ syscall_init (void) {
 void
 syscall_handler (struct intr_frame *f UNUSED) {
 	// TODO: Your implementation goes here.
-	void *addr;
+
 	/*** implement syscall_handgler using 
 	system call number stored in the user stack ***/
 	int *number=(int *)&f->R.rax;
 	//printf("system call no. : %d\n", *number);
 
 	switch(*number){
+		/*** SYS_HALT ***/
 		case 0:
 			syscall_halt();
 			break;
 
+		/*** SYS_EXIT ***/
 		case 1:
 			syscall_exit((int)f->R.rdi);
 			break;
 		
+		/*** SYS_EXEC ***/
+		case 3:
+			check_address((uint64_t)f->R.rdi);
+			f->R.rax=syscall_exec((char *)f->R.rdi);
+			break;
+		
 		/*** SYS_CREATE ***/
 		case 5:
-			// addr = (void *) f -> R.rdi;
-			// if (addr == NULL) {
-			// 	syscall_exit(-1);
-			// }
-			//else {
-				check_address((uint64_t) f -> R.rdi);
-				syscall_create((char *) f -> R.rdi, (unsigned) f -> R.rsi);
-			//}
-			
+			check_address((uint64_t) f -> R.rdi);
+			syscall_create((char *) f -> R.rdi, (unsigned) f -> R.rsi);
 			break;
 
+		/*** SYS_OPEN ***/
 		case 7:
 			check_address(f -> R.rdi);
 			syscall_open((char *)f->R.rdi);
 			break;
 
+		/*** SYS_FILESIZE ***/
 		case 8:
 			syscall_filesize((int)f->R.rdi);
 			break;
 
+		/*** SYS_READ ***/
 		case 9:
 			check_address(f -> R.rsi);
 			syscall_read((int)f->R.rdi, (void *)f->R.rsi, (unsigned)f->R.rdx);
 			break;
 		
+		/*** SYS_WRITE ***/
 		case 10:
 			check_address(f -> R.rsi);
 			syscall_write((int) f -> R.rdi, (void *) f -> R.rsi, (unsigned) f -> R.rdx);
 			break; 
 		
+		/*** SYS_SEEK ***/
 		case 11:
 			syscall_seek((int)f->R.rdi, (unsigned)f->R.rsi);
 			break;
 		
+		/*** SYS_TELL ***/
 		case 12:
 			syscall_tell((int)f->R.rdi);
 			break;
 		
+		/*** SYS_CLOSE ***/
 		case 13:
 			syscall_close((int)f->R.rdi);
 			break;
@@ -168,6 +176,14 @@ syscall_exit (int status) {
 
 	printf("%s: exit(%d)\n", curr -> name, status);
 	thread_exit();
+}
+
+int
+syscall_exec(const char *cmd_line){
+	/*** create child process ****/
+	pid_t pid;
+
+	process_create_initd(cmd_line);
 }
 
 bool

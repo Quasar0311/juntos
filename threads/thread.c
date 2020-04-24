@@ -244,7 +244,7 @@ thread_print_stats (void) {
 tid_t
 thread_create (const char *name, int priority,
 		thread_func *function, void *aux) {
-	struct thread *t;
+	struct thread *t, *curr;
 	tid_t tid;
 
 	ASSERT (function != NULL);
@@ -274,6 +274,19 @@ thread_create (const char *name, int priority,
 	list_init(&t->fd_table);
 	t->next_fd=2;
 
+	/*** parent process ***/
+	curr=thread_current();
+	t->parent=curr;
+
+	/*** initialize process descriptor ***/
+	t->process_load=false;
+	t->process_terminate=false;
+	sema_init(&t->exit_sema, 0);
+	sema_init(&t->load_sema, 0);
+
+	/*** add to child_list ***/
+	list_push_back(&curr->child_list, &t->child_elem);
+
 	/* Add to run queue. */
 	thread_unblock (t);
 
@@ -283,7 +296,6 @@ thread_create (const char *name, int priority,
 		if (!intr_context()) {
 			thread_yield();
 		}
-		
 	}
 
 	return tid;
@@ -665,6 +677,8 @@ init_thread (struct thread *t, const char *name, int priority) {
 
 	list_insert_ordered(&all_list, &t->all_elem, priority_less_func, NULL);
 
+	/*** initialize child_list ***/
+	list_init(&t->child_list);
 }
 
 /* Chooses and returns the next thread to be scheduled.  Should

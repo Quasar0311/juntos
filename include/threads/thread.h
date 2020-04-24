@@ -5,6 +5,7 @@
 #include <list.h>
 #include <stdint.h>
 #include "threads/interrupt.h"
+#include "threads/synch.h"
 #ifdef VM
 #include "vm/vm.h"
 #endif
@@ -27,6 +28,8 @@ typedef int tid_t;
 #define PRI_MIN 0                       /* Lowest priority. */
 #define PRI_DEFAULT 31                  /* Default priority. */
 #define PRI_MAX 63                      /* Highest priority. */
+
+typedef int pid_t;
 
 /* A kernel thread or user process.
  *
@@ -113,6 +116,22 @@ struct thread {
 	struct list fd_table;
 	/*** max fd of current table+ 1 ***/
 	int next_fd;
+
+	/*** parent descriptor, pointer of parent process ***/
+	struct thread *parent;
+	/*** child_list element ***/
+	struct list_elem child_elem;
+	struct list child_list;
+
+	/*** True: process program memory loaded ***/
+	bool process_load;
+	/*** True: process terminated ***/
+	bool process_terminate;
+	/*** exit semaphore ***/
+	struct semaphore exit_sema;
+	/*** load semaphore ***/
+	struct semaphore load_sema;
+	int exit_status;
 
 #endif
 #ifdef VM
