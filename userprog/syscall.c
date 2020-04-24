@@ -16,6 +16,7 @@
 #include "include/userprog/process.h"
 #include "include/filesys/file.h"
 #include "include/devices/input.h"
+#include "threads/palloc.h"
 
 struct lock filesys_lock;
 
@@ -94,31 +95,40 @@ syscall_handler (struct intr_frame *f UNUSED) {
 		
 		/*** SYS_CREATE ***/
 		case 5:
-			check_address((uint64_t) f -> R.rdi);
-			syscall_create((char *) f -> R.rdi, (unsigned) f -> R.rsi);
+			// addr = (void *) f -> R.rdi;
+			// if (addr == NULL) {
+			// 	syscall_exit(-1);
+			// }
+			//else {
+				check_address((uint64_t) f -> R.rdi);
+				f -> R.rax = syscall_create((char *) f -> R.rdi, (unsigned) f -> R.rsi);
+			//}
+			
 			break;
 
-		/*** SYS_OPEN ***/
+		case 6:
+			break;
+
 		case 7:
 			check_address(f -> R.rdi);
-			syscall_open((char *)f->R.rdi);
+			f -> R.rax = syscall_open((char *)f->R.rdi);
 			break;
 
 		/*** SYS_FILESIZE ***/
 		case 8:
-			syscall_filesize((int)f->R.rdi);
+			f -> R.rax = syscall_filesize((int)f->R.rdi);
 			break;
 
 		/*** SYS_READ ***/
 		case 9:
 			check_address(f -> R.rsi);
-			syscall_read((int)f->R.rdi, (void *)f->R.rsi, (unsigned)f->R.rdx);
+			f -> R.rax = syscall_read((int)f->R.rdi, (void *)f->R.rsi, (unsigned)f->R.rdx);
 			break;
 		
 		/*** SYS_WRITE ***/
 		case 10:
 			check_address(f -> R.rsi);
-			syscall_write((int) f -> R.rdi, (void *) f -> R.rsi, (unsigned) f -> R.rdx);
+			f -> R.rax = syscall_write((int) f -> R.rdi, (void *) f -> R.rsi, (unsigned) f -> R.rdx);
 			break; 
 		
 		/*** SYS_SEEK ***/
@@ -192,7 +202,12 @@ syscall_create (const char *file, unsigned initial_size) {
 		syscall_exit(-1);
 		return false;
 	}
+	else if (strlen(file) >= 511) {
+		//printf("hi : %d\n", false);
+		return 0;
+	}
 	else {
+		//printf("filesize : %d\n", strlen(file));
 		return filesys_create(file, (off_t) initial_size);
 	}
 	
@@ -203,13 +218,13 @@ syscall_open(const char *file){
 	struct file *f;
 	int fd=-1;
 
-	// lock_acquire(&filesys_lock);
-	printf("file name: %s\n", file);
-	// f=filesys_open(file);
-	f=filesys_open("sample.txt");
+	lock_acquire(&filesys_lock);
+	//printf("file name: %s\n", file);
+	f=filesys_open(file);
 	fd=process_add_file(f);
-	printf("fd: %d, file open : %d\n", fd, thread_current() -> next_fd);
-	// lock_release(&filesys_lock);
+	//printf("got fd : %d\n",fd);
+	//printf("fd: %d, file open : %d\n", fd, thread_current() -> next_fd);
+	lock_release(&filesys_lock);
 
 	return fd;
 }
@@ -245,7 +260,7 @@ syscall_read(int fd, void *buffer, unsigned size){
 		return -1;
 	}
 	
-	else bytes_read=file_read(f, buffer, size);
+	else bytes_read=file_read(f, buffer, (off_t) size);
 	lock_release(&filesys_lock);
 
 	return bytes_read;

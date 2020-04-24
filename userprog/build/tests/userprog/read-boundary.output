@@ -22,6 +22,7 @@ Putting 'sample.txt' into the file system...
 Executing 'read-boundary':
 (read-boundary) begin
 (read-boundary) open "sample.txt"
+<<<<<<< HEAD
 file name: sample.txt
 fd: 3, file open : 3
 read-boundary: exit(-1)
@@ -10425,3 +10426,17 @@ rsp 0000008004232480 rbp 00000080042324f0 rsi 0000000000000062 rdi 0000008004225
 rip 0000008004218599 r8 0000008004218586  r9 000000800421bada r10 0000000000000000
 r11 0000000000000202 r12 000000800421d7bc r13 0000000000000000 r14 0000000000000000
 r15 000000
+=======
+(read-boundary) end
+read-boundary: exit(0)
+Execution of 'read-boundary' complete.
+Timer: 1296 ticks
+Thread: 36 idle ticks, 1259 kernel ticks, 1 user ticks
+hd0:0: 0 reads, 0 writes
+hd0:1: 120 reads, 252 writes
+hd1:0: 107 reads, 0 writes
+Console: 972 characters output
+Keyboard: 0 keys pressed
+Exception: 0 page faults
+Powering off...
+>>>>>>> lab2_juntos

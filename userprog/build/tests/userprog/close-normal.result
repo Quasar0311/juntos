@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 FAIL
 Kernel panic in run: PANIC at ../../userprog/exception.c:98 in kill(): Kernel bug - unexpected interrupt in kernel
 Call stack: 0x8004218661 0x800421d4b6 0x80042095f1 0x8004209a0f 0x8004218883 0x800421bcc6 0x800421bd29 0x800421de09 0x800421d99b 0x800421d6e5 0x400171 0x4001cf 0x400c70
@@ -15,3 +16,6 @@ Translation of call stack:
 0x0000000000400171: (unknown)
 0x00000000004001cf: (unknown)
 0x0000000000400c70: (unknown)
+=======
+PASS
+>>>>>>> lab2_juntos

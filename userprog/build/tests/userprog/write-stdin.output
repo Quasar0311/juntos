@@ -23,12 +23,21 @@ Executing 'write-stdin':
 (write-stdin) end
 write-stdin: exit(0)
 Execution of 'write-stdin' complete.
+<<<<<<< HEAD
 Timer: 476 ticks
 Thread: 36 idle ticks, 440 kernel ticks, 1 user ticks
 hd0:0: 0 reads, 0 writes
 hd0:1: 79 reads, 228 writes
 hd1:0: 100 reads, 0 writes
 Console: 859 characters output
+=======
+Timer: 1286 ticks
+Thread: 40 idle ticks, 1243 kernel ticks, 3 user ticks
+hd0:0: 0 reads, 0 writes
+hd0:1: 79 reads, 228 writes
+hd1:0: 100 reads, 0 writes
+Console: 861 characters output
+>>>>>>> lab2_juntos
 Keyboard: 0 keys pressed
 Exception: 0 page faults
 Powering off...

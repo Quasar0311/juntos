@@ -23,6 +23,7 @@ Executing 'write-normal':
 (write-normal) begin
 (write-normal) create "test.txt"
 (write-normal) open "test.txt"
+<<<<<<< HEAD
 file name: test.txt
 fd: 3, file open : 3
 (write-normal) write() returned 10 instead of 373: FAILED
@@ -47,3 +48,17 @@ hd0:1: 140 reads, 259 writes
 hd1:0: 104 reads, 0 writes
 Console: 2003 characters output
 Key
+=======
+(write-normal) end
+write-normal: exit(0)
+Execution of 'write-normal' complete.
+Timer: 1313 ticks
+Thread: 33 idle ticks, 1278 kernel ticks, 2 user ticks
+hd0:0: 0 reads, 0 writes
+hd0:1: 142 reads, 260 writes
+hd1:0: 104 reads, 0 writes
+Console: 994 characters output
+Keyboard: 0 keys pressed
+Exception: 0 page faults
+Powering off...
+>>>>>>> lab2_juntos

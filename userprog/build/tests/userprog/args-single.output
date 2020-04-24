@@ -27,12 +27,17 @@ Executing 'args-single onearg':
 (args) end
 args-single: exit(0)
 Execution of 'args-single onearg' complete.
+<<<<<<< HEAD
 Timer: 474 ticks
 Thread: 30 idle ticks, 438 kernel ticks, 6 user ticks
+=======
+Timer: 1279 ticks
+Thread: 35 idle ticks, 1241 kernel ticks, 3 user ticks
+>>>>>>> lab2_juntos
 hd0:0: 0 reads, 0 writes
 hd0:1: 79 reads, 226 writes
 hd1:0: 99 reads, 0 writes
-Console: 961 characters output
+Console: 963 characters output
 Keyboard: 0 keys pressed
 Exception: 0 page faults
 Powering off...

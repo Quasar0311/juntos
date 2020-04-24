@@ -24,12 +24,17 @@ Executing 'create-normal':
 (create-normal) end
 create-normal: exit(0)
 Execution of 'create-normal' complete.
+<<<<<<< HEAD
 Timer: 483 ticks
 Thread: 32 idle ticks, 448 kernel ticks, 3 user ticks
+=======
+Timer: 1286 ticks
+Thread: 33 idle ticks, 1252 kernel ticks, 2 user ticks
+>>>>>>> lab2_juntos
 hd0:0: 0 reads, 0 writes
 hd0:1: 101 reads, 240 writes
 hd1:0: 100 reads, 0 writes
-Console: 908 characters output
+Console: 910 characters output
 Keyboard: 0 keys pressed
 Exception: 0 page faults
 Powering off...

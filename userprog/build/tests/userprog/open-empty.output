@@ -20,6 +20,7 @@ Boot complete.
 Putting 'open-empty' into the file system...
 Executing 'open-empty':
 (open-empty) begin
+<<<<<<< HEAD
 file name: 
 file is null
 fd: -1, file open : 2
@@ -32,6 +33,17 @@ hd0:0: 0 reads, 0 writes
 hd0:1: 96 reads, 228 writes
 hd1:0: 100 reads, 0 writes
 Console: 934 characters output
+=======
+(open-empty) end
+open-empty: exit(0)
+Execution of 'open-empty' complete.
+Timer: 1282 ticks
+Thread: 33 idle ticks, 1248 kernel ticks, 2 user ticks
+hd0:0: 0 reads, 0 writes
+hd0:1: 96 reads, 228 writes
+hd1:0: 100 reads, 0 writes
+Console: 853 characters output
+>>>>>>> lab2_juntos
 Keyboard: 0 keys pressed
 Exception: 0 page faults
 Powering off...

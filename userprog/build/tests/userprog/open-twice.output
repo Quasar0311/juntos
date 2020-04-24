@@ -21,6 +21,7 @@ Putting 'open-twice' into the file system...
 Putting 'sample.txt' into the file system...
 Executing 'open-twice':
 (open-twice) begin
+<<<<<<< HEAD
 file name: sample.txt
 fd: 3, file open : 3
 file name: sample.txt
@@ -53,3 +54,19 @@ hd0:1: 119 reads, 244 writes
 hd1:0: 103 reads, 0 writes
 Console: 2136 characters output
 Key
+=======
+(open-twice) open "sample.txt" once
+(open-twice) open "sample.txt" again
+(open-twice) end
+open-twice: exit(0)
+Execution of 'open-twice' complete.
+Timer: 1316 ticks
+Thread: 36 idle ticks, 1278 kernel ticks, 2 user ticks
+hd0:0: 0 reads, 0 writes
+hd0:1: 119 reads, 244 writes
+hd1:0: 103 reads, 0 writes
+Console: 987 characters output
+Keyboard: 0 keys pressed
+Exception: 0 page faults
+Powering off...
+>>>>>>> lab2_juntos

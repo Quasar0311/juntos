@@ -22,6 +22,7 @@ Putting 'sample.txt' into the file system...
 Executing 'write-boundary':
 (write-boundary) begin
 (write-boundary) open "sample.txt"
+<<<<<<< HEAD
 file name: sample.txt
 fd: 3, file open : 3
 (write-boundary) write() returned 10 instead of 373: FAILED
@@ -46,3 +47,17 @@ hd0:1: 118 reads, 250 writes
 hd1:0: 106 reads, 0 writes
 Console: 1988 characters output
 Key
+=======
+(write-boundary) end
+write-boundary: exit(0)
+Execution of 'write-boundary' complete.
+Timer: 1300 ticks
+Thread: 42 idle ticks, 1254 kernel ticks, 4 user ticks
+hd0:0: 0 reads, 0 writes
+hd0:1: 119 reads, 251 writes
+hd1:0: 106 reads, 0 writes
+Console: 981 characters output
+Keyboard: 0 keys pressed
+Exception: 0 page faults
+Powering off...
+>>>>>>> lab2_juntos

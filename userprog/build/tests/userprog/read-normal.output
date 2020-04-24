@@ -22,6 +22,7 @@ Putting 'sample.txt' into the file system...
 Executing 'read-normal':
 (read-normal) begin
 (read-normal) open "sample.txt" for verification
+<<<<<<< HEAD
 file name: sample.txt
 fd: 3, file open : 3
 (read-normal) size of sample.txt (8) differs from expected (373)
@@ -10426,3 +10427,18 @@ rsp 0000008004232480 rbp 00000080042324f0 rsi 0000000000000062 rdi 0000008004225
 rip 0000008004218599 r8 0000008004218586  r9 000000800421bada r10 0000000000000000
 r11 0000000000000206 r12 000000800421d7bc r13 0000000000000000 r14 0000000000000000
 r15 000000
+=======
+(read-normal) size of sample.txt (8) differs from expected (373)
+(read-normal) size of sample.txt (8) differs from expected (373): FAILED
+read-normal: exit(1)
+Execution of 'read-normal' complete.
+Timer: 1307 ticks
+Thread: 34 idle ticks, 1270 kernel ticks, 3 user ticks
+hd0:0: 0 reads, 0 writes
+hd0:1: 117 reads, 244 writes
+hd1:0: 103 reads, 0 writes
+Console: 1091 characters output
+Keyboard: 0 keys pressed
+Exception: 0 page faults
+Powering off...
+>>>>>>> lab2_juntos

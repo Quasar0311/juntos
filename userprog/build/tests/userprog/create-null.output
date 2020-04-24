@@ -22,12 +22,17 @@ Executing 'create-null':
 (create-null) begin
 create-null: exit(-1)
 Execution of 'create-null' complete.
+<<<<<<< HEAD
 Timer: 471 ticks
 Thread: 34 idle ticks, 436 kernel ticks, 1 user ticks
+=======
+Timer: 1316 ticks
+Thread: 34 idle ticks, 1281 kernel ticks, 1 user ticks
+>>>>>>> lab2_juntos
 hd0:0: 0 reads, 0 writes
 hd0:1: 79 reads, 228 writes
 hd1:0: 100 reads, 0 writes
-Console: 842 characters output
+Console: 844 characters output
 Keyboard: 0 keys pressed
 Exception: 0 page faults
 Powering off...
