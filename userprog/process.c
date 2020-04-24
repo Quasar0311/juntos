@@ -31,19 +31,20 @@ static void __do_fork (void *);
 int 
 process_add_file(struct file *f){
 	if(f==NULL) {
-		printf("file is null\n");
+		//printf("file is null\n");
 		return -1;
 	}
 	/*** add file to file descriptor ***/
-	struct file_pointer fp;
-	fp.file=f;
-	list_push_back(&thread_current()->fd_table, &fp.file_elem);
-
+	struct file_pointer *fp = palloc_get_page(0);
+	fp -> file = f;
+	list_push_back(&thread_current()->fd_table, &fp -> file_elem);
+	//printf("list size : %d\n", list_size(&thread_current() -> fd_table));
 	/*** increment by 1 of max file descriptor ***/
 	thread_current()->next_fd++;
-
+	//printf("hi : %d\n", thread_current() -> next_fd);
+	//palloc_free_page((void *) fp);
 	/*** return file descriptor ***/
-	return thread_current()->next_fd; 
+	return thread_current() -> next_fd; 
 }
 
 struct file
@@ -55,7 +56,7 @@ struct file
 	if(list_empty(&thread_current()->fd_table)) return NULL;
 
 	fp = list_begin(&thread_current()->fd_table);
-	for(int i=2; i<fd; i++){
+	for(int i=3; i<fd; i++){
 		fp=list_next(fp);
 	}
 
@@ -74,20 +75,21 @@ process_close_file(int fd){
 	struct list_elem *fp;
 	struct thread *curr = thread_current();
 	f = process_get_file(fd);
-
+	//printf("hi : %d\n", fd);
 	if (f == NULL) return;
-
+	
 	file_close(f);
 
 	/*** delete entry of corresponding file descriptor ***/
-	if(list_empty(&thread_current()->fd_table)) return NULL;
+	if(list_empty(&thread_current()->fd_table)) return;
 
 	fp = list_begin(&thread_current()->fd_table);
-	for(int i=2; i<fd; i++){
+	for(int i=3; i<fd; i++){
 		fp=list_next(fp);
 	}
 	list_remove(fp);
-	curr -> next_fd--;
+	palloc_free_page(list_entry(fp, struct file_pointer, file_elem));
+	
 
 }
 
@@ -281,7 +283,7 @@ process_wait (tid_t child_tid UNUSED) {
 	 * XXX:       implementing the process_wait. */
 	int i;
 
-	for (i = 0; i <= 500000000; i++) {
+	for (i = 0; i <= 1500000000; i++) {
 		;
 	}
 	
@@ -302,6 +304,7 @@ process_exit (void) {
 	while(curr -> next_fd != 2){
 		process_close_file(curr -> next_fd);
 		curr -> next_fd--;
+		//printf("fd : %d\n", curr -> next_fd);
 	}
 
 	/*** release file descriptor ***/
