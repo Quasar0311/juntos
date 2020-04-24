@@ -91,7 +91,7 @@ syscall_handler (struct intr_frame *f UNUSED) {
 			// 	syscall_exit(-1);
 			// }
 			//else {
-				check_address((uint64_t) f -> R.rdi); //check_address((void *)f->R.rdi);
+				check_address((uint64_t) f -> R.rdi);
 				syscall_create((char *) f -> R.rdi, (unsigned) f -> R.rsi);
 			//}
 			
