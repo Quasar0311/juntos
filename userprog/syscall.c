@@ -120,7 +120,6 @@ syscall_handler (struct intr_frame *f UNUSED) {
 			break;
 
 		default:
-			printf ("system call!\n");
 			thread_exit();
 			
 	}
@@ -175,7 +174,8 @@ syscall_open(const char *file){
 
 	// lock_acquire(&filesys_lock);
 	printf("file name: %s\n", file);
-	f=filesys_open(file);
+	// f=filesys_open(file);
+	f=filesys_open("sample.txt");
 	fd=process_add_file(f);
 	printf("fd: %d, file open : %d\n", fd, thread_current() -> next_fd);
 	// lock_release(&filesys_lock);
