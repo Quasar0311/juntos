@@ -17,8 +17,6 @@
 #include "threads/thread.h"
 #include "threads/mmu.h"
 #include "threads/vaddr.h"
-/*** for malloc ***/
-#include "threads/malloc.h"
 
 #include "intrinsic.h"
 #ifdef VM
@@ -29,6 +27,69 @@ static void process_cleanup (void);
 static bool load (const char *file_name, struct intr_frame *if_);
 static void initd (void *f_name);
 static void __do_fork (void *);
+
+int 
+process_add_file(struct file *f){
+	if(f==NULL) {
+		printf("file is null\n");
+		return -1;
+	}
+	/*** add file to file descriptor ***/
+	struct file_pointer fp;
+	fp.file=f;
+	list_push_back(&thread_current()->fd_table, &fp.file_elem);
+
+	/*** increment by 1 of max file descriptor ***/
+	thread_current()->next_fd++;
+
+	/*** return file descriptor ***/
+	return thread_current()->next_fd; 
+}
+
+struct file
+*process_get_file(int fd){
+	/*** return file corresponding to a file descriptor ***/
+	struct list_elem *fp;
+	struct file_pointer *f;
+
+	if(list_empty(&thread_current()->fd_table)) return NULL;
+
+	fp = list_begin(&thread_current()->fd_table);
+	for(int i=2; i<fd; i++){
+		fp=list_next(fp);
+	}
+
+	if (fp != NULL) {
+		f = list_entry(fp, struct file_pointer, file_elem);
+		return f -> file;
+	}
+	/*** if not return NULL ***/
+	else return NULL;
+}
+
+void
+process_close_file(int fd){
+	/*** close file corressponding to file descriptor ***/
+	struct file *f;
+	struct list_elem *fp;
+	struct thread *curr = thread_current();
+	f = process_get_file(fd);
+
+	if (f == NULL) return;
+
+	file_close(f);
+
+	/*** delete entry of corresponding file descriptor ***/
+	if(list_empty(&thread_current()->fd_table)) return NULL;
+
+	fp = list_begin(&thread_current()->fd_table);
+	for(int i=2; i<fd; i++){
+		fp=list_next(fp);
+	}
+	list_remove(fp);
+	curr -> next_fd--;
+
+}
 
 /* General process initializer for initd and other process. */
 static void
@@ -45,7 +106,7 @@ tid_t
 process_create_initd (const char *file_name) {
 	char *fn_copy;
 	tid_t tid;
-	char *file_title = malloc(strlen(file_name) + 1);
+	char *file_title = palloc_get_page(0);
 	strlcpy(file_title, file_name, strlen(file_name) + 1);
 	char *token, *save_ptr;
 
@@ -65,6 +126,7 @@ process_create_initd (const char *file_name) {
 	//printf("title : %s\n", file_title);
 	/* Create a new thread to execute FILE_NAME. */
 	tid = thread_create (file_title, PRI_DEFAULT, initd, fn_copy);
+	palloc_free_page(file_title);
 	if (tid == TID_ERROR)
 		palloc_free_page (fn_copy);
 	return tid;
@@ -217,8 +279,9 @@ process_wait (tid_t child_tid UNUSED) {
 	/* XXX: Hint) The pintos exit if process_wait (initd), we recommend you
 	 * XXX:       to add infinite loop here before
 	 * XXX:       implementing the process_wait. */
+	int i;
 
-	while (1) {
+	for (i = 0; i <= 500000000; i++) {
 		;
 	}
 	
@@ -228,12 +291,20 @@ process_wait (tid_t child_tid UNUSED) {
 /* Exit the process. This function is called by thread_exit (). */
 void
 process_exit (void) {
-	struct thread *curr = thread_current ();
+	struct thread *curr = thread_current ();	
+
 	/* TODO: Your code goes here.
 	 * TODO: Implement process termination message (see
 	 * TODO: project2/process_termination.html).
 	 * TODO: We recommend you to implement process resource cleanup here. */
+	
+	/*** close all files of process ***/
+	while(curr -> next_fd != 2){
+		process_close_file(curr -> next_fd);
+		curr -> next_fd--;
+	}
 
+	/*** release file descriptor ***/
 	process_cleanup ();
 }
 
@@ -352,9 +423,11 @@ load (const char *file_name, struct intr_frame *if_) {
 	uint64_t argc = 0;
 	char zero = 0;
 	size_t token_len;
-	char *file_copy_argc = malloc(strlen(file_name) + 1);
-	char *file_copy_argv = malloc(strlen(file_name) + 1);
-	char *file_title = malloc(strlen(file_name) + 1);
+	char *argv_addr;
+	//char *file_copy_argc = malloc(strlen(file_name) + 1);
+	char *file_copy_argc = palloc_get_page(0);
+	char *file_copy_argv = palloc_get_page(0);
+	char *file_title = palloc_get_page(0);
 	strlcpy(file_copy_argc, file_name, strlen(file_name) + 1);
 	strlcpy(file_copy_argv, file_name, strlen(file_name) + 1);
 	strlcpy(file_title, file_name, strlen(file_name) + 1);
@@ -464,10 +537,11 @@ load (const char *file_name, struct intr_frame *if_) {
 	}
 	//printf("argc : %d\n", argc);
 
-	char **argv = malloc(argc * sizeof(char*));
+	char **argv = palloc_get_page(0);
 
 	argc = 0;
 
+	/*** push argument ***/
 	for (token = strtok_r(file_copy_argv, " ", &save_ptr); token != NULL;
 			token = strtok_r(NULL, " ", &save_ptr)) {
 				token_len = strlen(token);
@@ -485,8 +559,9 @@ load (const char *file_name, struct intr_frame *if_) {
 		strlcpy((char *) if_ -> rsp, &zero, 2);
 	}
 
+	/*** push argument address ***/
 	for (i = argc; i >= 0; i--) {
-		if (i == argc) {
+		if (i == (int) argc) {
 			if_ -> rsp -= sizeof(char*);
 			strlcpy((char *) if_ -> rsp, &zero, sizeof(char*));
 			continue;
@@ -495,17 +570,22 @@ load (const char *file_name, struct intr_frame *if_) {
 		strlcpy((char *) if_ -> rsp, (char *) &argv[i], sizeof(char*));
 	}
 	//printf("argc3 : %p\n", if_ -> rsp);
+	//printf("if rsp : %p\n", if_ -> rsp);
+	argv_addr = (char *) if_ -> rsp;
 
 	if_ -> rsp -= sizeof(void*);
-	argc -= 1;
-	
+	//argc -= 1;
+	//printf("argv at argument : %p\n", argv_addr);
 	strlcpy((char *) if_ -> rsp, (char *) &argc, sizeof(void*));
 	
 	strlcpy((char *) &if_ -> R.rdi, (char *) &argc, sizeof(int));
-	strlcpy((char *) &if_ -> R.rsi, (char *) &argv[0], sizeof(char*));
+	strlcpy((char *) &if_ -> R.rsi, (char *) &argv_addr, sizeof(char*));
 	
-	hex_dump(if_ -> rsp, (void *) if_ -> rsp, 0x47480000 - (if_ -> rsp), true);
-	
+	// hex_dump(if_ -> rsp, (void *) if_ -> rsp, 0x47480000 - (if_ -> rsp), true);
+	palloc_free_page(file_copy_argc);
+	palloc_free_page(file_copy_argv);
+	palloc_free_page(file_title);
+	palloc_free_page(argv);
 	success = true;
 
 done:
