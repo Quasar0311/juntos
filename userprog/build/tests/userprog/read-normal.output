@@ -11,7 +11,7 @@ Booting from Hard Disk..Kernel command line: -q -f put read-normal put sample.tx
 Pintos booting with: 
 	base_mem: 0x0 ~ 0x9fc00 (Usable: 639 kB)
 	ext_mem: 0x100000 ~ 0xffe0000 (Usable: 260,992 kB)
-Calibrating timer...  104,755,200 loops/s.
+Calibrating timer...  78,540,800 loops/s.
 hd0:0: detected 321 sector (160 kB) disk, model "QEMU HARDDISK", serial "QM00001"
 hd0:1: detected 20,160 sector (9 MB) disk, model "QEMU HARDDISK", serial "QM00002"
 hd1:0: detected 103 sector (51 kB) disk, model "QEMU HARDDISK", serial "QM00003"
@@ -27,12 +27,12 @@ Executing 'read-normal':
 (read-normal) end
 read-normal: exit(0)
 Execution of 'read-normal' complete.
-Timer: 1303 ticks
-Thread: 30 idle ticks, 1268 kernel ticks, 5 user ticks
+Timer: 1304 ticks
+Thread: 40 idle ticks, 1261 kernel ticks, 3 user ticks
 hd0:0: 0 reads, 0 writes
 hd0:1: 117 reads, 244 writes
 hd1:0: 103 reads, 0 writes
-Console: 1052 characters output
+Console: 1051 characters output
 Keyboard: 0 keys pressed
 Exception: 0 page faults
 Powering off...

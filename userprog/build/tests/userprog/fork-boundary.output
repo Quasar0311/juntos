@@ -21,8 +21,8 @@ Putting 'fork-boundary' into the file system...
 Executing 'fork-boundary':
 (fork-boundary) begin
 Execution of 'fork-boundary' complete.
-Timer: 1283 ticks
-Thread: 35 idle ticks, 1247 kernel ticks, 1 user ticks
+Timer: 1298 ticks
+Thread: 33 idle ticks, 1264 kernel ticks, 1 user ticks
 hd0:0: 0 reads, 0 writes
 hd0:1: 80 reads, 234 writes
 hd1:0: 103 reads, 0 writes

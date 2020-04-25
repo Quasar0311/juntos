@@ -21,8 +21,8 @@ Putting 'fork-recursive' into the file system...
 Executing 'fork-recursive':
 (fork-recursive) begin
 Execution of 'fork-recursive' complete.
-Timer: 1298 ticks
-Thread: 36 idle ticks, 1261 kernel ticks, 1 user ticks
+Timer: 1305 ticks
+Thread: 33 idle ticks, 1270 kernel ticks, 2 user ticks
 hd0:0: 0 reads, 0 writes
 hd0:1: 85 reads, 230 writes
 hd1:0: 101 reads, 0 writes
