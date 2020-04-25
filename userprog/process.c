@@ -261,7 +261,7 @@ process_exec (void *f_name) { //start_process
 	char *file_name = f_name;
 	bool success;
 	struct thread *p;
-
+	//printf("fn : %s\n", file_name);
 	/* We cannot use the intr_frame in the thread structure.
 	 * This is because when current thread rescheduled,
 	 * it stores the execution information to the member. */
@@ -269,30 +269,37 @@ process_exec (void *f_name) { //start_process
 	_if.ds = _if.es = _if.ss = SEL_UDSEG;
 	_if.cs = SEL_UCSEG;
 	_if.eflags = FLAG_IF | FLAG_MBS;
+	// printf("before load1 : %s\n", file_name);
+	// /* We first kill the current context */
+	// // process_cleanup ();
+	// printf("before load : %s\n", file_name);
+	// /* And then load the binary */
+	// printf("before load2 : %s\n", file_name);
 
-	/* We first kill the current context */
-	process_cleanup ();
-
-	/* And then load the binary */
 	success = load (file_name, &_if);
 
 	/*** if load finish resume parent process by semaphore ***/
-	p=thread_current()->parent;
-	printf("thread name : %s\n", thread_current()->name);
-	printf("parent name : %s\n", p->name);
-	sema_up(&thread_current()->load_sema);
+	// p=thread_current()->parent;
+	// printf("thread name : %s\n", thread_current()->name);
+	// printf("parent name : %s\n", p->name);
+	// if (p -> tid != 1) {
+	// 	printf("name : %s\n", p -> name);
+	// 	sema_up(&p->load_sema);
+	// }
+	
 
 	/* If load failed, quit. */
-	palloc_free_page (file_name);
+	// palloc_free_page (file_name);
 	if (!success){
 		/*** if load fail process descriptor memory load fail ***/
-		thread_current()->process_load=false;
-		thread_exit();
-		// return -1;
+		// thread_current()->process_load=false;
+		// thread_exit();
+		//syscall_exit(-1);
+		return -1;
 	}
 
 	/*** if load success process descriptor memory load success ***/
-	if(success) thread_current()->process_load=true;
+	// if(success) thread_current()->process_load=true;
 
 	/* Start switched process. */
 	do_iret (&_if);
@@ -612,9 +619,12 @@ load (const char *file_name, struct intr_frame *if_) {
 	if_ -> rsp -= sizeof(void*);
 	//argc -= 1;
 	//printf("argv at argument : %p\n", argv_addr);
+	//printf("argc : %d\n", argc);
 	strlcpy((char *) if_ -> rsp, (char *) &argc, sizeof(void*));
-	
-	strlcpy((char *) &if_ -> R.rdi, (char *) &argc, sizeof(int));
+	// printf("argc : %d\n", argc);
+	// strlcpy((char *) &if_ -> R.rdi, (char *) &argc, sizeof(int));
+	if_ -> R.rdi = argc;
+	//printf("argc : %d\n", if_->R.rdi);
 	strlcpy((char *) &if_ -> R.rsi, (char *) &argv_addr, sizeof(char*));
 	
 	// hex_dump(if_ -> rsp, (void *) if_ -> rsp, 0x47480000 - (if_ -> rsp), true);

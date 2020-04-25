@@ -21,8 +21,8 @@ Putting 'fork-multiple' into the file system...
 Executing 'fork-multiple':
 (fork-multiple) begin
 Execution of 'fork-multiple' complete.
-Timer: 1299 ticks
-Thread: 38 idle ticks, 1261 kernel ticks, 1 user ticks
+Timer: 1303 ticks
+Thread: 34 idle ticks, 1269 kernel ticks, 0 user ticks
 hd0:0: 0 reads, 0 writes
 hd0:1: 85 reads, 230 writes
 hd1:0: 101 reads, 0 writes

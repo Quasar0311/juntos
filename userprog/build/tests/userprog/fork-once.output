@@ -21,8 +21,8 @@ Putting 'fork-once' into the file system...
 Executing 'fork-once':
 (fork-once) begin
 Execution of 'fork-once' complete.
-Timer: 1302 ticks
-Thread: 37 idle ticks, 1264 kernel ticks, 1 user ticks
+Timer: 1311 ticks
+Thread: 35 idle ticks, 1275 kernel ticks, 1 user ticks
 hd0:0: 0 reads, 0 writes
 hd0:1: 79 reads, 228 writes
 hd1:0: 100 reads, 0 writes

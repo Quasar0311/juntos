@@ -23,16 +23,14 @@ Executing 'exec-once':
 (exec-once) begin
 (exec-once) I'm your father
 (child-simple) run
-child-simple: exit(81)
-(exec-once) end
-exec-once: exit(0)
+exec-once: exit(81)
 Execution of 'exec-once' complete.
-Timer: 1314 ticks
-Thread: 40 idle ticks, 1273 kernel ticks, 1 user ticks
+Timer: 1289 ticks
+Thread: 33 idle ticks, 1252 kernel ticks, 5 user ticks
 hd0:0: 0 reads, 0 writes
 hd0:1: 157 reads, 434 writes
 hd1:0: 198 reads, 0 writes
-Console: 980 characters output
+Console: 942 characters output
 Keyboard: 0 keys pressed
 Exception: 0 page faults
 Powering off...

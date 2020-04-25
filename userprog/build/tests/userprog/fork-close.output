@@ -23,8 +23,8 @@ Executing 'fork-close':
 (fork-close) begin
 (fork-close) open "sample.txt"
 Execution of 'fork-close' complete.
-Timer: 1301 ticks
-Thread: 35 idle ticks, 1265 kernel ticks, 1 user ticks
+Timer: 1298 ticks
+Thread: 37 idle ticks, 1258 kernel ticks, 3 user ticks
 hd0:0: 0 reads, 0 writes
 hd0:1: 119 reads, 254 writes
 hd1:0: 108 reads, 0 writes
