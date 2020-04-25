@@ -277,22 +277,22 @@ process_exec (void *f_name) { //start_process
 	success = load (file_name, &_if);
 
 	/*** if load finish resume parent process by semaphore ***/
-	p=thread_current()->parent;
-	printf("thread name : %s\n", thread_current()->name);
-	printf("parent name : %s\n", p->name);
-	sema_up(&thread_current()->load_sema);
+	// p=thread_current()->parent;
+	// printf("thread name : %s\n", thread_current()->name);
+	// printf("parent name : %s\n", p->name);
+	// sema_up(&thread_current()->load_sema);
 
 	/* If load failed, quit. */
 	palloc_free_page (file_name);
 	if (!success){
 		/*** if load fail process descriptor memory load fail ***/
-		thread_current()->process_load=false;
-		thread_exit();
-		// return -1;
+		// thread_current()->process_load=false;
+		// thread_exit();
+		return -1;
 	}
 
 	/*** if load success process descriptor memory load success ***/
-	if(success) thread_current()->process_load=true;
+	// if(success) thread_current()->process_load=true;
 
 	/* Start switched process. */
 	do_iret (&_if);

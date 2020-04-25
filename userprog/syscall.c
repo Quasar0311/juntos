@@ -185,12 +185,14 @@ syscall_exec(const char *cmd_line){
 	pid_t pid;
 	struct thread *t;
 
-	pid=process_create_initd(cmd_line); 
-	t=get_child_process(pid);
-	sema_down(&t->load_sema);
-	if(t->process_load) return pid;
-	return -1;
+	// pid=process_create_initd(cmd_line); 
+	// t=get_child_process(pid);
+	// sema_down(&t->load_sema);
+	// if(t->process_load) return pid;
+	// return -1;
 
+	process_exec(cmd_line);
+	
 }
 
 bool
