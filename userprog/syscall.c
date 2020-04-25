@@ -180,20 +180,27 @@ syscall_exit (int status) {
 }
 
 int
-syscall_exec(const char *cmd_line){
-	/*** create child process ****/
-	pid_t pid;
-	struct thread *t;
-
-	// pid=process_create_initd(cmd_line); 
-	// t=get_child_process(pid);
-	// sema_down(&t->load_sema);
-	// if(t->process_load) return pid;
-	// return -1;
-
-	process_exec(cmd_line);
-	
+syscall_exec (const char *cmd_line) {
+	//printf("%s\n", cmd_line);
+	if(process_exec((void *) cmd_line)==-1){
+		syscall_exit(-1);
+		return -1;
+	};
 }
+
+// int
+// syscall_exec(const char *cmd_line){
+// 	/*** create child process ****/
+// 	pid_t pid;
+// 	struct thread *t;
+// 	struct thread *curr = thread_current();
+// 	pid=process_create_initd(cmd_line); 
+// 	t=get_child_process(pid);
+// 	sema_down(&curr->load_sema);
+// 	if(t->process_load) return pid;
+// 	return -1;
+
+// }
 
 bool
 syscall_create (const char *file, unsigned initial_size) {
