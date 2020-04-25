@@ -131,6 +131,8 @@ struct thread {
 	struct semaphore load_sema;
 	int exit_status;
 
+	pid_t pid;
+
 #endif
 #ifdef VM
 	/* Table for whole virtual memory owned by thread. */

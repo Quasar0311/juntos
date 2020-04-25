@@ -287,6 +287,8 @@ thread_create (const char *name, int priority,
 	/*** add to child_list ***/
 	list_push_back(&curr->child_list, &t->child_elem);
 
+	t->pid=t->tid;
+
 	/* Add to run queue. */
 	thread_unblock (t);
 

@@ -22,11 +22,9 @@ struct lock filesys_lock;
 
 void syscall_entry (void);
 void syscall_handler (struct intr_frame *);
-//void get_argument (struct intr_frame *f, int *arg, int count);
-// void check_address (void *addr);
 void check_address (uint64_t reg);
 void syscall_halt (void);
-void syscall_exec(const char *cmd_line);
+int syscall_exec(const char *cmd_line);
 bool syscall_create (const char *file, unsigned initial_size);
 int syscall_open(const char *file);
 int syscall_filesize(int fd);
@@ -88,22 +86,15 @@ syscall_handler (struct intr_frame *f UNUSED) {
 			break;
 		
 		/*** SYS_EXEC ***/
-		// case 3:
-		// 	check_address((uint64_t)f->R.rdi);
-		// 	f->R.rax=syscall_exec((char *)f->R.rdi);
-		// 	break;
+		case 3:
+			check_address((uint64_t)f->R.rdi);
+			f->R.rax=syscall_exec((char *)f->R.rdi);
+			break;
 		
 		/*** SYS_CREATE ***/
 		case 5:
-			// addr = (void *) f -> R.rdi;
-			// if (addr == NULL) {
-			// 	syscall_exit(-1);
-			// }
-			//else {
-				check_address((uint64_t) f -> R.rdi);
-				f -> R.rax = syscall_create((char *) f -> R.rdi, (unsigned) f -> R.rsi);
-			//}
-			
+			check_address((uint64_t) f -> R.rdi);
+			f -> R.rax = syscall_create((char *) f -> R.rdi, (unsigned) f -> R.rsi);
 			break;
 
 		case 6:
@@ -188,13 +179,19 @@ syscall_exit (int status) {
 	thread_exit();
 }
 
-// int
-// syscall_exec(const char *cmd_line){
-// 	/*** create child process ****/
-// 	pid_t pid;
+int
+syscall_exec(const char *cmd_line){
+	/*** create child process ****/
+	pid_t pid;
+	struct thread *t;
 
-// 	process_create_initd(cmd_line);
-// }
+	pid=process_create_initd(cmd_line); 
+	t=get_child_process(pid);
+	sema_down(&t->load_sema);
+	if(t->process_load) return pid;
+	return -1;
+
+}
 
 bool
 syscall_create (const char *file, unsigned initial_size) {

@@ -95,11 +95,22 @@ process_close_file(int fd){
 
 struct thread *
 get_child_process(int pid){
-	
+	struct thread *curr=thread_current(), *t;
+	struct list_elem *e=list_begin(&curr->child_list);
+
+	while(e!=list_end(&curr->child_list)){
+		t=list_entry(e, struct thread, child_elem);
+		if(t->pid==pid) return t;
+		e=list_next(e);
+	}
+	return NULL;
 }
 
 void
-remove_child_process(struct thread *cp){}
+remove_child_process(struct thread *cp){
+	list_remove(&cp->child_elem);
+	palloc_free_page(cp);
+}
 
 /* General process initializer for initd and other process. */
 static void
@@ -249,6 +260,7 @@ int
 process_exec (void *f_name) { //start_process
 	char *file_name = f_name;
 	bool success;
+	struct thread *p;
 
 	/* We cannot use the intr_frame in the thread structure.
 	 * This is because when current thread rescheduled,
@@ -261,21 +273,26 @@ process_exec (void *f_name) { //start_process
 	/* We first kill the current context */
 	process_cleanup ();
 
-	/*** if load finish resume parent process by semaphore ***/
-
 	/* And then load the binary */
 	success = load (file_name, &_if);
+
+	/*** if load finish resume parent process by semaphore ***/
+	p=thread_current()->parent;
+	printf("thread name : %s\n", thread_current()->name);
+	printf("parent name : %s\n", p->name);
+	sema_up(&thread_current()->load_sema);
 
 	/* If load failed, quit. */
 	palloc_free_page (file_name);
 	if (!success){
 		/*** if load fail process descriptor memory load fail ***/
+		thread_current()->process_load=false;
 		thread_exit();
 		// return -1;
 	}
 
 	/*** if load success process descriptor memory load success ***/
-	if(success){}
+	if(success) thread_current()->process_load=true;
 
 	/* Start switched process. */
 	do_iret (&_if);
