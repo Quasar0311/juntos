@@ -24,6 +24,7 @@ void syscall_entry (void);
 void syscall_handler (struct intr_frame *);
 void check_address (uint64_t reg);
 void syscall_halt (void);
+pid_t syscall_fork(const char *thread_name);
 int syscall_exec(const char *cmd_line);
 bool syscall_create (const char *file, unsigned initial_size);
 int syscall_open(const char *file);
@@ -177,6 +178,11 @@ syscall_exit (int status) {
 
 	printf("%s: exit(%d)\n", curr -> name, status);
 	thread_exit();
+}
+
+pid_t
+syscall_fork(const char *thread_name){
+	process_fork(thread_name, thread_current()->tf);
 }
 
 int
