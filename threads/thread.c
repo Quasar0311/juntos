@@ -312,8 +312,8 @@ thread_create (const char *name, int priority,
 			thread_yield();
 		}
 	}
-	printf("making thread %s...\n", t -> name);
-	printf("parent pid in thread_create = %d\n", curr -> tid);
+	// printf("making thread %s...\n", t -> name);
+	// printf("parent pid in thread_create = %d\n", curr -> tid);
 	return tid;
 }
 
@@ -737,6 +737,7 @@ do_iret (struct intr_frame *tf) {
 			"addq $32, %%rsp\n"
 			"iretq"
 			: : "g" ((uint64_t) tf) : "memory");
+			
 }
 
 /* Switching the thread by activating the new thread's page
