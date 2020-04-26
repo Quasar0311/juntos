@@ -188,13 +188,12 @@ syscall_exit (int status) {
 pid_t
 syscall_fork(const char *thread_name){
 	struct intr_frame *parent_frame = &thread_current() -> tf;
-	printf("parent rdi : %d\n", thread_current() -> tid);
+	// printf("parent rdi : %d\n", thread_current() -> tid);
 	process_fork(thread_name, &thread_current()->tf);
 }
 
 int
 syscall_exec (const char *cmd_line) {
-	//printf("%s\n", cmd_line);
 	if(process_exec((void *) cmd_line)==-1){
 		syscall_exit(-1);
 		return -1;
@@ -238,11 +237,8 @@ syscall_open(const char *file){
 	int fd=-1;
 
 	lock_acquire(&filesys_lock);
-	//printf("file name: %s\n", file);
 	f=filesys_open(file);
 	fd=process_add_file(f);
-	//printf("got fd : %d\n",fd);
-	//printf("fd: %d, file open : %d\n", fd, thread_current() -> next_fd);
 	lock_release(&filesys_lock);
 
 	return fd;

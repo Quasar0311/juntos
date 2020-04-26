@@ -178,8 +178,8 @@ process_fork (const char *name, struct intr_frame *if_ UNUSED) {
 
 	/* Clone current thread to new thread.*/
 	pid= thread_create (name, PRI_DEFAULT, __do_fork, thread_current ());
-	
-	/*** wait until child process loaded ***/
+
+	/*** wait until child process load ***/
 	sema_down(&thread_current()->load_sema);
 	return pid;
 }
@@ -229,7 +229,7 @@ __do_fork (void *aux) {
 	/* TODO: somehow pass the parent_if. (i.e. process_fork()'s if_) */
 	struct intr_frame *parent_if=&parent->tf;
 	bool succ = true;
-	
+	printf("__do_fork parent thread: %s\n", parent->name);
 	/* 1. Read the cpu context to local stack. */
 	memcpy (&if_, parent_if, sizeof (struct intr_frame));
 
@@ -253,9 +253,17 @@ __do_fork (void *aux) {
 	 * TODO:       in include/filesys/file.h. Note that parent should not return
 	 * TODO:       from the fork() until this function successfully duplicates
 	 * TODO:       the resources of parent.*/
+	if(file_duplicate(parent->open_file)==NULL) {
+		printf("file_duplicate fail/n");
+		current->process_load=false;
+		}
+	else {
+		printf("file_duplicate success/n");
+		current->process_load=true;
+		}
 	
 	/*** if memory load finish, resume parent process ***/
-	sema_up(&thread_current()->parent->load_sema);
+	sema_up(&parent->load_sema);
 	process_init ();
 
 	/* Finally, switch to the newly created process. */
@@ -271,7 +279,7 @@ int
 process_exec (void *f_name) { //start_process
 	char *file_name = f_name;
 	bool success;
-	struct thread *p;
+	// struct thread *p;
 	//printf("fn : %s\n", file_name);
 	/* We cannot use the intr_frame in the thread structure.
 	 * This is because when current thread rescheduled,
@@ -332,13 +340,22 @@ process_wait (tid_t child_tid UNUSED) {
 	/* XXX: Hint) The pintos exit if process_wait (initd), we recommend you
 	 * XXX:       to add infinite loop here before
 	 * XXX:       implementing the process_wait. */
-	int i;
+	// int i;
 
-	for (i = 0; i <= 1500000000; i++) {
-		;
-	}
+	// for (i = 0; i <= 1500000000; i++) {
+	// 	;
+	// }
 	
-	return -1;
+	// return -1;
+	struct thread *t;
+
+	/*** process descriptor of child process if NULL return -1 ***/
+	if(t=get_child_process(child_tid)==NULL) return -1;
+	/*** wait until child process exit ***/
+	sema_down(&t->exit_sema);
+	/*** remove child process descriptor ***/
+	remove_child_process(t);
+	/*** return child process exit status ***/
 }
 
 /* Exit the process. This function is called by thread_exit (). */
@@ -508,6 +525,8 @@ load (const char *file_name, struct intr_frame *if_) {
 		printf ("load: %s: open failed\n", file_title);
 		goto done;
 	}
+	/*** contain info of opened file ***/
+	else t->open_file=file;
 
 	/* Read and verify executable header. */
 	if (file_read (file, &ehdr, sizeof ehdr) != sizeof ehdr
