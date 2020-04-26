@@ -20,18 +20,13 @@ Boot complete.
 Putting 'write-normal' into the file system...
 Putting 'sample.txt' into the file system...
 Executing 'write-normal':
-(write-normal) begin
-(write-normal) create "test.txt"
-(write-normal) open "test.txt"
-(write-normal) end
-write-normal: exit(0)
 Execution of 'write-normal' complete.
-Timer: 1299 ticks
-Thread: 34 idle ticks, 1264 kernel ticks, 1 user ticks
+Timer: 73 ticks
+Thread: 38 idle ticks, 36 kernel ticks, 0 user ticks
 hd0:0: 0 reads, 0 writes
-hd0:1: 142 reads, 260 writes
+hd0:1: 61 reads, 246 writes
 hd1:0: 104 reads, 0 writes
-Console: 994 characters output
+Console: 863 characters output
 Keyboard: 0 keys pressed
 Exception: 0 page faults
 Powering off...

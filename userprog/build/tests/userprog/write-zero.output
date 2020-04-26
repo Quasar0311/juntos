@@ -20,17 +20,13 @@ Boot complete.
 Putting 'write-zero' into the file system...
 Putting 'sample.txt' into the file system...
 Executing 'write-zero':
-(write-zero) begin
-(write-zero) open "sample.txt"
-(write-zero) end
-write-zero: exit(0)
 Execution of 'write-zero' complete.
-Timer: 1279 ticks
-Thread: 33 idle ticks, 1246 kernel ticks, 1 user ticks
+Timer: 67 ticks
+Thread: 36 idle ticks, 31 kernel ticks, 0 user ticks
 hd0:0: 0 reads, 0 writes
-hd0:1: 110 reads, 242 writes
+hd0:1: 61 reads, 242 writes
 hd1:0: 102 reads, 0 writes
-Console: 945 characters output
+Console: 853 characters output
 Keyboard: 0 keys pressed
 Exception: 0 page faults
 Powering off...

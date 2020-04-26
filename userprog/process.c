@@ -28,6 +28,8 @@ static bool load (const char *file_name, struct intr_frame *if_);
 static void initd (void *f_name);
 static void __do_fork (void *);
 
+static struct intr_frame *parent_intr;
+
 int 
 process_add_file(struct file *f){
 	if(f==NULL) {
@@ -171,6 +173,8 @@ initd (void *f_name) {
  * TID_ERROR if the thread cannot be created. */
 tid_t
 process_fork (const char *name, struct intr_frame *if_ UNUSED) {
+	parent_intr = if_;
+	printf("thread_current name : %s\n", thread_current() -> name);
 	/* Clone current thread to new thread.*/
 	return thread_create (name,
 			PRI_DEFAULT, __do_fork, thread_current ());
@@ -215,12 +219,14 @@ duplicate_pte (uint64_t *pte, void *va, void *aux) {
 static void
 __do_fork (void *aux) {
 	struct intr_frame if_;
-	struct thread *parent = (struct thread *) aux;
+	// struct thread *parent = (struct thread *) aux;
+	
 	struct thread *current = thread_current ();
+	struct thread *parent = current -> parent;
 	/* TODO: somehow pass the parent_if. (i.e. process_fork()'s if_) */
-	struct intr_frame *parent_if;
+	struct intr_frame *parent_if = parent_intr;
 	bool succ = true;
-
+	printf("parent in __do_fork : %s\n", parent -> name);
 	/* 1. Read the cpu context to local stack. */
 	memcpy (&if_, parent_if, sizeof (struct intr_frame));
 

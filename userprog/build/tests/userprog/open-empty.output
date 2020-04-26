@@ -19,16 +19,13 @@ Formatting file system...done.
 Boot complete.
 Putting 'open-empty' into the file system...
 Executing 'open-empty':
-(open-empty) begin
-(open-empty) end
-open-empty: exit(0)
 Execution of 'open-empty' complete.
-Timer: 1304 ticks
-Thread: 36 idle ticks, 1264 kernel ticks, 4 user ticks
+Timer: 67 ticks
+Thread: 35 idle ticks, 32 kernel ticks, 0 user ticks
 hd0:0: 0 reads, 0 writes
-hd0:1: 96 reads, 228 writes
+hd0:1: 34 reads, 228 writes
 hd1:0: 100 reads, 0 writes
-Console: 853 characters output
+Console: 793 characters output
 Keyboard: 0 keys pressed
 Exception: 0 page faults
 Powering off...

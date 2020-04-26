@@ -20,16 +20,13 @@ Boot complete.
 Putting 'write-bad-ptr' into the file system...
 Putting 'sample.txt' into the file system...
 Executing 'write-bad-ptr':
-(write-bad-ptr) begin
-(write-bad-ptr) open "sample.txt"
-write-bad-ptr: exit(-1)
 Execution of 'write-bad-ptr' complete.
-Timer: 1296 ticks
-Thread: 35 idle ticks, 1261 kernel ticks, 1 user ticks
+Timer: 67 ticks
+Thread: 38 idle ticks, 29 kernel ticks, 0 user ticks
 hd0:0: 0 reads, 0 writes
-hd0:1: 111 reads, 242 writes
+hd0:1: 61 reads, 242 writes
 hd1:0: 102 reads, 0 writes
-Console: 953 characters output
+Console: 868 characters output
 Keyboard: 0 keys pressed
 Exception: 0 page faults
 Powering off...

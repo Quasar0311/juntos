@@ -19,23 +19,13 @@ Formatting file system...done.
 Boot complete.
 Putting 'args-multiple' into the file system...
 Executing 'args-multiple some arguments for you!':
-(args) begin
-(args) argc = 5
-(args) argv[0] = 'args-multiple'
-(args) argv[1] = 'some'
-(args) argv[2] = 'arguments'
-(args) argv[3] = 'for'
-(args) argv[4] = 'you!'
-(args) argv[5] = null
-(args) end
-args-multiple: exit(0)
 Execution of 'args-multiple some arguments for you!' complete.
-Timer: 1295 ticks
-Thread: 38 idle ticks, 1255 kernel ticks, 3 user ticks
+Timer: 66 ticks
+Thread: 34 idle ticks, 33 kernel ticks, 0 user ticks
 hd0:0: 0 reads, 0 writes
-hd0:1: 79 reads, 226 writes
+hd0:1: 34 reads, 226 writes
 hd1:0: 99 reads, 0 writes
-Console: 1102 characters output
+Console: 880 characters output
 Keyboard: 0 keys pressed
 Exception: 0 page faults
 Powering off...

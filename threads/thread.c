@@ -258,6 +258,10 @@ thread_create (const char *name, int priority,
 	init_thread (t, name, priority);
 	tid = t->tid = allocate_tid ();
 
+	/*** parent process ***/
+	curr=thread_current();
+	t->parent=curr;
+
 	/* Call the kernel_thread if it scheduled.
 	 * Note) rdi is 1st argument, and rsi is 2nd argument. */
 	t->tf.rip = (uintptr_t) kernel_thread;
@@ -273,10 +277,6 @@ thread_create (const char *name, int priority,
 	/*** allocate memory to fd table ***/
 	list_init(&t->fd_table);
 	t->next_fd=2;
-
-	/*** parent process ***/
-	curr=thread_current();
-	t->parent=curr;
 
 	/*** initialize process descriptor ***/
 	t->process_load=false;
@@ -299,7 +299,8 @@ thread_create (const char *name, int priority,
 			thread_yield();
 		}
 	}
-
+	printf("making thread %s...\n", t -> name);
+	// printf("parent pid in thread_create = %d\n", curr -> tid);
 	return tid;
 }
 

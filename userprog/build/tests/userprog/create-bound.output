@@ -19,17 +19,13 @@ Formatting file system...done.
 Boot complete.
 Putting 'create-bound' into the file system...
 Executing 'create-bound':
-(create-bound) begin
-(create-bound) create("quux.dat"): 1
-(create-bound) end
-create-bound: exit(0)
 Execution of 'create-bound' complete.
-Timer: 1278 ticks
-Thread: 34 idle ticks, 1243 kernel ticks, 1 user ticks
+Timer: 70 ticks
+Thread: 36 idle ticks, 34 kernel ticks, 0 user ticks
 hd0:0: 0 reads, 0 writes
-hd0:1: 101 reads, 244 writes
+hd0:1: 34 reads, 232 writes
 hd1:0: 102 reads, 0 writes
-Console: 907 characters output
+Console: 803 characters output
 Keyboard: 0 keys pressed
 Exception: 0 page faults
 Powering off...

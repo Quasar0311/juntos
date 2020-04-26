@@ -85,6 +85,11 @@ syscall_handler (struct intr_frame *f UNUSED) {
 		case 1:
 			syscall_exit((int)f->R.rdi);
 			break;
+
+		case 2:
+			check_address((uint64_t)f->R.rdi);
+			f->R.rax=syscall_fork((char *)f->R.rdi);
+			break;
 		
 		/*** SYS_EXEC ***/
 		case 3:
@@ -182,7 +187,9 @@ syscall_exit (int status) {
 
 pid_t
 syscall_fork(const char *thread_name){
-	process_fork(thread_name, thread_current()->tf);
+	struct intr_frame *parent_frame = &thread_current() -> tf;
+	printf("parent rdi : %d\n", thread_current() -> tid);
+	process_fork(thread_name, &thread_current()->tf);
 }
 
 int

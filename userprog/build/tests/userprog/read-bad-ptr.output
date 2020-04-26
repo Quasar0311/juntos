@@ -20,16 +20,13 @@ Boot complete.
 Putting 'read-bad-ptr' into the file system...
 Putting 'sample.txt' into the file system...
 Executing 'read-bad-ptr':
-(read-bad-ptr) begin
-(read-bad-ptr) open "sample.txt"
-read-bad-ptr: exit(-1)
 Execution of 'read-bad-ptr' complete.
-Timer: 1294 ticks
-Thread: 30 idle ticks, 1261 kernel ticks, 3 user ticks
+Timer: 68 ticks
+Thread: 35 idle ticks, 33 kernel ticks, 0 user ticks
 hd0:0: 0 reads, 0 writes
-hd0:1: 111 reads, 242 writes
+hd0:1: 61 reads, 242 writes
 hd1:0: 102 reads, 0 writes
-Console: 945 characters output
+Console: 863 characters output
 Keyboard: 0 keys pressed
 Exception: 0 page faults
 Powering off...

@@ -19,13 +19,13 @@ Formatting file system...done.
 Boot complete.
 Putting 'halt' into the file system...
 Executing 'halt':
-(halt) begin
-Timer: 252 ticks
-Thread: 36 idle ticks, 215 kernel ticks, 2 user ticks
+Execution of 'halt' complete.
+Timer: 67 ticks
+Thread: 37 idle ticks, 30 kernel ticks, 0 user ticks
 hd0:0: 0 reads, 0 writes
-hd0:1: 79 reads, 228 writes
+hd0:1: 34 reads, 228 writes
 hd1:0: 100 reads, 0 writes
-Console: 748 characters output
+Console: 763 characters output
 Keyboard: 0 keys pressed
 Exception: 0 page faults
 Powering off...
