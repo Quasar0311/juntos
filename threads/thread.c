@@ -249,7 +249,7 @@ thread_create (const char *name, int priority,
 	struct intr_frame curr_tf;
 
 	ASSERT (function != NULL);
-
+	
 	/* Allocate thread. */
 	t = palloc_get_page (PAL_ZERO);
 	if (t == NULL)
@@ -266,23 +266,14 @@ thread_create (const char *name, int priority,
 	curr_tf = thread_current() -> tf;
 	t->parent=curr;
 	
-	t -> parent_rbx = curr_tf.R.rbx;
-	t -> parent_rsp = curr_tf.rsp;
-	t -> parent_rbp = curr_tf.R.rbp;
-	t -> parent_r12 = curr_tf.R.r12;
-	t -> parent_r13 = curr_tf.R.r13;
-	t -> parent_r14 = curr_tf.R.r14;
-	t -> parent_r15 = curr_tf.R.r15;
-	t -> parent_rip = curr_tf.rip;
-	
-	
-	// printf("parent rip : %d\n", t -> parent_rip);
-	// printf("parent rsp : %d\n", t -> parent_rsp);
-	// printf("parent rbp : %d\n", t -> parent_rbp);
-	// printf("parent r12 : %d\n", t -> parent_r12);
-	// printf("parent r13 : %d\n", t -> parent_r13);
-	// printf("parent r14 : %d\n", t -> parent_r14);
-	// printf("parent r15 : %d\n", t -> parent_r15);
+	// t -> parent_rbx = curr_tf.R.rbx;
+	// t -> parent_rsp = curr_tf.rsp;
+	// t -> parent_rbp = curr_tf.R.rbp;
+	// t -> parent_r12 = curr_tf.R.r12;
+	// t -> parent_r13 = curr_tf.R.r13;
+	// t -> parent_r14 = curr_tf.R.r14;
+	// t -> parent_r15 = curr_tf.R.r15;
+	// t -> parent_rip = curr_tf.rip;
 
 	/* Call the kernel_thread if it scheduled.
 	 * Note) rdi is 1st argument, and rsi is 2nd argument. */
@@ -310,7 +301,7 @@ thread_create (const char *name, int priority,
 	list_push_back(&curr->child_list, &t->child_elem);
 
 	t->pid=t->tid;
-
+	// sema_down(&curr -> load_sema);
 	/* Add to run queue. */
 	thread_unblock (t);
 

@@ -187,18 +187,10 @@ syscall_exit (int status) {
 
 pid_t
 syscall_fork(const char *thread_name){
-	struct intr_frame *parent_frame = &thread_current() -> tf;
+	//struct intr_frame *parent_frame = &thread_current() -> tf;
 	printf("parent rdi : %d\n", thread_current() -> tid);
+	
 	process_fork(thread_name, &thread_current()->tf);
-}
-
-int
-syscall_exec (const char *cmd_line) {
-	//printf("%s\n", cmd_line);
-	if(process_exec((void *) cmd_line)==-1){
-		syscall_exit(-1);
-		return -1;
-	};
 }
 
 // int
@@ -214,6 +206,17 @@ syscall_exec (const char *cmd_line) {
 // 	return -1;
 
 // }
+
+int
+syscall_exec (const char *cmd_line) {
+	//printf("%s\n", cmd_line);
+	if(process_exec((void *) cmd_line)==-1){
+		syscall_exit(-1);
+		return -1;
+	};
+}
+
+
 
 bool
 syscall_create (const char *file, unsigned initial_size) {
