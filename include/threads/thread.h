@@ -133,6 +133,14 @@ struct thread {
 	int exit_status;
 
 	pid_t pid;
+	uint64_t parent_rbx;
+	uintptr_t parent_rsp;
+	uint64_t parent_rbp;
+	uint64_t parent_r12;
+	uint64_t parent_r13;
+	uint64_t parent_r14;
+	uint64_t parent_r15;
+	uintptr_t parent_rip;
 
 #endif
 #ifdef VM
@@ -147,7 +155,8 @@ struct thread {
 	/*** advanced scheduler ***/
 	int nice;
 	int recent_cpu;
-
+	
+	
 
 };
 

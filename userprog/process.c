@@ -29,8 +29,11 @@ static void initd (void *f_name);
 static void __do_fork (void *);
 
 static struct intr_frame *parent_intr;
+<<<<<<< HEAD
 static struct thread *test_thread;
 static int parent_pid;
+=======
+>>>>>>> 9aaf08a7c2763c627150d9f02e38c722a03f3257
 
 int 
 process_add_file(struct file *f){
@@ -176,8 +179,7 @@ initd (void *f_name) {
 tid_t
 process_fork (const char *name, struct intr_frame *if_ UNUSED) {
 	parent_intr = if_;
-	test_thread = thread_current();
-	printf("thread_current name : %s\n", thread_current() -> name);
+	printf("parent name in process_fork : %s\n", thread_current() -> name);
 	/* Clone current thread to new thread.*/
 	pid= thread_create (name,
 			PRI_DEFAULT, __do_fork, thread_current ());
@@ -223,16 +225,29 @@ duplicate_pte (uint64_t *pte, void *va, void *aux) {
 static void
 __do_fork (void *aux) {
 	struct intr_frame if_;
-	//  struct thread *parent = (struct thread *) aux;
+	struct thread *parent = (struct thread *) aux;
+	// printf("aux : %p\n", aux);
 	struct thread *current = thread_current ();
-	struct thread *parent = get_child_process(pid);
+	//struct thread *parent2 = current -> parent;
+	// printf("current value1 : %d\n", current -> value1);
+	// hex_dump(0x80042b7000, (void *) 0x80042b7000, 1000, 1);
+	// hex_dump(0x47480000, (void *) 0x47480000, 100, 1);
 	/* TODO: somehow pass the parent_if. (i.e. process_fork()'s if_) */
-	struct intr_frame *parent_if = parent_intr;
+	struct intr_frame parent_if;
 	bool succ = true;
-	printf("parent in __do_fork : %p, %p\n", parent -> name, current -> parent);
+	parent_if.R.rbx = current -> parent_rbx;
+	parent_if.rsp = current -> parent_rsp;
+	parent_if.R.rbp = current -> parent_rbp;
+	parent_if.R.r12 = current -> parent_r12;
+	parent_if.R.r13 = current -> parent_r13;
+	parent_if.R.r14 = current -> parent_r14;
+	parent_if.R.r15 = current -> parent_r15;
+	parent_if.rip = current -> parent_rip;
+	
+	printf("parent rsp in fork : %p\n", parent_if.rsp);
 	/* 1. Read the cpu context to local stack. */
-	memcpy (&if_, parent_if, sizeof (struct intr_frame));
-
+	memcpy (&if_, &parent_if, sizeof (struct intr_frame));
+	// if_.R.rax = 0;
 	/* 2. Duplicate PT */
 	current->pml4 = pml4_create();
 	if (current->pml4 == NULL)
