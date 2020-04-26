@@ -30,6 +30,7 @@ static void __do_fork (void *);
 
 static struct intr_frame *parent_intr;
 static struct thread *test_thread;
+static int parent_pid;
 
 int 
 process_add_file(struct file *f){
@@ -178,8 +179,9 @@ process_fork (const char *name, struct intr_frame *if_ UNUSED) {
 	test_thread = thread_current();
 	printf("thread_current name : %s\n", thread_current() -> name);
 	/* Clone current thread to new thread.*/
-	return thread_create (name,
+	pid= thread_create (name,
 			PRI_DEFAULT, __do_fork, thread_current ());
+	return pid;
 }
 
 #ifndef VM
@@ -221,10 +223,9 @@ duplicate_pte (uint64_t *pte, void *va, void *aux) {
 static void
 __do_fork (void *aux) {
 	struct intr_frame if_;
-	struct thread *parent = (struct thread *) aux;
-	
+	//  struct thread *parent = (struct thread *) aux;
 	struct thread *current = thread_current ();
-	//struct thread *parent = current -> parent;
+	struct thread *parent = get_child_process(pid);
 	/* TODO: somehow pass the parent_if. (i.e. process_fork()'s if_) */
 	struct intr_frame *parent_if = parent_intr;
 	bool succ = true;
