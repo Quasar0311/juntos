@@ -174,11 +174,14 @@ initd (void *f_name) {
 tid_t
 process_fork (const char *name, struct intr_frame *if_ UNUSED) {
 	parent_intr = if_;
-	printf("parent name in process_fork : %s\n", thread_current() -> name);
-	
+	pid_t pid;
+
 	/* Clone current thread to new thread.*/
-	return thread_create (name,
-			PRI_DEFAULT, __do_fork, thread_current ());
+	pid= thread_create (name, PRI_DEFAULT, __do_fork, thread_current ());
+	
+	/*** wait until child process loaded ***/
+	sema_down(&thread_current()->load_sema);
+	return pid;
 }
 
 #ifndef VM
@@ -193,9 +196,8 @@ duplicate_pte (uint64_t *pte, void *va, void *aux) {
 	bool writable;
 
 	/* 1. TODO: If the parent_page is kernel page, then return immediately. */
-	// if (is_kernel_vaddr(parent_page)) {
-	// 	return false;
-	// }
+	if(is_kernel_vaddr(parent->pml4)) return false;
+
 	/* 2. Resolve VA from the parent's page map level 4. */
 	parent_page = pml4_get_page (parent->pml4, va);
 
@@ -225,29 +227,14 @@ static void
 __do_fork (void *aux) {
 	struct intr_frame if_;
 	struct thread *parent = (struct thread *) aux;
-	
-	// printf("aux : %p\n", aux);
 	struct thread *current = thread_current ();
-	//struct thread *parent2 = current -> parent;
-	// printf("current value1 : %d\n", current -> value1);
-	//hex_dump(0x80042b9000, (void *) 0x80042b9000, 1000, 1);
-	// hex_dump(0x47480000, (void *) 0x47480000, 100, 1);
 	/* TODO: somehow pass the parent_if. (i.e. process_fork()'s if_) */
-	struct intr_frame *parent_if;
+	struct intr_frame *parent_if=&parent->tf;
 	bool succ = true;
-	// parent_if.R.rbx = current -> parent_rbx;
-	// parent_if.rsp = current -> parent_rsp;
-	// parent_if.R.rbp = current -> parent_rbp;
-	// parent_if.R.r12 = current -> parent_r12;
-	// parent_if.R.r13 = current -> parent_r13;
-	// parent_if.R.r14 = current -> parent_r14;
-	// parent_if.R.r15 = current -> parent_r15;
-	// parent_if.rip = current -> parent_rip;
 	
-	// printf("parent rsp in fork : %p\n", parent_if.rsp);
 	/* 1. Read the cpu context to local stack. */
 	memcpy (&if_, parent_if, sizeof (struct intr_frame));
-	if_.R.rax = 0;
+
 	/* 2. Duplicate PT */
 	current->pml4 = pml4_create();
 	if (current->pml4 == NULL)
@@ -268,7 +255,9 @@ __do_fork (void *aux) {
 	 * TODO:       in include/filesys/file.h. Note that parent should not return
 	 * TODO:       from the fork() until this function successfully duplicates
 	 * TODO:       the resources of parent.*/
-	// printf("dd\n");
+	
+	/*** if memory load finish, resume parent process ***/
+	sema_up(&thread_current()->parent->load_sema);
 	process_init ();
 
 	/* Finally, switch to the newly created process. */
