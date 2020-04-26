@@ -201,13 +201,13 @@ syscall_exec (const char *cmd_line) {
 	};
 }
 
-// int
-// syscall_exec(const char *cmd_line){
+// pid_t
+// syscall_fork(const char *thread_name){
 // 	/*** create child process ****/
 // 	pid_t pid;
 // 	struct thread *t;
 // 	struct thread *curr = thread_current();
-// 	pid=process_create_initd(cmd_line); 
+// 	pid=process_create_initd(thread_name); 
 // 	t=get_child_process(pid);
 // 	sema_down(&curr->load_sema);
 // 	if(t->process_load) return pid;
