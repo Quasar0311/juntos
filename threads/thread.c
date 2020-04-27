@@ -247,7 +247,7 @@ thread_create (const char *name, int priority,
 	struct thread *t, *curr;
 	tid_t tid;
 	struct intr_frame curr_tf;
-
+	printf("parent rbx at t_c : %d\n", thread_current() -> tf.rip);
 	ASSERT (function != NULL);
 	
 	/* Allocate thread. */

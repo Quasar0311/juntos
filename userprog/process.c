@@ -197,13 +197,12 @@ duplicate_pte (uint64_t *pte, void *va, void *aux) {
 	
 	//printf("parent va : %p\n", va);
 	/* 1. TODO: If the parent_page is kernel page, then return immediately. */
-	if(is_kernel_vaddr(va)) {
+	if(is_kern_pte(pte)) {
 		return true;
 	}
-
 	/* 2. Resolve VA from the parent's page map level 4. */
 	parent_page = pml4_get_page (parent->pml4, va);
-
+	
 	/* 3. TODO: Allocate new PAL_USER page for the child and set result to
 	 *    TODO: NEWPAGE. */
 	newpage = palloc_get_page(PAL_USER);
@@ -211,8 +210,13 @@ duplicate_pte (uint64_t *pte, void *va, void *aux) {
 	/* 4. TODO: Duplicate parent's page to the new page and
 	 *    TODO: check whether parent's page is writable or not (set WRITABLE
 	 *    TODO: according to the result). */
-	memcpy(parent_page, newpage, sizeof(void *));
-
+	memcpy(newpage, parent_page, sizeof(void *));
+	if (is_writable(pte)) {
+		writable = true;
+	}
+	else {
+		writable = false;
+	}
 	/* 5. Add new page to child's page table at address VA with WRITABLE
 	 *    permission. */
 	
@@ -235,10 +239,11 @@ __do_fork (void *aux) {
 	/* TODO: somehow pass the parent_if. (i.e. process_fork()'s if_) */
 	struct intr_frame *parent_if=&parent->tf;
 	bool succ = true;
-	//printf("rdi : %d\n", parent_if -> R.rdi);
+	printf("rdi : %p\n", parent_if -> R.rax);
+	if_.R.rax = 0;
 	/* 1. Read the cpu context to local stack. */
 	memcpy (&if_, parent_if, sizeof (struct intr_frame));
-	
+	if_.R.rax = 0;
 	/* 2. Duplicate PT */
 	current->pml4 = pml4_create();
 	if (current->pml4 == NULL)
@@ -267,8 +272,9 @@ __do_fork (void *aux) {
 	
 	/* Finally, switch to the newly created process. */
 	if (succ) {
-		if_.R.rax = 0;
+		printf("a\n");
 		do_iret (&if_);
+		printf("b\n");
 	}
 error:
 	printf("err\n");

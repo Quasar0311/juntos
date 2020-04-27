@@ -32,8 +32,8 @@ r11 0000000000000216 r12 0000000000000000 r13 0000000000000000 r14 0000000000000
 r15 0000000000000000 rflags 00000216
 es: 001b ds: 001b cs: 0023 ss: 001b
 Execution of 'fork-once' complete.
-Timer: 1312 ticks
-Thread: 30 idle ticks, 1273 kernel ticks, 9 user ticks
+Timer: 1296 ticks
+Thread: 37 idle ticks, 1252 kernel ticks, 8 user ticks
 hd0:0: 0 reads, 0 writes
 hd0:1: 79 reads, 228 writes
 hd1:0: 100 reads, 0 writes

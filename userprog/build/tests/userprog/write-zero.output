@@ -5,7 +5,8 @@ iPXE (http://ipxe.org) 00:03.0 C980 PCI2.10 PnP PMM+0FF915A0+0FEF15A0 C980
 Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
 
 
-Booting from Hard Disk..Kernel command line: -q -f put write-zero put sample.txt run write-zero
+Booting from Hard Disk...
+Kernel command line: -q -f put write-zero put sample.txt run write-zero
 0 ~ 9fc00 1
 100000 ~ ffe0000 1
 Pintos booting with: 
@@ -25,8 +26,8 @@ Executing 'write-zero':
 (write-zero) end
 write-zero: exit(0)
 Execution of 'write-zero' complete.
-Timer: 1287 ticks
-Thread: 35 idle ticks, 1251 kernel ticks, 1 user ticks
+Timer: 1304 ticks
+Thread: 35 idle ticks, 1269 kernel ticks, 1 user ticks
 hd0:0: 0 reads, 0 writes
 hd0:1: 110 reads, 242 writes
 hd1:0: 102 reads, 0 writes
