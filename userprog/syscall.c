@@ -1,5 +1,5 @@
 #include "userprog/syscall.h"
-#include "lib/user/syscall.h"
+// #include "lib/user/syscall.h"
 #include <stdio.h>
 #include <syscall-nr.h>
 #include <string.h>
@@ -24,7 +24,7 @@ void syscall_entry (void);
 void syscall_handler (struct intr_frame *);
 void check_address (uint64_t reg);
 void syscall_halt (void);
-pid_t syscall_fork(const char *thread_name);
+pid_t syscall_fork(const char *thread_name, struct intr_frame *parent_frame);
 int syscall_exec(const char *cmd_line);
 bool syscall_create (const char *file, unsigned initial_size);
 int syscall_open(const char *file);
@@ -67,9 +67,9 @@ syscall_init (void) {
 
 /* The main system call interface */
 void
-syscall_handler (struct intr_frame *f UNUSED) {
+syscall_handler (struct intr_frame *f) {
 	// TODO: Your implementation goes here.
-
+	int fork;
 	/*** implement syscall_handgler using 
 	system call number stored in the user stack ***/
 	int *number=(int *)&f->R.rax;
@@ -86,9 +86,14 @@ syscall_handler (struct intr_frame *f UNUSED) {
 			syscall_exit((int)f->R.rdi);
 			break;
 
+		/*** SYS_FORK ***/
 		case 2:
 			check_address((uint64_t)f->R.rdi);
-			f->R.rax=syscall_fork((char *)f->R.rdi);
+			
+			// memcpy(&thread_current()->fork_frame, &f, sizeof(struct intr_frame));
+			// intr_dump_frame(f);
+			fork=syscall_fork((char *)f->R.rdi, f);
+			f->R.rax = fork;
 			break;
 		
 		/*** SYS_EXEC ***/
@@ -186,11 +191,16 @@ syscall_exit (int status) {
 }
 
 pid_t
-syscall_fork(const char *thread_name){
-	//struct intr_frame *parent_frame = &thread_current() -> tf;
-	printf("parent rdi : %d\n", thread_current() -> tid);
-	
-	process_fork(thread_name, &thread_current()->tf);
+syscall_fork(const char *thread_name, struct intr_frame *parent_frame){
+
+	// struct intr_frame *frame = &thread_current() -> fork_frame;
+	// printf("parent rdi : %s\n", thread_current() -> tf.R.rdi);
+	// memcpy(parent_frame, &thread_current() -> tf, sizeof(struct intr_frame));
+	struct intr_frame *parent_copy = parent_frame;
+	return process_fork(thread_name, parent_copy);
+	// printf("name : %s\n", thread_current() -> name);
+	// printf("rax : %d\n", thread_current() -> tf.R.rax);
+	// return parent_frame -> R.rax;
 }
 
 int

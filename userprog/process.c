@@ -172,16 +172,16 @@ initd (void *f_name) {
 /* Clones the current process as `name`. Returns the new process's thread id, or
  * TID_ERROR if the thread cannot be created. */
 tid_t
-process_fork (const char *name, struct intr_frame *if_ UNUSED) {
-	parent_intr = if_;
-	pid_t pid;
-
+process_fork (const char *name, struct intr_frame *if_) {
+	tid_t tid = 0;
+	if_ -> R.rax = 0;
 	/* Clone current thread to new thread.*/
-	pid= thread_create (name, PRI_DEFAULT, __do_fork, thread_current ());
+	tid= thread_create (name, PRI_DEFAULT, __do_fork, if_);
 	
 	/*** wait until child process loaded ***/
 	sema_down(&thread_current()->load_sema);
-	return pid;
+	printf("tid : %d\n", tid);
+	return tid;
 }
 
 #ifndef VM
@@ -195,7 +195,6 @@ duplicate_pte (uint64_t *pte, void *va, void *aux) {
 	void *newpage;
 	bool writable;
 	
-	//printf("parent va : %p\n", va);
 	/* 1. TODO: If the parent_page is kernel page, then return immediately. */
 	if(is_kern_pte(pte)) {
 		return true;
@@ -210,7 +209,7 @@ duplicate_pte (uint64_t *pte, void *va, void *aux) {
 	/* 4. TODO: Duplicate parent's page to the new page and
 	 *    TODO: check whether parent's page is writable or not (set WRITABLE
 	 *    TODO: according to the result). */
-	memcpy(newpage, parent_page, sizeof(void *));
+	memcpy(newpage, parent_page, PGSIZE);
 	if (is_writable(pte)) {
 		writable = true;
 	}
@@ -222,6 +221,7 @@ duplicate_pte (uint64_t *pte, void *va, void *aux) {
 	
 	if (!pml4_set_page (current->pml4, va, newpage, writable)) {
 		/* 6. TODO: if fail to insert page, do error handling. */
+		thread_exit();
 	}
 	return true;
 }
@@ -234,16 +234,17 @@ duplicate_pte (uint64_t *pte, void *va, void *aux) {
 static void
 __do_fork (void *aux) {
 	struct intr_frame if_;
-	struct thread *parent = (struct thread *) aux;
+	struct thread *parent = thread_current() -> parent;
 	struct thread *current = thread_current ();
+	printf("parent name : %s\n", parent -> name);
 	/* TODO: somehow pass the parent_if. (i.e. process_fork()'s if_) */
-	struct intr_frame *parent_if=&parent->tf;
+	struct intr_frame *parent_if = aux;
 	bool succ = true;
-	printf("rdi : %p\n", parent_if -> R.rax);
-	if_.R.rax = 0;
 	/* 1. Read the cpu context to local stack. */
 	memcpy (&if_, parent_if, sizeof (struct intr_frame));
-	if_.R.rax = 0;
+	printf("if : %p\n", if_);
+	// printf("cur rax : %d\n", if_ .R.rax);
+	current -> tf = if_;
 	/* 2. Duplicate PT */
 	current->pml4 = pml4_create();
 	if (current->pml4 == NULL)
@@ -274,7 +275,7 @@ __do_fork (void *aux) {
 	if (succ) {
 		printf("a\n");
 		do_iret (&if_);
-		printf("b\n");
+		// printf("b\n");
 	}
 error:
 	printf("err\n");
@@ -649,7 +650,7 @@ load (const char *file_name, struct intr_frame *if_) {
 	//printf("argc : %d\n", argc);
 	strlcpy((char *) if_ -> rsp, (char *) &argc, sizeof(void*));
 	// printf("argc : %d\n", argc);
-	// strlcpy((char *) &if_ -> R.rdi, (char *) &argc, sizeof(int));
+	//strlcpy((char *) &if_ -> R.rdi, (char *) &argc, sizeof(char *));
 	if_ -> R.rdi = argc;
 	//printf("argc : %d\n", if_->R.rdi);
 	strlcpy((char *) &if_ -> R.rsi, (char *) &argv_addr, sizeof(char*));
