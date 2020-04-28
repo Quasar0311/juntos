@@ -26,6 +26,7 @@ void check_address (uint64_t reg);
 void syscall_halt (void);
 pid_t syscall_fork(const char *thread_name, struct intr_frame *parent_frame);
 int syscall_exec(const char *cmd_line);
+int syscall_wait (pid_t pid);
 bool syscall_create (const char *file, unsigned initial_size);
 int syscall_open(const char *file);
 int syscall_filesize(int fd);
@@ -74,7 +75,7 @@ syscall_handler (struct intr_frame *f) {
 	system call number stored in the user stack ***/
 	int *number=(int *)&f->R.rax;
 	//printf("system call no. : %d\n", *number);
-
+	
 	switch(*number){
 		/*** SYS_HALT ***/
 		case 0:
@@ -102,6 +103,11 @@ syscall_handler (struct intr_frame *f) {
 			f->R.rax=syscall_exec((char *)f->R.rdi);
 			break;
 		
+		/*** SYS_WAIT ***/
+		case 4:
+			f -> R.rax = syscall_wait((int) f -> R.rdi);
+			break;
+
 		/*** SYS_CREATE ***/
 		case 5:
 			check_address((uint64_t) f -> R.rdi);
@@ -185,7 +191,7 @@ syscall_halt (void) {
 void
 syscall_exit (int status) {
 	struct thread *curr = thread_current();
-
+	curr -> exit_status = status;
 	printf("%s: exit(%d)\n", curr -> name, status);
 	thread_exit();
 }
@@ -198,9 +204,7 @@ syscall_fork(const char *thread_name, struct intr_frame *parent_frame){
 	// memcpy(parent_frame, &thread_current() -> tf, sizeof(struct intr_frame));
 	struct intr_frame *parent_copy = parent_frame;
 	return process_fork(thread_name, parent_copy);
-	// printf("name : %s\n", thread_current() -> name);
-	// printf("rax : %d\n", thread_current() -> tf.R.rax);
-	// return parent_frame -> R.rax;
+
 }
 
 int
@@ -212,21 +216,10 @@ syscall_exec (const char *cmd_line) {
 	};
 }
 
-// pid_t
-// syscall_fork(const char *thread_name){
-// 	/*** create child process ****/
-// 	pid_t pid;
-// 	struct thread *t;
-// 	struct thread *curr = thread_current();
-// 	pid=process_create_initd(thread_name); 
-// 	t=get_child_process(pid);
-// 	sema_down(&curr->load_sema);
-// 	if(t->process_load) return pid;
-// 	return -1;
-
-// }
-
-
+int
+syscall_wait (pid_t pid) {
+	return process_wait(pid);
+}
 
 bool
 syscall_create (const char *file, unsigned initial_size) {

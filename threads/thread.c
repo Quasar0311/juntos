@@ -246,7 +246,6 @@ thread_create (const char *name, int priority,
 		thread_func *function, void *aux) {
 	struct thread *t, *curr;
 	tid_t tid;
-	struct intr_frame curr_tf;
 	ASSERT (function != NULL);
 	
 	/* Allocate thread. */
@@ -262,17 +261,9 @@ thread_create (const char *name, int priority,
 	// hex_dump(0x47480000, (void *) 0x47480000, 100, 1);
 	/*** parent process ***/
 	curr=thread_current();
-	curr_tf = thread_current() -> tf;
 	t->parent=curr;
-	
-	// t -> parent_rbx = curr_tf.R.rbx;
-	// t -> parent_rsp = curr_tf.rsp;
-	// t -> parent_rbp = curr_tf.R.rbp;
-	// t -> parent_r12 = curr_tf.R.r12;
-	// t -> parent_r13 = curr_tf.R.r13;
-	// t -> parent_r14 = curr_tf.R.r14;
-	// t -> parent_r15 = curr_tf.R.r15;
-	// t -> parent_rip = curr_tf.rip;
+	t -> exit_status = -1;
+
 
 	/* Call the kernel_thread if it scheduled.
 	 * Note) rdi is 1st argument, and rsi is 2nd argument. */
@@ -394,9 +385,15 @@ thread_tid (void) {
    returns to the caller. */
 void
 thread_exit (void) {
+	struct thread *curr = thread_current();
 	ASSERT (!intr_context ());
 
 #ifdef USERPROG
+	// if (thread_current() -> parent != NULL) {
+	// 	parent = thread_current() -> parent;
+	// }
+	sema_up(&curr -> exit_sema);
+	
 	process_exit ();
 #endif
 

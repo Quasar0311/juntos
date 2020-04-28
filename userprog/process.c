@@ -175,12 +175,12 @@ tid_t
 process_fork (const char *name, struct intr_frame *if_) {
 	tid_t tid = 0;
 	if_ -> R.rax = 0;
+	
 	/* Clone current thread to new thread.*/
 	tid= thread_create (name, PRI_DEFAULT, __do_fork, if_);
 	
 	/*** wait until child process loaded ***/
 	sema_down(&thread_current()->load_sema);
-	printf("tid : %d\n", tid);
 	return tid;
 }
 
@@ -236,15 +236,14 @@ __do_fork (void *aux) {
 	struct intr_frame if_;
 	struct thread *parent = thread_current() -> parent;
 	struct thread *current = thread_current ();
-	printf("parent name : %s\n", parent -> name);
+	
+	// list_push_back(&parent -> child_list, &current -> child_elem);
 	/* TODO: somehow pass the parent_if. (i.e. process_fork()'s if_) */
 	struct intr_frame *parent_if = aux;
 	bool succ = true;
 	/* 1. Read the cpu context to local stack. */
 	memcpy (&if_, parent_if, sizeof (struct intr_frame));
-	printf("if : %p\n", if_);
-	// printf("cur rax : %d\n", if_ .R.rax);
-	current -> tf = if_;
+
 	/* 2. Duplicate PT */
 	current->pml4 = pml4_create();
 	if (current->pml4 == NULL)
@@ -273,9 +272,7 @@ __do_fork (void *aux) {
 	
 	/* Finally, switch to the newly created process. */
 	if (succ) {
-		printf("a\n");
 		do_iret (&if_);
-		// printf("b\n");
 	}
 error:
 	printf("err\n");
@@ -345,17 +342,48 @@ process_exec (void *f_name) { //start_process
  * This function will be implemented in problem 2-2.  For now, it
  * does nothing. */
 int
-process_wait (tid_t child_tid UNUSED) {
+process_wait (tid_t child_tid) {
 	/* XXX: Hint) The pintos exit if process_wait (initd), we recommend you
 	 * XXX:       to add infinite loop here before
 	 * XXX:       implementing the process_wait. */
 	int i;
+	struct list_elem *e;
+	struct list *child_list = &thread_current() -> child_list;
+	struct thread *child;
 
-	for (i = 0; i <= 1500000000; i++) {
+	for (i = 1; i <= 1000000; i++) {
 		;
 	}
+
+	if (list_empty(child_list)) {
+		return -1;
+	}
+
 	
-	return -1;
+	for (e = list_begin(child_list); e != list_end(child_list); e = list_next(e)) {
+		child = list_entry(e, struct thread, child_elem);
+		if (child -> tid == child_tid) {
+			break;
+		}
+	}
+	if (child -> tid != child_tid) {
+		return -1;
+	}
+	
+	sema_down(&child -> exit_sema);
+
+	for (e = list_begin(child_list); e != list_end(child_list); e = list_next(e)) {
+		child = list_entry(e, struct thread, child_elem);
+		if (child -> tid == child_tid && child -> exit_status != -1) {
+			list_remove(e);
+			return child -> exit_status;
+		}
+		else {
+			return -1;
+		}
+	}
+
+	return child -> exit_status;
 }
 
 /* Exit the process. This function is called by thread_exit (). */
