@@ -5,7 +5,7 @@ iPXE (http://ipxe.org) 00:03.0 C980 PCI2.10 PnP PMM+013915A0+012F15A0 C980
 Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
 
 
-Booting from Hard Disk...Kernel command line: -q -f put multi-oom run multi-oom
+Booting from Hard Disk..Kernel command line: -q -f put multi-oom run multi-oom
 0 ~ 9fc00 1
 100000 ~ 13e0000 1
 Pintos booting with: 
@@ -21,28 +21,15 @@ Putting 'multi-oom' into the file system...
 Executing 'multi-oom':
 (multi-oom) begin
 child_6_X: exit(-1)
-child_7_X: exit(-1)
-child_8_X: exit(-1)
-child_9_X: exit(-1)
-child_10_X: exit(-1)
-child_11_X: exit(-1)
-Interrupt 0x0d (#GP General Protection Exception) at rip=800421c62b
- cr2=0000008004000000 error=               0
-rax cccccccccccccc0c rbx 0000000000000000 rcx 00000000004037d8 rdx 0000000000000020
-rsp 0000008004901eb0 rbp 0000008004901ee0 rsi 0000000000000000 rdi 00000080049010d0
-rip 000000800421c62b r8 0000000000000000  r9 0000000000000000 r10 0000000000000000
-r11 0000000000000212 r12 000000800421dc1d r13 0000000000000000 r14 0000000000000000
-r15 0000000000000000 rflags 00000296
-es: 001b ds: 001b cs: 0008 ss: 0010
-Kernel PANIC at ../../userprog/exception.c:98 in kill(): Kernel bug - unexpected interrupt in kernel
-Call stack: 0x800421875d 0x800421d906 0x80042096ed 0x8004209b0b 0x800421e063 0x800421dd2e 0x800421db46 0x4003d3 0x40044b 0x400fb0.
+Kernel PANIC at ../../lib/kernel/list.c:78 in list_next(): assertion `is_head (elem) || is_interior (elem)' failed.
+Call stack: 0x800421875d 0x80042189d9 0x800421bdca 0x800421be2d 0x800421c815 0x80042075ac 0x800421e0b8 0x800421db24 0x80042096ed 0x8004209b0b 0x400305 0x40044b 0x400fb0.
 The `backtrace' program can make call stacks useful.
 Read "Backtraces" in the "Debugging Tools" chapter
 of the Pintos documentation for more information.
-Timer: 427 ticks
-Thread: 78 idle ticks, 32 kernel ticks, 317 user ticks
+Timer: 189 ticks
+Thread: 67 idle ticks, 31 kernel ticks, 91 user ticks
 hd0:0: 0 reads, 0 writes
-hd0:1: 4401 reads, 238 writes
+hd0:1: 1854 reads, 238 writes
 hd1:0: 105 reads, 0 writes
-Console: 1804 characters output
+Console: 1234 characters output
 Key

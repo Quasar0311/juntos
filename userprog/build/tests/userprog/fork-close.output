@@ -14,7 +14,7 @@ Pintos booting with:
 Calibrating timer...  104,755,200 loops/s.
 hd0:0: detected 321 sector (160 kB) disk, model "QEMU HARDDISK", serial "QM00001"
 hd0:1: detected 20,160 sector (9 MB) disk, model "QEMU HARDDISK", serial "QM00002"
-hd1:0: detected 108 sector (54 kB) disk, model "QEMU HARDDISK", serial "QM00003"
+hd1:0: detected 107 sector (53 kB) disk, model "QEMU HARDDISK", serial "QM00003"
 Formatting file system...done.
 Boot complete.
 Putting 'fork-close' into the file system...
@@ -29,11 +29,11 @@ child: exit(0)
 (fork-close) end
 fork-close: exit(0)
 Execution of 'fork-close' complete.
-Timer: 73 ticks
-Thread: 30 idle ticks, 35 kernel ticks, 8 user ticks
+Timer: 77 ticks
+Thread: 32 idle ticks, 37 kernel ticks, 9 user ticks
 hd0:0: 0 reads, 0 writes
-hd0:1: 120 reads, 254 writes
-hd1:0: 108 reads, 0 writes
+hd0:1: 119 reads, 252 writes
+hd1:0: 107 reads, 0 writes
 Console: 1024 characters output
 Keyboard: 0 keys pressed
 Exception: 0 page faults

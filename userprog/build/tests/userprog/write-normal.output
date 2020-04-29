@@ -26,12 +26,12 @@ Executing 'write-normal':
 (write-normal) end
 write-normal: exit(0)
 Execution of 'write-normal' complete.
-Timer: 75 ticks
-Thread: 36 idle ticks, 33 kernel ticks, 6 user ticks
+Timer: 78 ticks
+Thread: 35 idle ticks, 33 kernel ticks, 10 user ticks
 hd0:0: 0 reads, 0 writes
 hd0:1: 142 reads, 260 writes
 hd1:0: 104 reads, 0 writes
-Console: 990 characters output
+Console: 991 characters output
 Keyboard: 0 keys pressed
 Exception: 0 page faults
 Powering off...
