@@ -121,6 +121,7 @@ void
 thread_wakeup (int64_t ticks) {
 	
 	if (list_empty(&sleep_list)) {
+		
 		return;
 	}
 	else {
