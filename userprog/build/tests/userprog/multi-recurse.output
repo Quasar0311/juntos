@@ -52,43 +52,13 @@ Executing 'multi-recurse 15':
 (multi-recurse) begin 0
 (multi-recurse) end 0
 multi-recurse: exit(0)
-(multi-recurse) end 1
-multi-recurse: exit(1)
-(multi-recurse) end 2
-multi-recurse: exit(2)
-(multi-recurse) end 3
-multi-recurse: exit(3)
-(multi-recurse) end 4
-multi-recurse: exit(4)
-(multi-recurse) end 5
-multi-recurse: exit(5)
-(multi-recurse) end 6
-multi-recurse: exit(6)
-(multi-recurse) end 7
-multi-recurse: exit(7)
-(multi-recurse) end 8
-multi-recurse: exit(8)
-(multi-recurse) end 9
-multi-recurse: exit(9)
-(multi-recurse) end 10
-multi-recurse: exit(10)
-(multi-recurse) end 11
-multi-recurse: exit(11)
-(multi-recurse) end 12
-multi-recurse: exit(12)
-(multi-recurse) end 13
-multi-recurse: exit(13)
-(multi-recurse) end 14
-multi-recurse: exit(14)
-(multi-recurse) end 15
-multi-recurse: exit(15)
 Execution of 'multi-recurse 15' complete.
-Timer: 164 ticks
-Thread: 30 idle ticks, 46 kernel ticks, 89 user ticks
+Timer: 111 ticks
+Thread: 46 idle ticks, 32 kernel ticks, 33 user ticks
 hd0:0: 0 reads, 0 writes
 hd0:1: 850 reads, 248 writes
 hd1:0: 110 reads, 0 writes
-Console: 2549 characters output
+Console: 1862 characters output
 Keyboard: 0 keys pressed
 Exception: 0 page faults
 Powering off...

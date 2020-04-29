@@ -5,7 +5,8 @@ iPXE (http://ipxe.org) 00:03.0 C980 PCI2.10 PnP PMM+0FF915A0+0FEF15A0 C980
 Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
 
 
-Booting from Hard Disk..Kernel command line: -q -f put fork-recursive run fork-recursive
+Booting from Hard Disk...
+Kernel command line: -q -f put fork-recursive run fork-recursive
 0 ~ 9fc00 1
 100000 ~ ffe0000 1
 Pintos booting with: 
@@ -28,31 +29,14 @@ Executing 'fork-recursive':
 (fork-recursive) child run
 (fork-recursive) child run
 (fork-recursive) child run
-child: exit(10)
-(fork-recursive) Parent: child exit status is 10
-child: exit(10)
-(fork-recursive) Parent: child exit status is 10
-child: exit(9)
-(fork-recursive) Parent: child exit status is 9
-child: exit(8)
-(fork-recursive) Parent: child exit status is 8
-child: exit(7)
-(fork-recursive) Parent: child exit status is 7
-child: exit(6)
-(fork-recursive) Parent: child exit status is 6
-child: exit(5)
-(fork-recursive) Parent: child exit status is 5
-child: exit(4)
-(fork-recursive) Parent: child exit status is 4
-(fork-recursive) end
-fork-recursive: exit(0)
+fork-recursive: exit(10)
 Execution of 'fork-recursive' complete.
-Timer: 107 ticks
-Thread: 34 idle ticks, 41 kernel ticks, 32 user ticks
+Timer: 75 ticks
+Thread: 36 idle ticks, 34 kernel ticks, 6 user ticks
 hd0:0: 0 reads, 0 writes
 hd0:1: 85 reads, 230 writes
 hd1:0: 101 reads, 0 writes
-Console: 1607 characters output
+Console: 1077 characters output
 Keyboard: 0 keys pressed
 Exception: 0 page faults
 Powering off...

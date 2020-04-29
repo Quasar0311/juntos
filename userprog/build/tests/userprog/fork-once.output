@@ -21,17 +21,14 @@ Putting 'fork-once' into the file system...
 Executing 'fork-once':
 (fork-once) begin
 (fork-once) child run
-child: exit(81)
-(fork-once) Parent: child exit status is 81
-(fork-once) end
-fork-once: exit(0)
+fork-once: exit(81)
 Execution of 'fork-once' complete.
-Timer: 72 ticks
-Thread: 39 idle ticks, 30 kernel ticks, 3 user ticks
+Timer: 68 ticks
+Thread: 32 idle ticks, 34 kernel ticks, 2 user ticks
 hd0:0: 0 reads, 0 writes
 hd0:1: 79 reads, 228 writes
 hd1:0: 100 reads, 0 writes
-Console: 923 characters output
+Console: 848 characters output
 Keyboard: 0 keys pressed
 Exception: 0 page faults
 Powering off...

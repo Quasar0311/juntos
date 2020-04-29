@@ -114,9 +114,11 @@ syscall_handler (struct intr_frame *f) {
 			f -> R.rax = syscall_create((char *) f -> R.rdi, (unsigned) f -> R.rsi);
 			break;
 
+		/*** SYS_REMOVE ***/
 		case 6:
 			break;
 
+		/*** SYS_OPEN ***/
 		case 7:
 			check_address(f -> R.rdi);
 			f -> R.rax = syscall_open((char *)f->R.rdi);
@@ -203,7 +205,9 @@ syscall_fork(const char *thread_name, struct intr_frame *parent_frame){
 	// printf("parent rdi : %s\n", thread_current() -> tf.R.rdi);
 	// memcpy(parent_frame, &thread_current() -> tf, sizeof(struct intr_frame));
 	struct intr_frame *parent_copy = parent_frame;
-	return process_fork(thread_name, parent_copy);
+	struct thread *curr=thread_current();
+	if (curr->process_load)
+		return process_fork(thread_name, parent_copy);
 
 }
 

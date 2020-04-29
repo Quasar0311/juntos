@@ -116,6 +116,8 @@ struct thread {
 	/*** max fd of current table+ 1 ***/
 	int next_fd;
 
+	struct file* open_file;
+
 	/*** parent descriptor, pointer of parent process ***/
 	struct thread *parent;
 	/*** child_list element ***/

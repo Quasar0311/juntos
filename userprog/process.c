@@ -92,7 +92,8 @@ process_close_file(int fd){
 	list_remove(fp);
 	palloc_free_page(list_entry(fp, struct file_pointer, file_elem));
 	
-
+	/*** decrease file descriptor for current thread ***/
+	curr -> next_fd--;
 }
 
 struct thread *
@@ -264,6 +265,11 @@ __do_fork (void *aux) {
 	 * TODO:       in include/filesys/file.h. Note that parent should not return
 	 * TODO:       from the fork() until this function successfully duplicates
 	 * TODO:       the resources of parent.*/
+	if(file_duplicate(parent->open_file)==NULL)
+		current->process_load=false;
+	else 
+		current->process_load=true;
+
 	
 	/*** if memory load finish, resume parent process ***/
 	sema_up(&thread_current()->parent->load_sema);
@@ -553,6 +559,8 @@ load (const char *file_name, struct intr_frame *if_) {
 		printf ("load: %s: open failed\n", file_title);
 		goto done;
 	}
+	/*** contain info of opened file ***/
+	else t->open_file=file;
 
 	/* Read and verify executable header. */
 	if (file_read (file, &ehdr, sizeof ehdr) != sizeof ehdr

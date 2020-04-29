@@ -1,14 +1,17 @@
 FAIL
-Kernel panic in run: PANIC at ../../userprog/exception.c:98 in kill(): Kernel bug - unexpected interrupt in kernel
-Call stack: 0x800421875d 0x800421d8ef 0x80042096ed 0x8004209b0b 0x800421e04c 0x800421dd17 0x800421db2f 0x4003d3 0x40044b 0x400fb0
-Translation of call stack:
-0x000000800421875d: debug_panic (lib/kernel/debug.c:32)
-0x000000800421d8ef: kill (userprog/exception.c:104)
-0x00000080042096ed: intr_handler (threads/interrupt.c:352)
-0x0000008004209b0b: intr_entry (threads/intr-stubs.o:?)
-0x000000800421e04c: syscall_wait (userprog/syscall.c:222)
-0x000000800421dd17: syscall_handler (userprog/syscall.c:108)
-0x000000800421db2f: no_sti (userprog/syscall-entry.o:?)
-0x00000000004003d3: (unknown)
-0x000000000040044b: (unknown)
-0x0000000000400fb0: (unknown)
+Test output failed to match any acceptable form.
+
+Acceptable output:
+  (multi-oom) begin
+  (multi-oom) Spawned at least 10 children.
+  (multi-oom) success. Program forked 10 iterations.
+  (multi-oom) end
+Differences in `diff -u' format:
+  (multi-oom) begin
+- (multi-oom) Spawned at least 10 children.
+- (multi-oom) success. Program forked 10 iterations.
+- (multi-oom) end
+
+(Process exit codes are excluded for matching purposes.)
+
+(User fault messages are excluded for matching purposes.)

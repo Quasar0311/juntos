@@ -25,18 +25,17 @@ Executing 'lg-seq-block':
 (lg-seq-block) writing "noodle"
 (lg-seq-block) close "noodle"
 (lg-seq-block) open "noodle" for verification
-(lg-seq-block) size of noodle (0) differs from expected (75678)
-(lg-seq-block) read of 512 bytes at offset 0 in "noodle" returned 0: FAILED
-lg-seq-block: exit(1)
-Kernel PANIC at ../../filesys/inode.c:304 in inode_allow_write(): assertion `inode->deny_write_cnt > 0' failed.
-Call stack: 0x800421875d 0x8004220374 0x800421f1cb 0x800421ef78 0x800421be4f 0x800421c73d 0x80042075ac 0x800421dfbe 0x800421dc70 0x800421db2f 0x400362 0x4007e0 0x400924 0x400dbc 0x400131 0x400e1a 0x400e63.
-The `backtrace' program can make call stacks useful.
-Read "Backtraces" in the "Debugging Tools" chapter
-of the Pintos documentation for more information.
-Timer: 94 ticks
-Thread: 43 idle ticks, 31 kernel ticks, 20 user ticks
+(lg-seq-block) verified contents of "noodle"
+(lg-seq-block) close "noodle"
+(lg-seq-block) end
+lg-seq-block: exit(0)
+Execution of 'lg-seq-block' complete.
+Timer: 99 ticks
+Thread: 45 idle ticks, 31 kernel ticks, 23 user ticks
 hd0:0: 0 reads, 0 writes
-hd0:1: 404 reads, 691 writes
+hd0:1: 552 reads, 691 writes
 hd1:0: 104 reads, 0 writes
-Console: 1590 characters output
-Key
+Console: 1110 characters output
+Keyboard: 0 keys pressed
+Exception: 0 page faults
+Powering off...

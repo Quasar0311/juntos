@@ -25,18 +25,17 @@ Executing 'sm-full':
 (sm-full) writing "quux"
 (sm-full) close "quux"
 (sm-full) open "quux" for verification
-(sm-full) size of quux (0) differs from expected (5678)
-(sm-full) read of 512 bytes at offset 0 in "quux" returned 0: FAILED
-sm-full: exit(1)
-Kernel PANIC at ../../filesys/inode.c:304 in inode_allow_write(): assertion `inode->deny_write_cnt > 0' failed.
-Call stack: 0x800421875d 0x8004220374 0x800421f1cb 0x800421ef78 0x800421be4f 0x800421c73d 0x80042075ac 0x800421dfbe 0x800421dc70 0x800421db2f 0x400362 0x4007e0 0x400924 0x400dbc 0x400131 0x400e1a 0x400e63.
-The `backtrace' program can make call stacks useful.
-Read "Backtraces" in the "Debugging Tools" chapter
-of the Pintos documentation for more information.
-Timer: 77 ticks
-Thread: 39 idle ticks, 30 kernel ticks, 8 user ticks
+(sm-full) verified contents of "quux"
+(sm-full) close "quux"
+(sm-full) end
+sm-full: exit(0)
+Execution of 'sm-full' complete.
+Timer: 78 ticks
+Thread: 37 idle ticks, 35 kernel ticks, 7 user ticks
 hd0:0: 0 reads, 0 writes
-hd0:1: 111 reads, 272 writes
+hd0:1: 123 reads, 272 writes
 hd1:0: 104 reads, 0 writes
-Console: 1509 characters output
-Key
+Console: 1020 characters output
+Keyboard: 0 keys pressed
+Exception: 0 page faults
+Powering off...
