@@ -274,7 +274,7 @@ __do_fork (void *aux) {
 	 * TODO:       in include/filesys/file.h. Note that parent should not return
 	 * TODO:       from the fork() until this function successfully duplicates
 	 * TODO:       the resources of parent.*/
-	
+	current->next_fd=parent->next_fd;
 	for (e = list_begin(&parent -> fd_table); e != list_end (&parent -> fd_table);
 	e = list_next(e)) {
 		new_file = file_duplicate(list_entry(e, struct file_pointer, file_elem) -> file);
@@ -282,9 +282,12 @@ __do_fork (void *aux) {
 		if (new_file != NULL) {
 			list_push_back(&current -> fd_table, &fp -> file_elem);
 		}
+		else {
+			current -> next_fd--;
+		}
 		
 	}
-	current->next_fd=parent->next_fd;
+	
 
 	current->process_load=true;	
 
