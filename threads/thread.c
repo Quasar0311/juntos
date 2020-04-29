@@ -392,6 +392,7 @@ thread_exit (void) {
 	// if (thread_current() -> parent != NULL) {
 	// 	parent = thread_current() -> parent;
 	// }
+	// printf("sema-up : %d\n", curr -> tid);
 	sema_up(&curr -> exit_sema);
 	
 	process_exit ();
