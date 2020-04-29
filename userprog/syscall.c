@@ -204,7 +204,7 @@ syscall_fork(const char *thread_name, struct intr_frame *parent_frame){
 	// memcpy(parent_frame, &thread_current() -> tf, sizeof(struct intr_frame));
 	struct intr_frame *parent_copy = parent_frame;
 	return process_fork(thread_name, parent_copy);
-
+	//file_duplicate
 }
 
 int
