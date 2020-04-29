@@ -1,0 +1,48 @@
+c[?7l[2J[0mSeaBIOS (version rel-1.11.0-0-g63451fca13-prebuilt.qemu-project.org)
+
+
+iPXE (http://ipxe.org) 00:03.0 C980 PCI2.10 PnP PMM+0FF915A0+0FEF15A0 C980
+Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
+
+
+Booting from Hard Disk..Kernel command line: -q -f put fork-boundary run fork-boundary
+0 ~ 9fc00 1
+100000 ~ ffe0000 1
+Pintos booting with: 
+	base_mem: 0x0 ~ 0x9fc00 (Usable: 639 kB)
+	ext_mem: 0x100000 ~ 0xffe0000 (Usable: 260,992 kB)
+Calibrating timer...  104,755,200 loops/s.
+hd0:0: detected 321 sector (160 kB) disk, model "QEMU HARDDISK", serial "QM00001"
+hd0:1: detected 20,160 sector (9 MB) disk, model "QEMU HARDDISK", serial "QM00002"
+hd1:0: detected 103 sector (51 kB) disk, model "QEMU HARDDISK", serial "QM00003"
+Formatting file system...done.
+Boot complete.
+Putting 'fork-boundary' into the file system...
+Executing 'fork-boundary':
+(fork-boundary) begin
+(fork-boundary) child run
+child-simple: exit(54)
+(fork-boundary) fork
+(fork-boundary) wait
+(fork-boundary) end
+fork-boundary: exit(0)
+Interrupt 0x0d (#GP General Protection Exception) at rip=800421c762
+ cr2=0000000000000000 error=               0
+rax cccccccccccccc0c rbx 0000000000204400 rcx 0000000000000000 rdx 00000000cccccccb
+rsp 0000008004000f40 rbp 0000008004000f70 rsi 0000008004000068 rdi 00000080040000d0
+rip 000000800421c762 r8 0000008004000efc  r9 000000800421bbd6 r10 0000000000000000
+r11 0000000000000000 r12 0000000000000000 r13 0000000000000000 r14 0000000000000000
+r15 0000000000000000 rflags 00200296
+es: 0010 ds: 0010 cs: 0008 ss: 0010
+Kernel PANIC at ../../userprog/exception.c:98 in kill(): Kernel bug - unexpected interrupt in kernel
+Call stack: 0x800421875d 0x800421d9d9 0x80042096ed 0x8004209b0b 0x8004206778 0x80042068c5 0x800420617a.
+The `backtrace' program can make call stacks useful.
+Read "Backtraces" in the "Debugging Tools" chapter
+of the Pintos documentation for more information.
+Timer: 79 ticks
+Thread: 36 idle ticks, 39 kernel ticks, 4 user ticks
+hd0:0: 0 reads, 0 writes
+hd0:1: 80 reads, 234 writes
+hd1:0: 103 reads, 0 writes
+Console: 1805 characters output
+Key
