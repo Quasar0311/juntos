@@ -242,11 +242,20 @@ int
 syscall_open(const char *file){
 	struct file *f;
 	int fd=-1;
+	struct thread *curr = thread_current();
+	
 
 	lock_acquire(&filesys_lock);
 	//printf("file name: %s\n", file);
+	
 	f=filesys_open(file);
 	fd=process_add_file(f);
+	if (!strcmp(curr -> name, file)) {
+		file_deny_write(f);
+	}
+
+	// curr -> run_file = f;
+	// file_deny_write(f);
 	//printf("got fd : %d\n",fd);
 	//printf("fd: %d, file open : %d\n", fd, thread_current() -> next_fd);
 	lock_release(&filesys_lock);
@@ -310,12 +319,13 @@ syscall_write(int fd, void *buffer, unsigned size){
 	f=process_get_file(fd);
 	if(f==NULL){
 		lock_release(&filesys_lock);
-		return -1;
+		return 0;
 	}
 	
-	else bytes_read=file_write(f, buffer, size);
+	else {
+		bytes_read=file_write(f, buffer, size);
+	}
 	lock_release(&filesys_lock);
-
 	return bytes_read;
 }
 

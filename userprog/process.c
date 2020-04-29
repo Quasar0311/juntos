@@ -76,10 +76,12 @@ process_close_file(int fd){
 	struct file *f;
 	struct list_elem *fp;
 	struct thread *curr = thread_current();
+	struct file_pointer *file_p;
 	f = process_get_file(fd);
 	//printf("hi : %d\n", fd);
 	if (f == NULL) return;
-	
+	// printf("fd : %d\n", fd);
+	// printf("nextfd : %d\n", curr -> next_fd);
 	file_close(f);
 
 	/*** delete entry of corresponding file descriptor ***/
@@ -89,11 +91,14 @@ process_close_file(int fd){
 	for(int i=3; i<fd; i++){
 		fp=list_next(fp);
 	}
-	list_remove(fp);
-	palloc_free_page(list_entry(fp, struct file_pointer, file_elem));
+	// printf("fd : %d, next_fd : %d\n", fd, curr -> next_fd);
+	file_p = list_entry(fp, struct file_pointer, file_elem);
+	file_p -> file = NULL;
+	//list_remove(fp);
+	//palloc_free_page(list_entry(fp, struct file_pointer, file_elem));
 	
 	/*** decrease file descriptor for current thread ***/
-	curr -> next_fd--;
+	
 
 }
 
@@ -238,7 +243,10 @@ __do_fork (void *aux) {
 	struct intr_frame if_;
 	struct thread *parent = thread_current() -> parent;
 	struct thread *current = thread_current ();
-	
+	struct list_elem *e;
+	struct file_pointer *fp = palloc_get_page(0);
+	struct file *new_file;	
+
 	// list_push_back(&parent -> child_list, &current -> child_elem);
 	/* TODO: somehow pass the parent_if. (i.e. process_fork()'s if_) */
 	struct intr_frame *parent_if = aux;
@@ -266,7 +274,23 @@ __do_fork (void *aux) {
 	 * TODO:       in include/filesys/file.h. Note that parent should not return
 	 * TODO:       from the fork() until this function successfully duplicates
 	 * TODO:       the resources of parent.*/
+	current->next_fd=parent->next_fd;
+	for (e = list_begin(&parent -> fd_table); e != list_end (&parent -> fd_table);
+	e = list_next(e)) {
+		new_file = file_duplicate(list_entry(e, struct file_pointer, file_elem) -> file);
+		fp -> file = new_file;
+		if (new_file != NULL) {
+			list_push_back(&current -> fd_table, &fp -> file_elem);
+		}
+		else {
+			current -> next_fd--;
+		}
+		
+	}
 	
+
+	current->process_load=true;	
+
 	/*** if memory load finish, resume parent process ***/
 	sema_up(&thread_current()->parent->load_sema);
 	
@@ -301,7 +325,7 @@ process_exec (void *f_name) { //start_process
 	// // process_cleanup ();
 	// printf("before load : %s\n", file_name);
 	// /* And then load the binary */
-
+	lock_init(&writable_lock);
 	success = load (file_name, &_if);
 
 	/*** if load finish resume parent process by semaphore ***/
@@ -352,10 +376,7 @@ process_wait (tid_t child_tid) {
 	struct list *child_list = &thread_current() -> child_list;
 	struct thread *child;
 
-	for (i = 1; i <= 1000000; i++) {
-		;
-	}
-
+	
 	if (list_empty(child_list)) {
 		return -1;
 	}
@@ -370,17 +391,21 @@ process_wait (tid_t child_tid) {
 	if (child -> tid != child_tid) {
 		return -1;
 	}
+	//printf("sema-down : %d\n", child -> tid);
 	
 	sema_down(&child -> exit_sema);
+	// printf("doing : %d\n", child_tid);
+	// child_list = &thread_current() -> child_list;
 
 	for (e = list_begin(child_list); e != list_end(child_list); e = list_next(e)) {
 		child = list_entry(e, struct thread, child_elem);
 		if (child -> tid == child_tid && child -> exit_status != -1) {
 			list_remove(e);
+			// printf("removed\n");
 			return child -> exit_status;
 		}
 		else {
-			return -1;
+			;
 		}
 	}
 
@@ -519,7 +544,7 @@ load (const char *file_name, struct intr_frame *if_) {
 	int i;
 	
 	/*** Acquire lock for running file ***/
-	lock_acquire(&t -> writable_lock);
+	// lock_acquire(&writable_lock);
 	/*** Arguments passing ***/
 	char *token, *save_ptr;
 	uint64_t argc = 0;
@@ -554,7 +579,7 @@ load (const char *file_name, struct intr_frame *if_) {
 	file = filesys_open (file_title);
 	if (file == NULL) {
 		/*** Release when file open fail ***/
-		lock_release(&t -> writable_lock);
+		//lock_release(&writable_lock);
 		printf ("load: %s: open failed\n", file_title);
 		goto done;
 	}
@@ -564,7 +589,7 @@ load (const char *file_name, struct intr_frame *if_) {
 		 Then release lock. ***/
 	t -> run_file = file;
 	file_deny_write(file);
-	lock_release(&writable_lock);
+	// lock_release(&writable_lock);
 
 	/* Read and verify executable header. */
 	if (file_read (file, &ehdr, sizeof ehdr) != sizeof ehdr
