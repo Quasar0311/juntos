@@ -28,7 +28,7 @@ static bool load (const char *file_name, struct intr_frame *if_);
 static void initd (void *f_name);
 static void __do_fork (void *);
 
-static struct intr_frame *parent_intr;
+
 
 int 
 process_add_file(struct file *f){
@@ -518,7 +518,9 @@ load (const char *file_name, struct intr_frame *if_) {
 	off_t file_ofs;
 	bool success = false;
 	int i;
-
+	
+	/*** Acquire lock for running file ***/
+	lock_acquire(&t -> writable_lock);
 	/*** Arguments passing ***/
 	char *token, *save_ptr;
 	uint64_t argc = 0;
@@ -552,9 +554,18 @@ load (const char *file_name, struct intr_frame *if_) {
 	/* Open executable file. */
 	file = filesys_open (file_title);
 	if (file == NULL) {
+		/*** Release when file open fail ***/
+		lock_release(&t -> writable_lock);
 		printf ("load: %s: open failed\n", file_title);
 		goto done;
 	}
+
+	/*** Initial run_file to opened file, 
+		 and deny write so cannot write to opened file.
+		 Then release lock. ***/
+	t -> run_file = file;
+	file_deny_write(file);
+	lock_release(&writable_lock);
 
 	/* Read and verify executable header. */
 	if (file_read (file, &ehdr, sizeof ehdr) != sizeof ehdr

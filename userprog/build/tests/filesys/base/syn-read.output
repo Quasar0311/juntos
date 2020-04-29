@@ -1,0 +1,66 @@
+c[?7l[2J[0mSeaBIOS (version rel-1.11.0-0-g63451fca13-prebuilt.qemu-project.org)
+
+
+iPXE (http://ipxe.org) 00:03.0 C980 PCI2.10 PnP PMM+0FF915A0+0FEF15A0 C980
+Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
+
+
+Booting from Hard Disk..Kernel command line: -q -f put syn-read put child-syn-read run syn-read
+0 ~ 9fc00 1
+100000 ~ ffe0000 1
+Pintos booting with: 
+	base_mem: 0x0 ~ 0x9fc00 (Usable: 639 kB)
+	ext_mem: 0x100000 ~ 0xffe0000 (Usable: 260,992 kB)
+Calibrating timer...  104,755,200 loops/s.
+hd0:0: detected 321 sector (160 kB) disk, model "QEMU HARDDISK", serial "QM00001"
+hd0:1: detected 20,160 sector (9 MB) disk, model "QEMU HARDDISK", serial "QM00002"
+hd1:0: detected 221 sector (110 kB) disk, model "QEMU HARDDISK", serial "QM00003"
+Formatting file system...done.
+Boot complete.
+Putting 'syn-read' into the file system...
+Putting 'child-syn-read' into the file system...
+Executing 'syn-read':
+(syn-read) begin
+(syn-read) create "data"
+(syn-read) open "data"
+(syn-read) write "data"
+(syn-read) close "data"
+(syn-read) exec child 1 of 10: "child-syn-read 0"
+(syn-read) exec child 2 of 10: "child-syn-read 1"
+(syn-read) exec child 3 of 10: "child-syn-read 2"
+(syn-read) exec child 4 of 10: "child-syn-read 3"
+(syn-read) exec child 5 of 10: "child-syn-read 4"
+(syn-read) exec child 6 of 10: "child-syn-read 5"
+(syn-read) exec child 7 of 10: "child-syn-read 6"
+(syn-read) exec child 8 of 10: "child-syn-read 7"
+(syn-read) exec child 9 of 10: "child-syn-read 8"
+(syn-read) exec child 10 of 10: "child-syn-read 9"
+child-syn-read: exit(0)
+(syn-read) wait for child 1 of 10 returned 0 (expected 0)
+child-syn-read: exit(5)
+child-syn-read: exit(2)
+child-syn-read: exit(6)
+child-syn-read: exit(9)
+child-syn-read: exit(3)
+child-syn-read: exit(1)
+(syn-read) wait for child 2 of 10 returned 1 (expected 1)
+Interrupt 0x0d (#GP General Protection Exception) at rip=800421c62b
+ cr2=0000000000000000 error=               0
+rax cccccccccccccc0c rbx 0000000000000000 rcx 0000000000403818 rdx 0000000000000020
+rsp 00000080042b9eb0 rbp 00000080042b9ee0 rsi 0000000000000000 rdi 00000080042b90d0
+rip 000000800421c62b r8 0000000000000000  r9 0000000000000000 r10 0000000000000000
+r11 0000000000000216 r12 000000800421dc1d r13 0000000000000000 r14 0000000000000000
+r15 0000000000000000 rflags 00000296
+es: 001b ds: 001b cs: 0008 ss: 0010
+Kernel PANIC at ../../userprog/exception.c:98 in kill(): Kernel bug - unexpected interrupt in kernel
+Call stack: 0x800421875d 0x800421d906 0x80042096ed 0x8004209b0b 0x800421e063 0x800421dd2e 0x800421db46 0x4007b9 0x4002be 0x400fa7 0x400ff0.
+The `backtrace' program can make call stacks useful.
+Read "Backtraces" in the "Debugging Tools" chapter
+of the Pintos documentation for more information.
+Timer: 353 ticks
+Thread: 173 idle ticks, 26 kernel ticks, 154 user ticks
+hd0:0: 0 reads, 0 writes
+hd0:1: 7705 reads, 496 writes
+hd1:0: 221 reads, 0 writes
+Console: 2638 characters output
+Key
