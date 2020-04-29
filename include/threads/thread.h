@@ -116,6 +116,8 @@ struct thread {
 	/*** max fd of current table+ 1 ***/
 	int next_fd;
 
+	struct file *open_file;
+
 	/*** parent descriptor, pointer of parent process ***/
 	struct thread *parent;
 	/*** child_list element ***/
@@ -134,7 +136,6 @@ struct thread {
 
 	pid_t pid;
 
-
 #endif
 #ifdef VM
 	/* Table for whole virtual memory owned by thread. */
@@ -143,15 +144,11 @@ struct thread {
 
 	/* Owned by thread.c. */
 	struct intr_frame tf;               /* Information for switching */
-	struct intr_frame fork_frame;
 	unsigned magic;                     /* Detects stack overflow. */
 
 	/*** advanced scheduler ***/
 	int nice;
 	int recent_cpu;
-	
-	
-
 };
 
 /* If false (default), use round-robin scheduler.
@@ -175,7 +172,7 @@ tid_t thread_create (const char *name, int priority, thread_func *, void *);
 void thread_block (void);
 void thread_unblock (struct thread *);
 /*** compares the priority of two threads A and B ***/
-bool priority_less_func(const struct list_elem *a, const struct list_elem *b, void *aux UNUSED);
+bool prioriy_less_func(const struct list_elem *a, const struct list_elem *b, void *aux UNUSED);
 
 struct thread *thread_current (void);
 tid_t thread_tid (void);
