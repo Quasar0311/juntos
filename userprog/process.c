@@ -301,7 +301,7 @@ process_exec (void *f_name) { //start_process
 	// // process_cleanup ();
 	// printf("before load : %s\n", file_name);
 	// /* And then load the binary */
-
+	lock_init(&writable_lock);
 	success = load (file_name, &_if);
 
 	/*** if load finish resume parent process by semaphore ***/
@@ -519,7 +519,7 @@ load (const char *file_name, struct intr_frame *if_) {
 	int i;
 	
 	/*** Acquire lock for running file ***/
-	lock_acquire(&t -> writable_lock);
+	lock_acquire(&writable_lock);
 	/*** Arguments passing ***/
 	char *token, *save_ptr;
 	uint64_t argc = 0;
@@ -554,7 +554,7 @@ load (const char *file_name, struct intr_frame *if_) {
 	file = filesys_open (file_title);
 	if (file == NULL) {
 		/*** Release when file open fail ***/
-		lock_release(&t -> writable_lock);
+		lock_release(&writable_lock);
 		printf ("load: %s: open failed\n", file_title);
 		goto done;
 	}
