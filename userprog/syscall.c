@@ -114,9 +114,11 @@ syscall_handler (struct intr_frame *f) {
 			f -> R.rax = syscall_create((char *) f -> R.rdi, (unsigned) f -> R.rsi);
 			break;
 
+		/*** SYS_REMOVE ***/
 		case 6:
 			break;
 
+		/*** SYS_OPEN ***/
 		case 7:
 			check_address(f -> R.rdi);
 			f -> R.rax = syscall_open((char *)f->R.rdi);
@@ -203,8 +205,13 @@ syscall_fork(const char *thread_name, struct intr_frame *parent_frame){
 	// printf("parent rdi : %s\n", thread_current() -> tf.R.rdi);
 	// memcpy(parent_frame, &thread_current() -> tf, sizeof(struct intr_frame));
 	struct intr_frame *parent_copy = parent_frame;
+	// if(thread_current()->process_load)
 	return process_fork(thread_name, parent_copy);
-
+	// pid_t pid;
+	// pid=process_fork(thread_name, parent_copy);
+	// if(pid==0) return pid;
+	// else 
+	// 	if(thread_current()->process_load) return pid;
 }
 
 int
@@ -266,11 +273,9 @@ syscall_open(const char *file){
 int
 syscall_filesize(int fd){
 	struct file *f;
-	off_t len;
-	f = process_get_file(fd);
-	if (f == NULL) {
-		return -1;
-	}
+
+	f=process_get_file(fd);
+	if(f==NULL) return -1;
 	return file_length(f);
 }
 
@@ -280,6 +285,12 @@ syscall_read(int fd, void *buffer, unsigned size){
 	off_t bytes_read;
 
 	lock_acquire(&filesys_lock);
+	// printf("read next_fd: %d\n", thread_current()->next_fd);
+	// printf("read fd: %d\n", fd);
+	// if (list_empty(&thread_current() -> fd_table)) {
+	// 	printf("empty\n");
+	// }
+	// printf("fdtable size : %d\n", list_size(&thread_current() -> fd_table));
 
 	if(fd==0){
 		/*** invalid use of void expression ***/
@@ -306,7 +317,7 @@ int
 syscall_write(int fd, void *buffer, unsigned size){
 	struct file *f;
 	off_t bytes_read;
-	// printf("fd : %d\n", fd);
+
 	lock_acquire(&filesys_lock);
 
 	if(fd==1){

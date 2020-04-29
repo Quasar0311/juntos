@@ -78,6 +78,7 @@ process_close_file(int fd){
 	struct thread *curr = thread_current();
 	struct file_pointer *file_p;
 	f = process_get_file(fd);
+	//file_allow_write(f);
 	//printf("hi : %d\n", fd);
 	if (f == NULL) return;
 	// printf("fd : %d\n", fd);
@@ -579,10 +580,12 @@ load (const char *file_name, struct intr_frame *if_) {
 	file = filesys_open (file_title);
 	if (file == NULL) {
 		/*** Release when file open fail ***/
-		//lock_release(&writable_lock);
+		// lock_release(&t -> writable_lock);
 		printf ("load: %s: open failed\n", file_title);
 		goto done;
 	}
+	/*** contain info of opened file ***/
+	// else t->open_file=file;
 
 	/*** Initial run_file to opened file, 
 		 and deny write so cannot write to opened file.
