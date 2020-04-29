@@ -205,10 +205,8 @@ syscall_fork(const char *thread_name, struct intr_frame *parent_frame){
 	// printf("parent rdi : %s\n", thread_current() -> tf.R.rdi);
 	// memcpy(parent_frame, &thread_current() -> tf, sizeof(struct intr_frame));
 	struct intr_frame *parent_copy = parent_frame;
-	struct thread *curr=thread_current();
-	if (curr->process_load)
-		return process_fork(thread_name, parent_copy);
-
+	return process_fork(thread_name, parent_copy);
+	//file_duplicate
 }
 
 int
