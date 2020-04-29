@@ -25,18 +25,17 @@ Executing 'sm-seq-block':
 (sm-seq-block) writing "noodle"
 (sm-seq-block) close "noodle"
 (sm-seq-block) open "noodle" for verification
-(sm-seq-block) size of noodle (0) differs from expected (5678)
-(sm-seq-block) read of 512 bytes at offset 0 in "noodle" returned 0: FAILED
-sm-seq-block: exit(1)
-Kernel PANIC at ../../filesys/inode.c:304 in inode_allow_write(): assertion `inode->deny_write_cnt > 0' failed.
-Call stack: 0x800421875d 0x8004220374 0x800421f1cb 0x800421ef78 0x800421be4f 0x800421c73d 0x80042075ac 0x800421dfbe 0x800421dc70 0x800421db2f 0x400362 0x4007e0 0x400924 0x400dbc 0x400131 0x400e1a 0x400e63.
-The `backtrace' program can make call stacks useful.
-Read "Backtraces" in the "Debugging Tools" chapter
-of the Pintos documentation for more information.
-Timer: 76 ticks
-Thread: 38 idle ticks, 31 kernel ticks, 7 user ticks
+(sm-seq-block) verified contents of "noodle"
+(sm-seq-block) close "noodle"
+(sm-seq-block) end
+sm-seq-block: exit(0)
+Execution of 'sm-seq-block' complete.
+Timer: 70 ticks
+Thread: 36 idle ticks, 27 kernel ticks, 7 user ticks
 hd0:0: 0 reads, 0 writes
-hd0:1: 132 reads, 283 writes
+hd0:1: 144 reads, 283 writes
 hd1:0: 104 reads, 0 writes
-Console: 1588 characters output
-Key
+Console: 1109 characters output
+Keyboard: 0 keys pressed
+Exception: 0 page faults
+Powering off...

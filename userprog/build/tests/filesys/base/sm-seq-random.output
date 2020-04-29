@@ -5,7 +5,8 @@ iPXE (http://ipxe.org) 00:03.0 C980 PCI2.10 PnP PMM+0FF915A0+0FEF15A0 C980
 Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
 
 
-Booting from Hard Disk..Kernel command line: -q -f put sm-seq-random run sm-seq-random
+Booting from Hard Disk...
+Kernel command line: -q -f put sm-seq-random run sm-seq-random
 0 ~ 9fc00 1
 100000 ~ ffe0000 1
 Pintos booting with: 
@@ -25,18 +26,17 @@ Executing 'sm-seq-random':
 (sm-seq-random) writing "nibble"
 (sm-seq-random) close "nibble"
 (sm-seq-random) open "nibble" for verification
-(sm-seq-random) size of nibble (0) differs from expected (5678)
-(sm-seq-random) read of 512 bytes at offset 0 in "nibble" returned 0: FAILED
-sm-seq-random: exit(1)
-Kernel PANIC at ../../filesys/inode.c:304 in inode_allow_write(): assertion `inode->deny_write_cnt > 0' failed.
-Call stack: 0x800421875d 0x8004220374 0x800421f1cb 0x800421ef78 0x800421be4f 0x800421c73d 0x80042075ac 0x800421dfbe 0x800421dc70 0x800421db2f 0x4003a5 0x400823 0x400967 0x400dff 0x400174 0x400e5d 0x400ea6.
-The `backtrace' program can make call stacks useful.
-Read "Backtraces" in the "Debugging Tools" chapter
-of the Pintos documentation for more information.
-Timer: 75 ticks
-Thread: 39 idle ticks, 26 kernel ticks, 10 user ticks
+(sm-seq-random) verified contents of "nibble"
+(sm-seq-random) close "nibble"
+(sm-seq-random) end
+sm-seq-random: exit(0)
+Execution of 'sm-seq-random' complete.
+Timer: 70 ticks
+Thread: 35 idle ticks, 28 kernel ticks, 8 user ticks
 hd0:0: 0 reads, 0 writes
-hd0:1: 127 reads, 281 writes
+hd0:1: 139 reads, 281 writes
 hd1:0: 104 reads, 0 writes
-Console: 1602 characters output
-Key
+Console: 1124 characters output
+Keyboard: 0 keys pressed
+Exception: 0 page faults
+Powering off...

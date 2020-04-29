@@ -26,8 +26,8 @@ Executing 'rox-simple':
 (rox-simple) try to write "rox-simple": FAILED
 rox-simple: exit(1)
 Execution of 'rox-simple' complete.
-Timer: 71 ticks
-Thread: 30 idle ticks, 37 kernel ticks, 4 user ticks
+Timer: 76 ticks
+Thread: 37 idle ticks, 32 kernel ticks, 7 user ticks
 hd0:0: 0 reads, 0 writes
 hd0:1: 84 reads, 231 writes
 hd1:0: 101 reads, 0 writes

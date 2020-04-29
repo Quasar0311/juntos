@@ -257,9 +257,11 @@ syscall_open(const char *file){
 int
 syscall_filesize(int fd){
 	struct file *f;
-
-	f=process_get_file(fd);
-	if(f==NULL) return -1;
+	off_t len;
+	f = process_get_file(fd);
+	if (f == NULL) {
+		return -1;
+	}
 	return file_length(f);
 }
 
@@ -295,7 +297,7 @@ int
 syscall_write(int fd, void *buffer, unsigned size){
 	struct file *f;
 	off_t bytes_read;
-
+	// printf("fd : %d\n", fd);
 	lock_acquire(&filesys_lock);
 
 	if(fd==1){

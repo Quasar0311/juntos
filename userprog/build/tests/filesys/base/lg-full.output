@@ -25,18 +25,17 @@ Executing 'lg-full':
 (lg-full) writing "quux"
 (lg-full) close "quux"
 (lg-full) open "quux" for verification
-(lg-full) size of quux (0) differs from expected (75678)
-(lg-full) read of 512 bytes at offset 0 in "quux" returned 0: FAILED
-lg-full: exit(1)
-Kernel PANIC at ../../filesys/inode.c:304 in inode_allow_write(): assertion `inode->deny_write_cnt > 0' failed.
-Call stack: 0x800421875d 0x8004220374 0x800421f1cb 0x800421ef78 0x800421be4f 0x800421c73d 0x80042075ac 0x800421dfbe 0x800421dc70 0x800421db2f 0x400362 0x4007e0 0x400924 0x400dbc 0x400131 0x400e1a 0x400e63.
-The `backtrace' program can make call stacks useful.
-Read "Backtraces" in the "Debugging Tools" chapter
-of the Pintos documentation for more information.
-Timer: 79 ticks
-Thread: 36 idle ticks, 29 kernel ticks, 14 user ticks
+(lg-full) verified contents of "quux"
+(lg-full) close "quux"
+(lg-full) end
+lg-full: exit(0)
+Execution of 'lg-full' complete.
+Timer: 82 ticks
+Thread: 42 idle ticks, 30 kernel ticks, 10 user ticks
 hd0:0: 0 reads, 0 writes
-hd0:1: 111 reads, 544 writes
+hd0:1: 259 reads, 544 writes
 hd1:0: 104 reads, 0 writes
-Console: 1511 characters output
-Key
+Console: 1021 characters output
+Keyboard: 0 keys pressed
+Exception: 0 page faults
+Powering off...

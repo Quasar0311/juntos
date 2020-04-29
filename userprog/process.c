@@ -92,6 +92,8 @@ process_close_file(int fd){
 	list_remove(fp);
 	palloc_free_page(list_entry(fp, struct file_pointer, file_elem));
 	
+	/*** decrease file descriptor for current thread ***/
+	curr -> next_fd--;
 
 }
 

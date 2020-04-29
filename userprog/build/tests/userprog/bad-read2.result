@@ -1,1 +1,19 @@
-PASS
+FAIL
+Test output failed to match any acceptable form.
+
+Acceptable output:
+  (bad-read2) begin
+  bad-read2: exit(-1)
+Differences in `diff -u' format:
+- (bad-read2) begin
+- bad-read2: exit(-1)
++ bad-read2: dying due to interrupt 0x0d (#GP General Protection Exception).
++ Interrupt 0x0d (#GP General Protection Exception) at rip=400143
++ rax 000080004747ffe0 rbx 0000000000000000 rcx 0000000000000000 rdx 000080004747ffe0
++ rsp 000000004747ffa0 rbp 000000004747ffb0 rsi 000080004747ffe0 rdi 0000000000000001
++ rip 0000000000400143 r8 0000000000000001  r9 0000000000000000 r10 0000800421250000
++ r11 000080042b9f3000 r12 0000000000000000 r13 0000800420982700 r14 000080042b9f2000
++ r15 0000200000000200 rflags 00000206
++ es: 001b ds: 001b cs: 0023 ss: 001b
+
+(User fault messages are excluded for matching purposes.)

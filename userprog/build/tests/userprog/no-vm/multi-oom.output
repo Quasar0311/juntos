@@ -11,7 +11,7 @@ Booting from Hard Disk..Kernel command line: -q -f put multi-oom run multi-oom
 Pintos booting with: 
 	base_mem: 0x0 ~ 0x9fc00 (Usable: 639 kB)
 	ext_mem: 0x100000 ~ 0x13e0000 (Usable: 19,328 kB)
-Calibrating timer...  78,540,800 loops/s.
+Calibrating timer...  104,755,200 loops/s.
 hd0:0: detected 321 sector (160 kB) disk, model "QEMU HARDDISK", serial "QM00001"
 hd0:1: detected 20,160 sector (9 MB) disk, model "QEMU HARDDISK", serial "QM00002"
 hd1:0: detected 105 sector (52 kB) disk, model "QEMU HARDDISK", serial "QM00003"
@@ -21,23 +21,28 @@ Putting 'multi-oom' into the file system...
 Executing 'multi-oom':
 (multi-oom) begin
 child_6_X: exit(-1)
-Interrupt 0x0d (#GP General Protection Exception) at rip=800421c614
+Interrupt 0x0d (#GP General Protection Exception) at rip=800421c62b
  cr2=0000000000000000 error=               0
 rax cccccccccccccc0c rbx 0000000000000000 rcx 00000000004037d8 rdx 0000000000000020
 rsp 00000080044e8eb0 rbp 00000080044e8ee0 rsi 0000000000000000 rdi 00000080044e80d0
-rip 000000800421c614 r8 0000000000000000  r9 0000000000000000 r10 0000000000000000
-r11 0000000000000212 r12 000000800421dc06 r13 0000000000000000 r14 0000000000000000
-r15 0000000000000000 rflags 00000296
+rip 000000800421c62b r8 0000000000000000  r9 0000000000000000 r10 0000000000000000
+r11 0000000000000212 r12 000000800421dc1d r13 0000000000000000 r14 0000000000000000
+r15 00008004209b0b00 rflags 00000296
 es: 001b ds: 001b cs: 0008 ss: 0010
 Kernel PANIC at ../../userprog/exception.c:98 in kill(): Kernel bug - unexpected interrupt in kernel
-Call stack: 0x800421875d 0x800421d8ef 0x80042096ed 0x8004209b0b 0x800421e04c 0x800421dd17 0x800421db2f 0x4003d3 0x40044b 0x400fb0.
-The `backtrace' program can make call stacks useful.
-Read "Backtraces" in the "Debugging Tools" chapter
-of the Pintos documentation for more information.
-Timer: 197 ticks
-Thread: 53 idle ticks, 30 kernel ticks, 114 user ticks
+Call stack: 0x800421875d 0x800421d906 0x80042096ed 0x8004209b0b 0x800421e063 0x800421dd2e 0x800421db46 0x4003d3 0x40044b 0x400fb0 0x1Interrupt 0x0d (#GP General Protection Exception) at rip=8004215797
+ cr2=0000000000000000 error=               0
+rax 0000800424000000 rbx 0000000000000000 rcx 00000080040b8000 rdx 00000000000003d4
+rsp 00000080044e8cf0 rbp 00000080044e8d00 rsi 000000000000b50f rdi 0000000000000000
+rip 0000008004215797 r8 00000080044e8c08  r9 000000800421bbd6 r10 0000000000000000
+r11 0000000000000212 r12 000000800421dc1d r13 0000000000000000 r14 0000000000000000
+r15 00008004209b0b00 rflags 00000006
+es: 0010 ds: 0010 cs: 0008 ss: 0010
+Kernel PANIC recursion at ../../userprog/exception.c:98 in kill().
+Timer: 196 ticks
+Thread: 58 idle ticks, 32 kernel ticks, 106 user ticks
 hd0:0: 0 reads, 0 writes
-hd0:1: 1906 reads, 238 writes
+hd0:1: 1904 reads, 238 writes
 hd1:0: 105 reads, 0 writes
-Console: 1701 characters output
+Console: 2138 characters output
 Key
