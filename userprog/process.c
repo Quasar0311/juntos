@@ -80,8 +80,8 @@ process_close_file(int fd){
 	f = process_get_file(fd);
 	//printf("hi : %d\n", fd);
 	if (f == NULL) return;
-	// printf("fd : %d\n", fd);
-	// printf("nextfd : %d\n", curr -> next_fd);
+	printf("fd : %d\n", fd);
+	printf("nextfd : %d\n", curr -> next_fd);
 	file_close(f);
 
 	/*** delete entry of corresponding file descriptor ***/
