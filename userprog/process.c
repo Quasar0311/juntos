@@ -77,9 +77,13 @@ process_close_file(int fd){
 	struct list_elem *fp;
 	struct thread *curr = thread_current();
 	f = process_get_file(fd);
+	//file_allow_write(f);
 	//printf("hi : %d\n", fd);
 	if (f == NULL) return;
-	
+	// printf("fd : %d\n", fd);
+	// printf("next_fd: %d\n", curr->next_fd);
+	// printf("closing : %p\n", f);
+	if(fd>curr->next_fd) return;
 	file_close(f);
 
 	/*** delete entry of corresponding file descriptor ***/
@@ -238,6 +242,9 @@ __do_fork (void *aux) {
 	struct intr_frame if_;
 	struct thread *parent = thread_current() -> parent;
 	struct thread *current = thread_current ();
+	struct list_elem *e;
+	struct file_pointer *fp = palloc_get_page(0);
+	struct file *new_file;
 	
 	// list_push_back(&parent -> child_list, &current -> child_elem);
 	/* TODO: somehow pass the parent_if. (i.e. process_fork()'s if_) */
@@ -266,7 +273,17 @@ __do_fork (void *aux) {
 	 * TODO:       in include/filesys/file.h. Note that parent should not return
 	 * TODO:       from the fork() until this function successfully duplicates
 	 * TODO:       the resources of parent.*/
-	
+	//current->fd_table=parent->fd_table;
+	for (e = list_begin(&parent -> fd_table); e != list_end (&parent -> fd_table);
+	e = list_next(e)) {
+		new_file = file_duplicate(list_entry(e, struct file_pointer, file_elem) -> file);
+		fp -> file = new_file;
+		list_push_back(&current -> fd_table, &fp -> file_elem);
+	}
+	current->next_fd=parent->next_fd;
+
+	current->process_load=true;
+		
 	/*** if memory load finish, resume parent process ***/
 	sema_up(&thread_current()->parent->load_sema);
 	
@@ -519,7 +536,7 @@ load (const char *file_name, struct intr_frame *if_) {
 	int i;
 	
 	/*** Acquire lock for running file ***/
-	lock_acquire(&t -> writable_lock);
+	// lock_acquire(&t -> writable_lock);
 	/*** Arguments passing ***/
 	char *token, *save_ptr;
 	uint64_t argc = 0;
@@ -554,17 +571,19 @@ load (const char *file_name, struct intr_frame *if_) {
 	file = filesys_open (file_title);
 	if (file == NULL) {
 		/*** Release when file open fail ***/
-		lock_release(&t -> writable_lock);
+		// lock_release(&t -> writable_lock);
 		printf ("load: %s: open failed\n", file_title);
 		goto done;
 	}
+	/*** contain info of opened file ***/
+	// else t->open_file=file;
 
 	/*** Initial run_file to opened file, 
 		 and deny write so cannot write to opened file.
 		 Then release lock. ***/
 	t -> run_file = file;
 	file_deny_write(file);
-	lock_release(&writable_lock);
+	// lock_release(&writable_lock);
 
 	/* Read and verify executable header. */
 	if (file_read (file, &ehdr, sizeof ehdr) != sizeof ehdr
