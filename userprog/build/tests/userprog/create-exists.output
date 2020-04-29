@@ -12,7 +12,7 @@ Pintos booting with:
 	base_mem: 0x0 ~ 0x9fc00 (Usable: 639 kB)
 	ext_mem: 0x100000 ~ 0xffe0000 (Usable: 260,992 kB)
 Calibrating timer...  104,755,200 loops/s.
-hd0:0: detected 313 sector (156 kB) disk, model "QEMU HARDDISK", serial "QM00001"
+hd0:0: detected 321 sector (160 kB) disk, model "QEMU HARDDISK", serial "QM00001"
 hd0:1: detected 20,160 sector (9 MB) disk, model "QEMU HARDDISK", serial "QM00002"
 hd1:0: detected 101 sector (50 kB) disk, model "QEMU HARDDISK", serial "QM00003"
 Formatting file system...done.
@@ -23,15 +23,17 @@ Executing 'create-exists':
 (create-exists) create quux.dat
 (create-exists) create warble.dat
 (create-exists) try to re-create quux.dat
-(create-exists) try to re-create quux.dat: FAILED
-create-exists: exit(1)
+(create-exists) create baffle.dat
+(create-exists) try to re-create quux.dat
+(create-exists) end
+create-exists: exit(0)
 Execution of 'create-exists' complete.
-Timer: 549 ticks
-Thread: 30 idle ticks, 508 kernel ticks, 11 user ticks
+Timer: 74 ticks
+Thread: 34 idle ticks, 32 kernel ticks, 8 user ticks
 hd0:0: 0 reads, 0 writes
-hd0:1: 131 reads, 270 writes
+hd0:1: 162 reads, 298 writes
 hd1:0: 101 reads, 0 writes
-Console: 1015 characters output
+Console: 1058 characters output
 Keyboard: 0 keys pressed
 Exception: 0 page faults
 Powering off...

@@ -244,11 +244,10 @@ thread_print_stats (void) {
 tid_t
 thread_create (const char *name, int priority,
 		thread_func *function, void *aux) {
-	struct thread *t;
+	struct thread *t, *curr;
 	tid_t tid;
-
 	ASSERT (function != NULL);
-
+	
 	/* Allocate thread. */
 	t = palloc_get_page (PAL_ZERO);
 	if (t == NULL)
@@ -257,6 +256,14 @@ thread_create (const char *name, int priority,
 	/* Initialize thread. */
 	init_thread (t, name, priority);
 	tid = t->tid = allocate_tid ();
+	
+	//hex_dump(0x80042b9000, (void *) 0x80042b9000, 100, 1);
+	// hex_dump(0x47480000, (void *) 0x47480000, 100, 1);
+	/*** parent process ***/
+	curr=thread_current();
+	t->parent=curr;
+	t -> exit_status = -1;
+
 
 	/* Call the kernel_thread if it scheduled.
 	 * Note) rdi is 1st argument, and rsi is 2nd argument. */
@@ -274,6 +281,17 @@ thread_create (const char *name, int priority,
 	list_init(&t->fd_table);
 	t->next_fd=2;
 
+	/*** initialize process descriptor ***/
+	t->process_load=false;
+	t->process_terminate=false;
+	sema_init(&t->exit_sema, 0);
+	sema_init(&t->load_sema, 0);
+
+	/*** add to child_list ***/
+	list_push_back(&curr->child_list, &t->child_elem);
+
+	t->pid=t->tid;
+	// sema_down(&curr -> load_sema);
 	/* Add to run queue. */
 	thread_unblock (t);
 
@@ -283,9 +301,9 @@ thread_create (const char *name, int priority,
 		if (!intr_context()) {
 			thread_yield();
 		}
-		
 	}
-
+	// printf("making thread %s...\n", t -> name);
+	// printf("parent pid in thread_create = %d\n", curr -> tid);
 	return tid;
 }
 
@@ -367,9 +385,15 @@ thread_tid (void) {
    returns to the caller. */
 void
 thread_exit (void) {
+	struct thread *curr = thread_current();
 	ASSERT (!intr_context ());
 
 #ifdef USERPROG
+	// if (thread_current() -> parent != NULL) {
+	// 	parent = thread_current() -> parent;
+	// }
+	sema_up(&curr -> exit_sema);
+	
 	process_exit ();
 #endif
 
@@ -662,9 +686,12 @@ init_thread (struct thread *t, const char *name, int priority) {
 
 	t->nice=NICE_DEFAULT;
 	t->recent_cpu=RECENT_CPU_DEFAULT;
+	// t -> parent = thread_current();
 
 	list_insert_ordered(&all_list, &t->all_elem, priority_less_func, NULL);
 
+	/*** initialize child_list ***/
+	list_init(&t->child_list);
 }
 
 /* Chooses and returns the next thread to be scheduled.  Should
@@ -706,6 +733,7 @@ do_iret (struct intr_frame *tf) {
 			"addq $32, %%rsp\n"
 			"iretq"
 			: : "g" ((uint64_t) tf) : "memory");
+			
 }
 
 /* Switching the thread by activating the new thread's page

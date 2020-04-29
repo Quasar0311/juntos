@@ -5,6 +5,7 @@
 #include "threads/interrupt.h"
 #include "threads/thread.h"
 #include "intrinsic.h"
+#include "userprog/syscall.h"
 
 /* Number of page faults processed. */
 static long long page_fault_cnt;
@@ -140,14 +141,13 @@ page_fault (struct intr_frame *f) {
 	write = (f->error_code & PF_W) != 0;
 	user = (f->error_code & PF_U) != 0;
 
-	/*** exit(-1) if page fault ***/
-	// exit(-1);
-
 	/*** page fault in the kernel merely sets rax to -1 
 	and copies its former value into %rip ***/
-	if(is_kernel_vaddr(fault_addr)){
+	if(!user){
 		f->rip=f->R.rax;
 		f->R.rax=-1;
+		/*** exit(-1) if page fault ***/
+		syscall_exit(-1);
 	}
 
 #ifdef VM
@@ -158,6 +158,8 @@ page_fault (struct intr_frame *f) {
 
 	/* Count page faults. */
 	page_fault_cnt++;
+
+	syscall_exit(-1);
 
 	/* If the fault is true fault, show info and exit. */
 	printf ("Page fault at %p: %s error %s page in %s context.\n",

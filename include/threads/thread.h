@@ -5,6 +5,7 @@
 #include <list.h>
 #include <stdint.h>
 #include "threads/interrupt.h"
+#include "threads/synch.h"
 #ifdef VM
 #include "vm/vm.h"
 #endif
@@ -28,6 +29,7 @@ typedef int tid_t;
 #define PRI_DEFAULT 31                  /* Default priority. */
 #define PRI_MAX 63                      /* Highest priority. */
 
+typedef int pid_t;
 /* A kernel thread or user process.
  *
  * Each thread structure is stored in its own 4 kB page.  The
@@ -114,6 +116,25 @@ struct thread {
 	/*** max fd of current table+ 1 ***/
 	int next_fd;
 
+	/*** parent descriptor, pointer of parent process ***/
+	struct thread *parent;
+	/*** child_list element ***/
+	struct list_elem child_elem;
+	struct list child_list;
+
+	/*** True: process program memory loaded ***/
+	bool process_load;
+	/*** True: process terminated ***/
+	bool process_terminate;
+	/*** exit semaphore ***/
+	struct semaphore exit_sema;
+	/*** load semaphore ***/
+	struct semaphore load_sema;
+	int exit_status;
+
+	pid_t pid;
+
+
 #endif
 #ifdef VM
 	/* Table for whole virtual memory owned by thread. */
@@ -122,12 +143,14 @@ struct thread {
 
 	/* Owned by thread.c. */
 	struct intr_frame tf;               /* Information for switching */
+	struct intr_frame fork_frame;
 	unsigned magic;                     /* Detects stack overflow. */
 
 	/*** advanced scheduler ***/
 	int nice;
 	int recent_cpu;
-
+	
+	
 
 };
 
