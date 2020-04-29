@@ -114,9 +114,11 @@ syscall_handler (struct intr_frame *f) {
 			f -> R.rax = syscall_create((char *) f -> R.rdi, (unsigned) f -> R.rsi);
 			break;
 
+		/*** SYS_REMOVE ***/
 		case 6:
 			break;
 
+		/*** SYS_OPEN ***/
 		case 7:
 			check_address(f -> R.rdi);
 			f -> R.rax = syscall_open((char *)f->R.rdi);

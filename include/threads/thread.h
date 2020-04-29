@@ -116,6 +116,8 @@ struct thread {
 	/*** max fd of current table+ 1 ***/
 	int next_fd;
 
+	struct file *open_file;
+
 	/*** parent descriptor, pointer of parent process ***/
 	struct thread *parent;
 	/*** child_list element ***/
@@ -134,7 +136,6 @@ struct thread {
 
 	pid_t pid;
 
-
 #endif
 #ifdef VM
 	/* Table for whole virtual memory owned by thread. */
@@ -143,15 +144,11 @@ struct thread {
 
 	/* Owned by thread.c. */
 	struct intr_frame tf;               /* Information for switching */
-	struct intr_frame fork_frame;
 	unsigned magic;                     /* Detects stack overflow. */
 
 	/*** advanced scheduler ***/
 	int nice;
 	int recent_cpu;
-	
-	
-
 };
 
 /* If false (default), use round-robin scheduler.
