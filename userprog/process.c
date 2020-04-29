@@ -28,7 +28,7 @@ static bool load (const char *file_name, struct intr_frame *if_);
 static void initd (void *f_name);
 static void __do_fork (void *);
 
-
+struct lock writable_lock;
 
 int 
 process_add_file(struct file *f){
@@ -301,7 +301,6 @@ process_exec (void *f_name) { //start_process
 	// // process_cleanup ();
 	// printf("before load : %s\n", file_name);
 	// /* And then load the binary */
-	// printf("before load2 : %s\n", file_name);
 
 	success = load (file_name, &_if);
 
