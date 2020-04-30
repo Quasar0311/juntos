@@ -24,27 +24,18 @@ Executing 'fork-read':
 (fork-read) open "sample.txt"
 (fork-read) child run
 (fork-read) Child: pintos is funny!
-fd : 3
-nextfd : 3
 (fork-read) end
 child: exit(0)
 (fork-read) Parent success
-fd : 3
-nextfd : 3
 (fork-read) end
 fork-read: exit(0)
 Execution of 'fork-read' complete.
-<<<<<<< HEAD
-Timer: 76 ticks
-Thread: 40 idle ticks, 29 kernel ticks, 7 user ticks
-=======
-Timer: 80 ticks
-Thread: 37 idle ticks, 39 kernel ticks, 5 user ticks
->>>>>>> 40664cc7213e8025a9c0b9e5ca1e8982f44bb9da
+Timer: 83 ticks
+Thread: 30 idle ticks, 42 kernel ticks, 11 user ticks
 hd0:0: 0 reads, 0 writes
 hd0:1: 124 reads, 256 writes
 hd1:0: 109 reads, 0 writes
-Console: 1084 characters output
+Console: 1049 characters output
 Keyboard: 0 keys pressed
 Exception: 0 page faults
 Powering off...

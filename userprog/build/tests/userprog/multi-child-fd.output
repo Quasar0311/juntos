@@ -25,28 +25,19 @@ Executing 'multi-child-fd':
 (multi-child-fd) open "sample.txt"
 (child-close) begin
 (child-close) verified contents of "sample.txt"
-fd : 3
-nextfd : 3
 (child-close) end
 child-close: exit(0)
 (multi-child-fd) wait(exec()) = 0
 (multi-child-fd) verified contents of "sample.txt"
 (multi-child-fd) end
 multi-child-fd: exit(0)
-fd : 3
-nextfd : 3
 Execution of 'multi-child-fd' complete.
-<<<<<<< HEAD
-Timer: 82 ticks
-Thread: 40 idle ticks, 36 kernel ticks, 6 user ticks
-=======
-Timer: 91 ticks
-Thread: 40 idle ticks, 42 kernel ticks, 9 user ticks
->>>>>>> 40664cc7213e8025a9c0b9e5ca1e8982f44bb9da
+Timer: 83 ticks
+Thread: 31 idle ticks, 44 kernel ticks, 9 user ticks
 hd0:0: 0 reads, 0 writes
 hd0:1: 201 reads, 478 writes
 hd1:0: 215 reads, 0 writes
-Console: 1268 characters output
+Console: 1232 characters output
 Keyboard: 0 keys pressed
 Exception: 0 page faults
 Powering off...

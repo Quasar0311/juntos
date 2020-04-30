@@ -81,8 +81,8 @@ process_close_file(int fd){
 	//printf("hi : %d\n", fd);
 	if (f == NULL) return;
 	if(fd>curr->next_fd) return;
-	printf("fd : %d\n", fd);
-	printf("nextfd : %d\n", curr -> next_fd);
+	// printf("fd : %d\n", fd);
+	// printf("nextfd : %d\n", curr -> next_fd);
 	file_close(f);
 
 	/*** delete entry of corresponding file descriptor ***/
@@ -280,7 +280,8 @@ __do_fork (void *aux) {
 			list_push_back(&current -> fd_table, &fp -> file_elem);
 		}
 		else {
-			current -> next_fd--;
+			list_push_back(&current->fd_table, NULL);
+			// current -> next_fd--;
 		}
 		
 	}

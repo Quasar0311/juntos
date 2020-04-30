@@ -27,17 +27,12 @@ child-simple: exit(81)
 (wait-simple) end
 wait-simple: exit(0)
 Execution of 'wait-simple' complete.
-<<<<<<< HEAD
-Timer: 86 ticks
-Thread: 40 idle ticks, 40 kernel ticks, 6 user ticks
-=======
-Timer: 76 ticks
-Thread: 33 idle ticks, 38 kernel ticks, 6 user ticks
->>>>>>> 40664cc7213e8025a9c0b9e5ca1e8982f44bb9da
+Timer: 83 ticks
+Thread: 35 idle ticks, 39 kernel ticks, 10 user ticks
 hd0:0: 0 reads, 0 writes
 hd0:1: 157 reads, 434 writes
 hd1:0: 198 reads, 0 writes
-Console: 996 characters output
+Console: 997 characters output
 Keyboard: 0 keys pressed
 Exception: 0 page faults
 Powering off...

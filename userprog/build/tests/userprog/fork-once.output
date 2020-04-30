@@ -5,13 +5,14 @@ iPXE (http://ipxe.org) 00:03.0 C980 PCI2.10 PnP PMM+0FF915A0+0FEF15A0 C980
 Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
 
 
-Booting from Hard Disk..Kernel command line: -q -f put fork-once run fork-once
+Booting from Hard Disk...
+Kernel command line: -q -f put fork-once run fork-once
 0 ~ 9fc00 1
 100000 ~ ffe0000 1
 Pintos booting with: 
 	base_mem: 0x0 ~ 0x9fc00 (Usable: 639 kB)
 	ext_mem: 0x100000 ~ 0xffe0000 (Usable: 260,992 kB)
-Calibrating timer...  91,648,000 loops/s.
+Calibrating timer...  90,009,600 loops/s.
 hd0:0: detected 321 sector (160 kB) disk, model "QEMU HARDDISK", serial "QM00001"
 hd0:1: detected 20,160 sector (9 MB) disk, model "QEMU HARDDISK", serial "QM00002"
 hd1:0: detected 100 sector (50 kB) disk, model "QEMU HARDDISK", serial "QM00003"
@@ -25,18 +26,23 @@ child: exit(81)
 (fork-once) Parent: child exit status is 81
 (fork-once) end
 fork-once: exit(0)
-Execution of 'fork-once' complete.
-<<<<<<< HEAD
-Timer: 75 ticks
-Thread: 30 idle ticks, 38 kernel ticks, 7 user ticks
-=======
-Timer: 78 ticks
-Thread: 37 idle ticks, 36 kernel ticks, 5 user ticks
->>>>>>> 40664cc7213e8025a9c0b9e5ca1e8982f44bb9da
+Interrupt 0x0d (#GP General Protection Exception) at rip=800421c774
+ cr2=0000000000000000 error=               0
+rax cccccccccccccc0c rbx 0000000000204400 rcx 0000000000000000 rdx 00000000cccccccb
+rsp 0000008004000f40 rbp 0000008004000f70 rsi 0000008004000068 rdi 00000080040000d0
+rip 000000800421c774 r8 0000008004000efc  r9 000000800421bbd6 r10 0000000000000000
+r11 0000000000000000 r12 0000000000000000 r13 0000000000000000 r14 0000000000000000
+r15 0000000000000000 rflags 00200296
+es: 0010 ds: 0010 cs: 0008 ss: 0010
+Kernel PANIC at ../../userprog/exception.c:98 in kill(): Kernel bug - unexpected interrupt in kernel
+Call stack: 0x800421875d 0x800421d9eb 0x80042096ed 0x8004209b0b 0x8004206778 0x80042068c5 0x800420617a.
+The `backtrace' program can make call stacks useful.
+Read "Backtraces" in the "Debugging Tools" chapter
+of the Pintos documentation for more information.
+Timer: 82 ticks
+Thread: 30 idle ticks, 46 kernel ticks, 6 user ticks
 hd0:0: 0 reads, 0 writes
 hd0:1: 79 reads, 228 writes
 hd1:0: 100 reads, 0 writes
-Console: 922 characters output
-Keyboard: 0 keys pressed
-Exception: 0 page faults
-Powering off...
+Console: 1767 characters output
+Key

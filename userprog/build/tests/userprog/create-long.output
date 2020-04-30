@@ -11,11 +11,7 @@ Booting from Hard Disk..Kernel command line: -q -f put create-long run create-lo
 Pintos booting with: 
 	base_mem: 0x0 ~ 0x9fc00 (Usable: 639 kB)
 	ext_mem: 0x100000 ~ 0xffe0000 (Usable: 260,992 kB)
-<<<<<<< HEAD
-Calibrating timer...  99,532,800 loops/s.
-=======
 Calibrating timer...  104,755,200 loops/s.
->>>>>>> 40664cc7213e8025a9c0b9e5ca1e8982f44bb9da
 hd0:0: detected 321 sector (160 kB) disk, model "QEMU HARDDISK", serial "QM00001"
 hd0:1: detected 20,160 sector (9 MB) disk, model "QEMU HARDDISK", serial "QM00002"
 hd1:0: detected 100 sector (50 kB) disk, model "QEMU HARDDISK", serial "QM00003"
@@ -28,13 +24,8 @@ Executing 'create-long':
 (create-long) end
 create-long: exit(0)
 Execution of 'create-long' complete.
-<<<<<<< HEAD
-Timer: 79 ticks
-Thread: 44 idle ticks, 31 kernel ticks, 4 user ticks
-=======
-Timer: 63 ticks
-Thread: 35 idle ticks, 25 kernel ticks, 3 user ticks
->>>>>>> 40664cc7213e8025a9c0b9e5ca1e8982f44bb9da
+Timer: 71 ticks
+Thread: 39 idle ticks, 29 kernel ticks, 4 user ticks
 hd0:0: 0 reads, 0 writes
 hd0:1: 79 reads, 228 writes
 hd1:0: 100 reads, 0 writes

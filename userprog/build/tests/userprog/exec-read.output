@@ -25,33 +25,25 @@ Executing 'exec-read':
 (exec-read) open "sample.txt"
 (exec-read) read "sample.txt" first 20 bytes
 (child-read) begin
-(child-read) open "sample.txt"
-(child-read) read "sample.txt" first 20 bytes
-(child-read) read "sample.txt" remainders
-(child-read) Child success
-fd : 3
-nextfd : 4
-fd : 4
-nextfd : 4
-(child-read) end
-child-read: exit(0)
+child-read: dying due to interrupt 0x0d (#GP General Protection Exception).
+Interrupt 0x0d (#GP General Protection Exception) at rip=40013f
+ cr2=0000000000000000 error=               0
+rax 000080004747ffe0 rbx 000080042baeb000 rcx 0000000000404143 rdx 0000000000000013
+rsp 000000004747ff78 rbp 000000004747ffa8 rsi 0000000000607700 rdi 0000000000000001
+rip 000000000040013f r8 0000000000000000  r9 0000000000000000 r10 0000000000000000
+r11 0000000000000202 r12 000080042bae5000 r13 0000000000000600 r14 000080042bae4000
+r15 000080042b906800 rflags 00000212
+es: 001b ds: 001b cs: 0023 ss: 001b
 (exec-read) Parent success
-fd : 3
-nextfd : 3
 (exec-read) end
 exec-read: exit(0)
 Execution of 'exec-read' complete.
-<<<<<<< HEAD
-Timer: 88 ticks
-Thread: 39 idle ticks, 38 kernel ticks, 11 user ticks
-=======
-Timer: 90 ticks
-Thread: 39 idle ticks, 39 kernel ticks, 13 user ticks
->>>>>>> 40664cc7213e8025a9c0b9e5ca1e8982f44bb9da
+Timer: 99 ticks
+Thread: 51 idle ticks, 34 kernel ticks, 15 user ticks
 hd0:0: 0 reads, 0 writes
-hd0:1: 212 reads, 494 writes
+hd0:1: 207 reads, 494 writes
 hd1:0: 223 reads, 0 writes
-Console: 1322 characters output
+Console: 1678 characters output
 Keyboard: 0 keys pressed
 Exception: 0 page faults
 Powering off...

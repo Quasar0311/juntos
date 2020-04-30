@@ -11,7 +11,7 @@ Booting from Hard Disk..Kernel command line: -q -f put lg-seq-block run lg-seq-b
 Pintos booting with: 
 	base_mem: 0x0 ~ 0x9fc00 (Usable: 639 kB)
 	ext_mem: 0x100000 ~ 0xffe0000 (Usable: 260,992 kB)
-Calibrating timer...  104,755,200 loops/s.
+Calibrating timer...  54,067,200 loops/s.
 hd0:0: detected 321 sector (160 kB) disk, model "QEMU HARDDISK", serial "QM00001"
 hd0:1: detected 20,160 sector (9 MB) disk, model "QEMU HARDDISK", serial "QM00002"
 hd1:0: detected 104 sector (52 kB) disk, model "QEMU HARDDISK", serial "QM00003"
@@ -34,21 +34,12 @@ nextfd : 4
 (lg-seq-block) end
 lg-seq-block: exit(0)
 Execution of 'lg-seq-block' complete.
-<<<<<<< HEAD
-Timer: 103 ticks
-Thread: 47 idle ticks, 34 kernel ticks, 22 user ticks
+Timer: 146 ticks
+Thread: 58 idle ticks, 46 kernel ticks, 42 user ticks
 hd0:0: 0 reads, 0 writes
 hd0:1: 552 reads, 691 writes
 hd1:0: 104 reads, 0 writes
-Console: 1147 characters output
-=======
-Timer: 100 ticks
-Thread: 45 idle ticks, 29 kernel ticks, 26 user ticks
-hd0:0: 0 reads, 0 writes
-hd0:1: 552 reads, 691 writes
-hd1:0: 104 reads, 0 writes
-Console: 1111 characters output
->>>>>>> 40664cc7213e8025a9c0b9e5ca1e8982f44bb9da
+Console: 1146 characters output
 Keyboard: 0 keys pressed
 Exception: 0 page faults
 Powering off...

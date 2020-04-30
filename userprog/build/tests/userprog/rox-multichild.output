@@ -5,8 +5,7 @@ iPXE (http://ipxe.org) 00:03.0 C980 PCI2.10 PnP PMM+0FF915A0+0FEF15A0 C980
 Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
 
 
-Booting from Hard Disk...
-Kernel command line: -q -f put rox-multichild put child-rox run rox-multichild
+Booting from Hard Disk..Kernel command line: -q -f put rox-multichild put child-rox run rox-multichild
 0 ~ 9fc00 1
 100000 ~ ffe0000 1
 Pintos booting with: 
@@ -28,63 +27,17 @@ Executing 'rox-multichild':
 (rox-multichild) exec "child-rox 5"
 (child-rox) begin
 (child-rox) try to write "child-rox"
-fd : 4
-nextfd : 4
 (child-rox) exec "child-rox 4"
-<<<<<<< HEAD
 child-rox: exit(-1)
-fd : 4
-nextfd : 4
 Kernel PANIC at ../../filesys/inode.c:304 in inode_allow_write(): assertion `inode->deny_write_cnt > 0' failed.
-Call stack: 0x800421875d 0x80042204ea 0x800421f341 0x800421f0ee 0x800421be96 0x800421c84c 0x80042075ac 0x800421e0ef 0x800421db2c 0x80042096ed 0x8004209b0b 0x800421c4b8 0x8004207dd2.
+Call stack: 0x800421875d 0x80042204b5 0x800421f30c 0x800421f0b9 0x800421be62 0x800421c817 0x80042075ac 0x800421e0ba 0x800421daf7 0x80042096ed 0x8004209b0b 0x800421c487 0x8004207dd2.
 The `backtrace' program can make call stacks useful.
 Read "Backtraces" in the "Debugging Tools" chapter
 of the Pintos documentation for more information.
-Timer: 81 ticks
-Thread: 39 idle ticks, 32 kernel ticks, 10 user ticks
-=======
-(child-rox) begin
-(child-rox) try to write "child-rox"
-(child-rox) exec "child-rox 3"
-(child-rox) begin
-(child-rox) try to write "child-rox"
-(child-rox) exec "child-rox 2"
-(child-rox) begin
-(child-rox) try to write "child-rox"
-(child-rox) exec "child-rox 1"
-(child-rox) begin
-(child-rox) try to write "child-rox"
-(child-rox) try to write "child-rox"
-(child-rox) end
-child-rox: exit(12)
-(child-rox) try to write "child-rox"
-(child-rox) end
-child-rox: exit(12)
-(child-rox) try to write "child-rox"
-(child-rox) end
-child-rox: exit(12)
-(child-rox) try to write "child-rox"
-(child-rox) end
-child-rox: exit(12)
-(child-rox) try to write "child-rox"
-(child-rox) end
-child-rox: exit(12)
-(rox-multichild) write "child-rox"
-(rox-multichild) end
-rox-multichild: exit(0)
-Execution of 'rox-multichild' complete.
-Timer: 116 ticks
-Thread: 49 idle ticks, 36 kernel ticks, 31 user ticks
->>>>>>> 40664cc7213e8025a9c0b9e5ca1e8982f44bb9da
+Timer: 84 ticks
+Thread: 41 idle ticks, 33 kernel ticks, 10 user ticks
 hd0:0: 0 reads, 0 writes
-hd0:1: 409 reads, 468 writes
+hd0:1: 169 reads, 467 writes
 hd1:0: 214 reads, 0 writes
-<<<<<<< HEAD
-Console: 1586 characters output
+Console: 1550 characters output
 Key
-=======
-Console: 1881 characters output
-Keyboard: 0 keys pressed
-Exception: 0 page faults
-Powering off...
->>>>>>> 40664cc7213e8025a9c0b9e5ca1e8982f44bb9da

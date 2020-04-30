@@ -11,7 +11,7 @@ Booting from Hard Disk..Kernel command line: -q -f put create-empty run create-e
 Pintos booting with: 
 	base_mem: 0x0 ~ 0x9fc00 (Usable: 639 kB)
 	ext_mem: 0x100000 ~ 0xffe0000 (Usable: 260,992 kB)
-Calibrating timer...  78,540,800 loops/s.
+Calibrating timer...  104,755,200 loops/s.
 hd0:0: detected 321 sector (160 kB) disk, model "QEMU HARDDISK", serial "QM00001"
 hd0:1: detected 20,160 sector (9 MB) disk, model "QEMU HARDDISK", serial "QM00002"
 hd1:0: detected 100 sector (50 kB) disk, model "QEMU HARDDISK", serial "QM00003"
@@ -22,17 +22,12 @@ Executing 'create-empty':
 (create-empty) begin
 create-empty: exit(-1)
 Execution of 'create-empty' complete.
-<<<<<<< HEAD
-Timer: 74 ticks
-Thread: 33 idle ticks, 38 kernel ticks, 3 user ticks
-=======
-Timer: 71 ticks
-Thread: 36 idle ticks, 32 kernel ticks, 3 user ticks
->>>>>>> 40664cc7213e8025a9c0b9e5ca1e8982f44bb9da
+Timer: 67 ticks
+Thread: 36 idle ticks, 28 kernel ticks, 3 user ticks
 hd0:0: 0 reads, 0 writes
 hd0:1: 79 reads, 228 writes
 hd1:0: 100 reads, 0 writes
-Console: 846 characters output
+Console: 847 characters output
 Keyboard: 0 keys pressed
 Exception: 0 page faults
 Powering off...
