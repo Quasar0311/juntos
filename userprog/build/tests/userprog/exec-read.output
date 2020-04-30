@@ -5,13 +5,14 @@ iPXE (http://ipxe.org) 00:03.0 C980 PCI2.10 PnP PMM+0FF915A0+0FEF15A0 C980
 Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
 
 
-Booting from Hard Disk..Kernel command line: -q -f put exec-read put sample.txt put child-read run exec-read
+Booting from Hard Disk...
+Kernel command line: -q -f put exec-read put sample.txt put child-read run exec-read
 0 ~ 9fc00 1
 100000 ~ ffe0000 1
 Pintos booting with: 
 	base_mem: 0x0 ~ 0x9fc00 (Usable: 639 kB)
 	ext_mem: 0x100000 ~ 0xffe0000 (Usable: 260,992 kB)
-Calibrating timer...  104,755,200 loops/s.
+Calibrating timer...  19,635,200 loops/s.
 hd0:0: detected 321 sector (160 kB) disk, model "QEMU HARDDISK", serial "QM00001"
 hd0:1: detected 20,160 sector (9 MB) disk, model "QEMU HARDDISK", serial "QM00002"
 hd1:0: detected 223 sector (111 kB) disk, model "QEMU HARDDISK", serial "QM00003"
@@ -21,26 +22,22 @@ Putting 'exec-read' into the file system...
 Putting 'sample.txt' into the file system...
 Putting 'child-read' into the file system...
 Executing 'exec-read':
-(exec-read) begin
-(exec-read) open "sample.txt"
-(exec-read) read "sample.txt" first 20 bytes
-(child-read) begin
-(child-read) open "sample.txt"
-(child-read) read "sample.txt" first 20 bytes
-(child-read) read "sample.txt" remainders
-(child-read) Child success
-(child-read) end
-child-read: exit(0)
-(exec-read) Parent success
-(exec-read) end
-exec-read: exit(0)
+exec-read: dying due to interrupt 0x0d (#GP General Protection Exception).
+Interrupt 0x0d (#GP General Protection Exception) at rip=400426
+ cr2=0000000000000000 error=               0
+rax 000080004747ffe0 rbx 0000000000001000 rcx 0000000000001000 rdx 000080004747ffe0
+rsp 000000004747ffa0 rbp 000000004747ffb0 rsi 000080004747ffe0 rdi 0000000000000001
+rip 0000000000400426 r8 000080042b9fb000  r9 000080042b800000 r10 000080042b800000
+r11 0000000000000000 r12 0000000000000000 r13 0000000000000000 r14 0000000000000000
+r15 0000000000000000 rflags 00000206
+es: 001b ds: 001b cs: 0023 ss: 001b
 Execution of 'exec-read' complete.
-Timer: 89 ticks
-Thread: 43 idle ticks, 36 kernel ticks, 10 user ticks
+Timer: 137 ticks
+Thread: 70 idle ticks, 51 kernel ticks, 16 user ticks
 hd0:0: 0 reads, 0 writes
-hd0:1: 212 reads, 494 writes
+hd0:1: 145 reads, 494 writes
 hd1:0: 223 reads, 0 writes
-Console: 1268 characters output
+Console: 1503 characters output
 Keyboard: 0 keys pressed
 Exception: 0 page faults
 Powering off...
