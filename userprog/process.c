@@ -79,11 +79,12 @@ process_close_file(int fd){
 	struct file_pointer *file_p;
 	f = process_get_file(fd);
 	//printf("hi : %d\n", fd);
-	if (f == NULL) return;
+	// if (f == NULL) return;
+	// if(fd>curr->next_fd) return;
 	// printf("fd : %d\n", fd);
 	// printf("nextfd : %d\n", curr -> next_fd);
 	// printf("fd_table size : %d\n", list_size(&thread_current() -> fd_table));
-	file_close(f);
+	// file_close(f);
 
 	/*** delete entry of corresponding file descriptor ***/
 	if(list_empty(&thread_current()->fd_table)) return;
@@ -281,9 +282,11 @@ __do_fork (void *aux) {
 		if (list_entry(e, struct file_pointer, file_elem) -> file == NULL) {
 			// fp -> file = NULL;
 			// list_push_back(&current -> fd_table, &fp -> file_elem);
+			printf("null file\n");
 			current -> next_fd--;
 		}
 		else {
+			printf("file duplicate\n");
 			new_file = file_duplicate(list_entry(e, struct file_pointer, file_elem) -> file);
 			fp -> file = new_file;
 			// if (new_file != NULL) {
