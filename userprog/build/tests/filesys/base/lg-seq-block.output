@@ -24,18 +24,22 @@ Executing 'lg-seq-block':
 (lg-seq-block) open "noodle"
 (lg-seq-block) writing "noodle"
 (lg-seq-block) close "noodle"
+fd : 3
+nextfd : 3
 (lg-seq-block) open "noodle" for verification
 (lg-seq-block) verified contents of "noodle"
 (lg-seq-block) close "noodle"
+fd : 4
+nextfd : 4
 (lg-seq-block) end
 lg-seq-block: exit(0)
 Execution of 'lg-seq-block' complete.
-Timer: 95 ticks
-Thread: 46 idle ticks, 28 kernel ticks, 21 user ticks
+Timer: 103 ticks
+Thread: 47 idle ticks, 34 kernel ticks, 22 user ticks
 hd0:0: 0 reads, 0 writes
 hd0:1: 552 reads, 691 writes
 hd1:0: 104 reads, 0 writes
-Console: 1110 characters output
+Console: 1147 characters output
 Keyboard: 0 keys pressed
 Exception: 0 page faults
 Powering off...

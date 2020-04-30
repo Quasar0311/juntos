@@ -24,18 +24,22 @@ Executing 'lg-seq-random':
 (lg-seq-random) open "nibble"
 (lg-seq-random) writing "nibble"
 (lg-seq-random) close "nibble"
+fd : 3
+nextfd : 3
 (lg-seq-random) open "nibble" for verification
 (lg-seq-random) verified contents of "nibble"
 (lg-seq-random) close "nibble"
+fd : 4
+nextfd : 4
 (lg-seq-random) end
 lg-seq-random: exit(0)
 Execution of 'lg-seq-random' complete.
-Timer: 93 ticks
-Thread: 44 idle ticks, 32 kernel ticks, 18 user ticks
+Timer: 101 ticks
+Thread: 44 idle ticks, 29 kernel ticks, 28 user ticks
 hd0:0: 0 reads, 0 writes
 hd0:1: 505 reads, 680 writes
 hd1:0: 104 reads, 0 writes
-Console: 1125 characters output
+Console: 1162 characters output
 Keyboard: 0 keys pressed
 Exception: 0 page faults
 Powering off...

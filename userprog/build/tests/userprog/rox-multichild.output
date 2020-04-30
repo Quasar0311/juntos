@@ -5,7 +5,8 @@ iPXE (http://ipxe.org) 00:03.0 C980 PCI2.10 PnP PMM+0FF915A0+0FEF15A0 C980
 Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
 
 
-Booting from Hard Disk..Kernel command line: -q -f put rox-multichild put child-rox run rox-multichild
+Booting from Hard Disk...
+Kernel command line: -q -f put rox-multichild put child-rox run rox-multichild
 0 ~ 9fc00 1
 100000 ~ ffe0000 1
 Pintos booting with: 
@@ -27,17 +28,21 @@ Executing 'rox-multichild':
 (rox-multichild) exec "child-rox 5"
 (child-rox) begin
 (child-rox) try to write "child-rox"
+fd : 4
+nextfd : 4
 (child-rox) exec "child-rox 4"
 child-rox: exit(-1)
+fd : 4
+nextfd : 4
 Kernel PANIC at ../../filesys/inode.c:304 in inode_allow_write(): assertion `inode->deny_write_cnt > 0' failed.
-Call stack: 0x800421875d 0x80042204a3 0x800421f2fa 0x800421f0a7 0x800421be4f 0x800421c805 0x80042075ac 0x800421e0a8 0x800421dae5 0x80042096ed 0x8004209b0b 0x800421c471 0x8004207dd2.
+Call stack: 0x800421875d 0x80042204ea 0x800421f341 0x800421f0ee 0x800421be96 0x800421c84c 0x80042075ac 0x800421e0ef 0x800421db2c 0x80042096ed 0x8004209b0b 0x800421c4b8 0x8004207dd2.
 The `backtrace' program can make call stacks useful.
 Read "Backtraces" in the "Debugging Tools" chapter
 of the Pintos documentation for more information.
-Timer: 90 ticks
-Thread: 41 idle ticks, 40 kernel ticks, 9 user ticks
+Timer: 81 ticks
+Thread: 39 idle ticks, 32 kernel ticks, 10 user ticks
 hd0:0: 0 reads, 0 writes
 hd0:1: 169 reads, 467 writes
 hd1:0: 214 reads, 0 writes
-Console: 1549 characters output
+Console: 1586 characters output
 Key

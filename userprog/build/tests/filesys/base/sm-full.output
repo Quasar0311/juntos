@@ -24,18 +24,22 @@ Executing 'sm-full':
 (sm-full) open "quux"
 (sm-full) writing "quux"
 (sm-full) close "quux"
+fd : 3
+nextfd : 3
 (sm-full) open "quux" for verification
 (sm-full) verified contents of "quux"
 (sm-full) close "quux"
+fd : 4
+nextfd : 4
 (sm-full) end
 sm-full: exit(0)
 Execution of 'sm-full' complete.
-Timer: 70 ticks
-Thread: 35 idle ticks, 30 kernel ticks, 6 user ticks
+Timer: 75 ticks
+Thread: 35 idle ticks, 33 kernel ticks, 8 user ticks
 hd0:0: 0 reads, 0 writes
 hd0:1: 123 reads, 272 writes
 hd1:0: 104 reads, 0 writes
-Console: 1020 characters output
+Console: 1056 characters output
 Keyboard: 0 keys pressed
 Exception: 0 page faults
 Powering off...

@@ -24,13 +24,15 @@ Executing 'write-boundary':
 (write-boundary) open "sample.txt"
 (write-boundary) end
 write-boundary: exit(0)
+fd : 3
+nextfd : 3
 Execution of 'write-boundary' complete.
-Timer: 69 ticks
-Thread: 30 idle ticks, 36 kernel ticks, 4 user ticks
+Timer: 71 ticks
+Thread: 30 idle ticks, 37 kernel ticks, 4 user ticks
 hd0:0: 0 reads, 0 writes
 hd0:1: 119 reads, 251 writes
 hd1:0: 106 reads, 0 writes
-Console: 977 characters output
+Console: 995 characters output
 Keyboard: 0 keys pressed
 Exception: 0 page faults
 Powering off...

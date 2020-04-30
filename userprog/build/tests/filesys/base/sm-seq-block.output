@@ -24,18 +24,22 @@ Executing 'sm-seq-block':
 (sm-seq-block) open "noodle"
 (sm-seq-block) writing "noodle"
 (sm-seq-block) close "noodle"
+fd : 3
+nextfd : 3
 (sm-seq-block) open "noodle" for verification
 (sm-seq-block) verified contents of "noodle"
 (sm-seq-block) close "noodle"
+fd : 4
+nextfd : 4
 (sm-seq-block) end
 sm-seq-block: exit(0)
 Execution of 'sm-seq-block' complete.
-Timer: 74 ticks
-Thread: 39 idle ticks, 27 kernel ticks, 8 user ticks
+Timer: 78 ticks
+Thread: 37 idle ticks, 33 kernel ticks, 9 user ticks
 hd0:0: 0 reads, 0 writes
 hd0:1: 144 reads, 283 writes
 hd1:0: 104 reads, 0 writes
-Console: 1109 characters output
+Console: 1145 characters output
 Keyboard: 0 keys pressed
 Exception: 0 page faults
 Powering off...

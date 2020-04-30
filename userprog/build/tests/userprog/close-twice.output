@@ -23,16 +23,18 @@ Executing 'close-twice':
 (close-twice) begin
 (close-twice) open "sample.txt"
 (close-twice) close "sample.txt"
+fd : 3
+nextfd : 3
 (close-twice) close "sample.txt" again
 (close-twice) end
 close-twice: exit(0)
 Execution of 'close-twice' complete.
-Timer: 67 ticks
-Thread: 30 idle ticks, 34 kernel ticks, 4 user ticks
+Timer: 71 ticks
+Thread: 39 idle ticks, 30 kernel ticks, 2 user ticks
 hd0:0: 0 reads, 0 writes
 hd0:1: 110 reads, 242 writes
 hd1:0: 102 reads, 0 writes
-Console: 1022 characters output
+Console: 1040 characters output
 Keyboard: 0 keys pressed
 Exception: 0 page faults
 Powering off...

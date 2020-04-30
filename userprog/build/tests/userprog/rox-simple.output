@@ -25,13 +25,15 @@ Executing 'rox-simple':
 (rox-simple) try to write "rox-simple"
 (rox-simple) end
 rox-simple: exit(0)
+fd : 3
+nextfd : 3
 Execution of 'rox-simple' complete.
-Timer: 65 ticks
-Thread: 33 idle ticks, 28 kernel ticks, 4 user ticks
+Timer: 73 ticks
+Thread: 40 idle ticks, 29 kernel ticks, 4 user ticks
 hd0:0: 0 reads, 0 writes
 hd0:1: 83 reads, 230 writes
 hd1:0: 101 reads, 0 writes
-Console: 950 characters output
+Console: 968 characters output
 Keyboard: 0 keys pressed
 Exception: 0 page faults
 Powering off...

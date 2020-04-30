@@ -24,15 +24,17 @@ Executing 'sm-create':
 (sm-create) open "blargle" for verification
 (sm-create) verified contents of "blargle"
 (sm-create) close "blargle"
+fd : 3
+nextfd : 3
 (sm-create) end
 sm-create: exit(0)
 Execution of 'sm-create' complete.
-Timer: 72 ticks
-Thread: 35 idle ticks, 33 kernel ticks, 4 user ticks
+Timer: 73 ticks
+Thread: 34 idle ticks, 33 kernel ticks, 6 user ticks
 hd0:0: 0 reads, 0 writes
 hd0:1: 118 reads, 260 writes
 hd1:0: 104 reads, 0 writes
-Console: 986 characters output
+Console: 1004 characters output
 Keyboard: 0 keys pressed
 Exception: 0 page faults
 Powering off...

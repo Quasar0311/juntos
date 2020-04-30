@@ -24,13 +24,15 @@ Executing 'open-boundary':
 (open-boundary) open "sample.txt"
 (open-boundary) end
 open-boundary: exit(0)
+fd : 3
+nextfd : 3
 Execution of 'open-boundary' complete.
-Timer: 75 ticks
-Thread: 37 idle ticks, 34 kernel ticks, 4 user ticks
+Timer: 81 ticks
+Thread: 37 idle ticks, 37 kernel ticks, 7 user ticks
 hd0:0: 0 reads, 0 writes
 hd0:1: 110 reads, 248 writes
 hd1:0: 105 reads, 0 writes
-Console: 968 characters output
+Console: 986 characters output
 Keyboard: 0 keys pressed
 Exception: 0 page faults
 Powering off...

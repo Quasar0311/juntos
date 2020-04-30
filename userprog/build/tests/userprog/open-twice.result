@@ -1,1 +1,23 @@
-PASS
+FAIL
+Test output failed to match any acceptable form.
+
+Acceptable output:
+  (open-twice) begin
+  (open-twice) open "sample.txt" once
+  (open-twice) open "sample.txt" again
+  (open-twice) end
+  open-twice: exit(0)
+Differences in `diff -u' format:
+  (open-twice) begin
+  (open-twice) open "sample.txt" once
+  (open-twice) open "sample.txt" again
+  (open-twice) end
+  open-twice: exit(0)
++ fd : 6
++ nextfd : 6
++ fd : 5
++ nextfd : 5
++ fd : 4
++ nextfd : 4
++ fd : 3
++ nextfd : 3
