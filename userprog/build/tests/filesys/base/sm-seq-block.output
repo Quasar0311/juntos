@@ -34,12 +34,21 @@ nextfd : 4
 (sm-seq-block) end
 sm-seq-block: exit(0)
 Execution of 'sm-seq-block' complete.
+<<<<<<< HEAD
 Timer: 78 ticks
 Thread: 37 idle ticks, 33 kernel ticks, 9 user ticks
 hd0:0: 0 reads, 0 writes
 hd0:1: 144 reads, 283 writes
 hd1:0: 104 reads, 0 writes
 Console: 1145 characters output
+=======
+Timer: 76 ticks
+Thread: 32 idle ticks, 33 kernel ticks, 11 user ticks
+hd0:0: 0 reads, 0 writes
+hd0:1: 144 reads, 283 writes
+hd1:0: 104 reads, 0 writes
+Console: 1110 characters output
+>>>>>>> 40664cc7213e8025a9c0b9e5ca1e8982f44bb9da
 Keyboard: 0 keys pressed
 Exception: 0 page faults
 Powering off...

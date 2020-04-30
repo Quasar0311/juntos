@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 FAIL
 Kernel panic in run: PANIC at ../../filesys/inode.c:304 in inode_allow_write(): assertion `inode->deny_write_cnt > 0' failed.
 Call stack: 0x800421875d 0x80042204ea 0x800421f341 0x800421f0ee 0x800421be96 0x800421c84c 0x80042075ac 0x800421e0ef 0x800421db2c 0x80042096ed 0x8004209b0b 0x800421c4b8 0x8004207dd2
@@ -15,3 +16,6 @@ Translation of call stack:
 0x0000008004209b0b: intr_entry (threads/intr-stubs.o:?)
 0x000000800421c4b8: __do_fork (userprog/process.c:280)
 0x0000008004207dd2: kernel_thread (threads/thread.c:663)
+=======
+PASS
+>>>>>>> 40664cc7213e8025a9c0b9e5ca1e8982f44bb9da

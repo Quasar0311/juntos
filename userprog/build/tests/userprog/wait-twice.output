@@ -29,7 +29,11 @@ child-simple: exit(81)
 wait-twice: exit(0)
 Execution of 'wait-twice' complete.
 Timer: 82 ticks
+<<<<<<< HEAD
 Thread: 40 idle ticks, 34 kernel ticks, 8 user ticks
+=======
+Thread: 38 idle ticks, 35 kernel ticks, 9 user ticks
+>>>>>>> 40664cc7213e8025a9c0b9e5ca1e8982f44bb9da
 hd0:0: 0 reads, 0 writes
 hd0:1: 157 reads, 434 writes
 hd1:0: 198 reads, 0 writes

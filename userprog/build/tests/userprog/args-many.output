@@ -2,7 +2,8 @@
 
 
 iPXE (http://ipxe.org) 00:03.0 C980 PCI2.10 PnP PMM+0FF915A0+0FEF15A0 C980
-Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
+Press Ctrl-B to configure iPXE (PCI 00:03.0)...
+                                                                               
 
 
 Booting from Hard Disk..Kernel command line: -q -f put args-many run 'args-many a b c d e f g h i j k l m n o p q r s t u v'
@@ -49,7 +50,11 @@ Executing 'args-many a b c d e f g h i j k l m n o p q r s t u v':
 args-many: exit(0)
 Execution of 'args-many a b c d e f g h i j k l m n o p q r s t u v' complete.
 Timer: 72 ticks
+<<<<<<< HEAD
 Thread: 31 idle ticks, 33 kernel ticks, 8 user ticks
+=======
+Thread: 34 idle ticks, 30 kernel ticks, 8 user ticks
+>>>>>>> 40664cc7213e8025a9c0b9e5ca1e8982f44bb9da
 hd0:0: 0 reads, 0 writes
 hd0:1: 79 reads, 226 writes
 hd1:0: 99 reads, 0 writes

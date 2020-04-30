@@ -34,8 +34,13 @@ nextfd : 4
 (sm-full) end
 sm-full: exit(0)
 Execution of 'sm-full' complete.
+<<<<<<< HEAD
 Timer: 75 ticks
 Thread: 35 idle ticks, 33 kernel ticks, 8 user ticks
+=======
+Timer: 70 ticks
+Thread: 38 idle ticks, 27 kernel ticks, 5 user ticks
+>>>>>>> 40664cc7213e8025a9c0b9e5ca1e8982f44bb9da
 hd0:0: 0 reads, 0 writes
 hd0:1: 123 reads, 272 writes
 hd1:0: 104 reads, 0 writes

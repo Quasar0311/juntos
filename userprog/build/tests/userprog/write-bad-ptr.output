@@ -30,8 +30,13 @@ r11 0000000000000000 r12 0000000000000000 r13 0000000000000000 r14 0000000000000
 r15 0000000000000000 rflags 00000206
 es: 001b ds: 001b cs: 0023 ss: 001b
 Execution of 'write-bad-ptr' complete.
+<<<<<<< HEAD
 Timer: 70 ticks
 Thread: 36 idle ticks, 30 kernel ticks, 4 user ticks
+=======
+Timer: 67 ticks
+Thread: 31 idle ticks, 33 kernel ticks, 3 user ticks
+>>>>>>> 40664cc7213e8025a9c0b9e5ca1e8982f44bb9da
 hd0:0: 0 reads, 0 writes
 hd0:1: 106 reads, 242 writes
 hd1:0: 102 reads, 0 writes

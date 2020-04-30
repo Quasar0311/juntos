@@ -35,11 +35,19 @@ nextfd : 4
 lg-seq-random: exit(0)
 Execution of 'lg-seq-random' complete.
 Timer: 101 ticks
+<<<<<<< HEAD
 Thread: 44 idle ticks, 29 kernel ticks, 28 user ticks
 hd0:0: 0 reads, 0 writes
 hd0:1: 505 reads, 680 writes
 hd1:0: 104 reads, 0 writes
 Console: 1162 characters output
+=======
+Thread: 43 idle ticks, 30 kernel ticks, 28 user ticks
+hd0:0: 0 reads, 0 writes
+hd0:1: 505 reads, 680 writes
+hd1:0: 104 reads, 0 writes
+Console: 1126 characters output
+>>>>>>> 40664cc7213e8025a9c0b9e5ca1e8982f44bb9da
 Keyboard: 0 keys pressed
 Exception: 0 page faults
 Powering off...

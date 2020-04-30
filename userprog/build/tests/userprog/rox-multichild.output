@@ -31,6 +31,7 @@ Executing 'rox-multichild':
 fd : 4
 nextfd : 4
 (child-rox) exec "child-rox 4"
+<<<<<<< HEAD
 child-rox: exit(-1)
 fd : 4
 nextfd : 4
@@ -41,8 +42,49 @@ Read "Backtraces" in the "Debugging Tools" chapter
 of the Pintos documentation for more information.
 Timer: 81 ticks
 Thread: 39 idle ticks, 32 kernel ticks, 10 user ticks
+=======
+(child-rox) begin
+(child-rox) try to write "child-rox"
+(child-rox) exec "child-rox 3"
+(child-rox) begin
+(child-rox) try to write "child-rox"
+(child-rox) exec "child-rox 2"
+(child-rox) begin
+(child-rox) try to write "child-rox"
+(child-rox) exec "child-rox 1"
+(child-rox) begin
+(child-rox) try to write "child-rox"
+(child-rox) try to write "child-rox"
+(child-rox) end
+child-rox: exit(12)
+(child-rox) try to write "child-rox"
+(child-rox) end
+child-rox: exit(12)
+(child-rox) try to write "child-rox"
+(child-rox) end
+child-rox: exit(12)
+(child-rox) try to write "child-rox"
+(child-rox) end
+child-rox: exit(12)
+(child-rox) try to write "child-rox"
+(child-rox) end
+child-rox: exit(12)
+(rox-multichild) write "child-rox"
+(rox-multichild) end
+rox-multichild: exit(0)
+Execution of 'rox-multichild' complete.
+Timer: 116 ticks
+Thread: 49 idle ticks, 36 kernel ticks, 31 user ticks
+>>>>>>> 40664cc7213e8025a9c0b9e5ca1e8982f44bb9da
 hd0:0: 0 reads, 0 writes
-hd0:1: 169 reads, 467 writes
+hd0:1: 409 reads, 468 writes
 hd1:0: 214 reads, 0 writes
+<<<<<<< HEAD
 Console: 1586 characters output
 Key
+=======
+Console: 1881 characters output
+Keyboard: 0 keys pressed
+Exception: 0 page faults
+Powering off...
+>>>>>>> 40664cc7213e8025a9c0b9e5ca1e8982f44bb9da

@@ -36,8 +36,13 @@ multi-child-fd: exit(0)
 fd : 3
 nextfd : 3
 Execution of 'multi-child-fd' complete.
+<<<<<<< HEAD
 Timer: 82 ticks
 Thread: 40 idle ticks, 36 kernel ticks, 6 user ticks
+=======
+Timer: 91 ticks
+Thread: 40 idle ticks, 42 kernel ticks, 9 user ticks
+>>>>>>> 40664cc7213e8025a9c0b9e5ca1e8982f44bb9da
 hd0:0: 0 reads, 0 writes
 hd0:1: 201 reads, 478 writes
 hd1:0: 215 reads, 0 writes

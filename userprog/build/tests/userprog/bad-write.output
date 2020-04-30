@@ -22,8 +22,13 @@ Executing 'bad-write':
 (bad-write) begin
 bad-write: exit(-1)
 Execution of 'bad-write' complete.
+<<<<<<< HEAD
 Timer: 68 ticks
 Thread: 34 idle ticks, 31 kernel ticks, 3 user ticks
+=======
+Timer: 69 ticks
+Thread: 31 idle ticks, 36 kernel ticks, 2 user ticks
+>>>>>>> 40664cc7213e8025a9c0b9e5ca1e8982f44bb9da
 hd0:0: 0 reads, 0 writes
 hd0:1: 79 reads, 228 writes
 hd1:0: 100 reads, 0 writes

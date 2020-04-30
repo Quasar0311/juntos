@@ -23,8 +23,13 @@ Executing 'open-empty':
 (open-empty) end
 open-empty: exit(0)
 Execution of 'open-empty' complete.
+<<<<<<< HEAD
 Timer: 63 ticks
 Thread: 30 idle ticks, 30 kernel ticks, 3 user ticks
+=======
+Timer: 66 ticks
+Thread: 33 idle ticks, 30 kernel ticks, 3 user ticks
+>>>>>>> 40664cc7213e8025a9c0b9e5ca1e8982f44bb9da
 hd0:0: 0 reads, 0 writes
 hd0:1: 96 reads, 228 writes
 hd1:0: 100 reads, 0 writes

@@ -34,12 +34,21 @@ nextfd : 4
 (lg-seq-block) end
 lg-seq-block: exit(0)
 Execution of 'lg-seq-block' complete.
+<<<<<<< HEAD
 Timer: 103 ticks
 Thread: 47 idle ticks, 34 kernel ticks, 22 user ticks
 hd0:0: 0 reads, 0 writes
 hd0:1: 552 reads, 691 writes
 hd1:0: 104 reads, 0 writes
 Console: 1147 characters output
+=======
+Timer: 100 ticks
+Thread: 45 idle ticks, 29 kernel ticks, 26 user ticks
+hd0:0: 0 reads, 0 writes
+hd0:1: 552 reads, 691 writes
+hd1:0: 104 reads, 0 writes
+Console: 1111 characters output
+>>>>>>> 40664cc7213e8025a9c0b9e5ca1e8982f44bb9da
 Keyboard: 0 keys pressed
 Exception: 0 page faults
 Powering off...

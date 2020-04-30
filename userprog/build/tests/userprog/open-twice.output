@@ -34,8 +34,13 @@ nextfd : 4
 fd : 3
 nextfd : 3
 Execution of 'open-twice' complete.
+<<<<<<< HEAD
 Timer: 70 ticks
 Thread: 30 idle ticks, 35 kernel ticks, 5 user ticks
+=======
+Timer: 76 ticks
+Thread: 38 idle ticks, 36 kernel ticks, 3 user ticks
+>>>>>>> 40664cc7213e8025a9c0b9e5ca1e8982f44bb9da
 hd0:0: 0 reads, 0 writes
 hd0:1: 119 reads, 244 writes
 hd1:0: 103 reads, 0 writes

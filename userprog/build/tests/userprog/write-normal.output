@@ -28,8 +28,13 @@ write-normal: exit(0)
 fd : 3
 nextfd : 3
 Execution of 'write-normal' complete.
+<<<<<<< HEAD
 Timer: 71 ticks
 Thread: 30 idle ticks, 35 kernel ticks, 6 user ticks
+=======
+Timer: 74 ticks
+Thread: 36 idle ticks, 31 kernel ticks, 7 user ticks
+>>>>>>> 40664cc7213e8025a9c0b9e5ca1e8982f44bb9da
 hd0:0: 0 reads, 0 writes
 hd0:1: 142 reads, 260 writes
 hd1:0: 104 reads, 0 writes

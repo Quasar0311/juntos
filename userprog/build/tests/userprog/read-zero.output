@@ -27,8 +27,13 @@ read-zero: exit(0)
 fd : 3
 nextfd : 3
 Execution of 'read-zero' complete.
+<<<<<<< HEAD
 Timer: 69 ticks
 Thread: 34 idle ticks, 31 kernel ticks, 4 user ticks
+=======
+Timer: 70 ticks
+Thread: 34 idle ticks, 33 kernel ticks, 3 user ticks
+>>>>>>> 40664cc7213e8025a9c0b9e5ca1e8982f44bb9da
 hd0:0: 0 reads, 0 writes
 hd0:1: 110 reads, 244 writes
 hd1:0: 103 reads, 0 writes

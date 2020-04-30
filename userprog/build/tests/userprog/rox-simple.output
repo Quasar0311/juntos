@@ -28,8 +28,13 @@ rox-simple: exit(0)
 fd : 3
 nextfd : 3
 Execution of 'rox-simple' complete.
+<<<<<<< HEAD
 Timer: 73 ticks
 Thread: 40 idle ticks, 29 kernel ticks, 4 user ticks
+=======
+Timer: 71 ticks
+Thread: 34 idle ticks, 33 kernel ticks, 4 user ticks
+>>>>>>> 40664cc7213e8025a9c0b9e5ca1e8982f44bb9da
 hd0:0: 0 reads, 0 writes
 hd0:1: 83 reads, 230 writes
 hd1:0: 101 reads, 0 writes

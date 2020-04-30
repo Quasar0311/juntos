@@ -42,8 +42,13 @@ rox-child: exit(0)
 fd : 3
 nextfd : 3
 Execution of 'rox-child' complete.
+<<<<<<< HEAD
 Timer: 84 ticks
 Thread: 39 idle ticks, 35 kernel ticks, 10 user ticks
+=======
+Timer: 87 ticks
+Thread: 33 idle ticks, 44 kernel ticks, 10 user ticks
+>>>>>>> 40664cc7213e8025a9c0b9e5ca1e8982f44bb9da
 hd0:0: 0 reads, 0 writes
 hd0:1: 173 reads, 468 writes
 hd1:0: 214 reads, 0 writes

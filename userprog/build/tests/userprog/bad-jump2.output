@@ -23,7 +23,11 @@ Executing 'bad-jump2':
 bad-jump2: exit(-1)
 Execution of 'bad-jump2' complete.
 Timer: 66 ticks
+<<<<<<< HEAD
 Thread: 34 idle ticks, 30 kernel ticks, 3 user ticks
+=======
+Thread: 31 idle ticks, 33 kernel ticks, 2 user ticks
+>>>>>>> 40664cc7213e8025a9c0b9e5ca1e8982f44bb9da
 hd0:0: 0 reads, 0 writes
 hd0:1: 79 reads, 228 writes
 hd1:0: 100 reads, 0 writes
