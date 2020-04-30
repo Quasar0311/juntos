@@ -1,0 +1,17 @@
+FAIL
+Test output failed to match any acceptable form.
+
+Acceptable output:
+  (exit) begin
+  exit: exit(57)
+Differences in `diff -u' format:
++ size : 2
++ waiting : 3
++ waiting2 : 3
++ no, : 2 
++ waiting3 : 3
++ sema-down : 3
+  (exit) begin
+  exit: exit(57)
++ sema-up : 3
++ removed
