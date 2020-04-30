@@ -1,9 +1,0 @@
-Failed to import the site module
-Traceback (most recent call last):
-  File "/usr/lib/python3.5/site.py", line 580, in <module>
-    main()
-  File "/usr/lib/python3.5/site.py", line 561, in main
-    abs_paths()
-  File "/usr/lib/python3.5/site.py", line 107, in abs_paths
-    if (getattr(getattr(m, '__loader__', None), '__module__', None) not in
-KeyboardInterrupt

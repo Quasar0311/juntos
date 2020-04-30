@@ -286,6 +286,7 @@ thread_create (const char *name, int priority,
 	t->process_terminate=false;
 	sema_init(&t->exit_sema, 0);
 	sema_init(&t->load_sema, 0);
+	sema_init(&t -> child_sema, 0);
 
 	/*** add to child_list ***/
 	list_push_back(&curr->child_list, &t->child_elem);
@@ -394,7 +395,10 @@ thread_exit (void) {
 	// 	parent = thread_current() -> parent;
 	// }
 	// printf("sema-up : %d\n", curr -> tid);
+	curr -> process_terminate = true;
 	sema_up(&curr -> exit_sema);
+	// sema_up(&curr -> child_sema);
+	sema_down(&curr -> child_sema);
 	
 	process_exit ();
 #endif

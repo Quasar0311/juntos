@@ -299,10 +299,9 @@ __do_fork (void *aux) {
 	
 
 	current->process_load=true;	
-
+	// list_push_back(&parent -> child_list, &current -> child_elem);
 	/*** if memory load finish, resume parent process ***/
 	sema_up(&thread_current()->parent->load_sema);
-	
 	process_init ();
 	
 	/* Finally, switch to the newly created process. */
@@ -395,15 +394,18 @@ process_wait (tid_t child_tid) {
 	}
 	//printf("list size : %d\n", list_size(child_list));
 	// printf("waiting2 : %d\n", child_tid);
-	
-	for (e = list_begin(child_list); e != list_end(child_list); e = list_next(e)) {
+	// printf("list size : %p\n", (&thread_current() -> child_list));
+	for (e = list_begin(&thread_current() -> child_list); e != list_end(&thread_current() -> child_list); e = list_next(e)) {
+		
 		child = list_entry(e, struct thread, child_elem);
+		// printf("child tid : %d\n", child -> tid);
 		if (child -> tid == child_tid) {
 			break;
-		}
-		else {
-			// printf("no, : %d \n", child -> tid);
-		}
+		}	
+		
+		// else {
+		// 	// printf("no, : %d \n", child -> tid);
+		// }
 	}
 
 	// printf("waiting3 : %d\n", child_tid);
@@ -420,6 +422,8 @@ process_wait (tid_t child_tid) {
 		child = list_entry(e, struct thread, child_elem);
 		if (child -> tid == child_tid && child -> exit_status != -1) {
 			list_remove(e);
+			sema_up(&child -> child_sema);
+
 			// printf("removed\n");
 			return child -> exit_status;
 		}
@@ -428,7 +432,7 @@ process_wait (tid_t child_tid) {
 		}
 	}
 
-	return child -> exit_status;
+	return -1;
 }
 
 /* Exit the process. This function is called by thread_exit (). */
@@ -436,6 +440,8 @@ void
 process_exit (void) {
 	struct thread *curr = thread_current ();
 	int i;
+	struct file_pointer *fp;
+	struct list_elem *e;
 
 	/* TODO: Your code goes here.
 	 * TODO: Implement process termination message (see
@@ -451,9 +457,15 @@ process_exit (void) {
 		curr -> next_fd--;
 		//printf("fd : %d\n", curr -> next_fd);
 	}
-
+	// for (e = list_begin(&curr -> fd_table); e != list_end(&curr -> fd_table);
+	// e = list_next(e)) {
+	// 	fp = list_entry(e, struct file_pointer, file_elem);
+	// 	palloc_free_page((void *) fp);
+	// 	printf("free\n");
+	// }
+	//palloc_free_page((void *) &curr -> fd_table);
 	/*** release file descriptor ***/
-	// process_cleanup ();
+	process_cleanup ();
 }
 
 /* Free the current process's resources. */

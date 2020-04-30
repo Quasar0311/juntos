@@ -128,6 +128,7 @@ struct thread {
 	bool process_terminate;
 	/*** exit semaphore ***/
 	struct semaphore exit_sema;
+	struct semaphore child_sema;
 	/*** load semaphore ***/
 	struct semaphore load_sema;
 	int exit_status;
