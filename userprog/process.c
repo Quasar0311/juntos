@@ -80,6 +80,7 @@ process_close_file(int fd){
 	f = process_get_file(fd);
 	//printf("hi : %d\n", fd);
 	if (f == NULL) return;
+	if(fd>curr->next_fd) return;
 	printf("fd : %d\n", fd);
 	printf("nextfd : %d\n", curr -> next_fd);
 	file_close(f);
@@ -94,12 +95,8 @@ process_close_file(int fd){
 	// printf("fd : %d, next_fd : %d\n", fd, curr -> next_fd);
 	file_p = list_entry(fp, struct file_pointer, file_elem);
 	file_p -> file = NULL;
-	//list_remove(fp);
-	//palloc_free_page(list_entry(fp, struct file_pointer, file_elem));
-	
-	/*** decrease file descriptor for current thread ***/
-	
-
+	// list_remove(fp);
+	// palloc_free_page(list_entry(fp, struct file_pointer, file_elem));
 }
 
 struct thread *
@@ -288,9 +285,6 @@ __do_fork (void *aux) {
 		
 	}
 	
-
-	current->process_load=true;	
-
 	/*** if memory load finish, resume parent process ***/
 	sema_up(&thread_current()->parent->load_sema);
 	
@@ -345,6 +339,7 @@ process_exec (void *f_name) { //start_process
 		// thread_current()->process_load=false;
 		// thread_exit();
 		//syscall_exit(-1);
+		// printf("syscall_exit(-1)\n");
 		return -1;
 	}
 
@@ -666,7 +661,6 @@ load (const char *file_name, struct intr_frame *if_) {
 	/* TODO: Your code goes here.
 	 * TODO: Implement argument passing (see project2/argument_passing.html). */
 	
-
 	for (token = strtok_r(file_copy_argc, " ", &save_ptr); token != NULL;
 			token = strtok_r(NULL, " ", &save_ptr)) {
 			argc++;

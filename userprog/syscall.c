@@ -211,6 +211,7 @@ int
 syscall_exec (const char *cmd_line) {
 	//printf("%s\n", cmd_line);
 	if(process_exec((void *) cmd_line)==-1){
+		// printf("syscall_exit(-1)\n");
 		syscall_exit(-1);
 		return -1;
 	};
