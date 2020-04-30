@@ -5,7 +5,7 @@ iPXE (http://ipxe.org) 00:03.0 C980 PCI2.10 PnP PMM+0FF915A0+0FEF15A0 C980
 Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
 
 
-Booting from Hard Disk..Kernel command line: -q -f put bad-write run bad-write
+Booting from Hard Disk..Kernel command line: -q -f put create-normal run create-normal
 0 ~ 9fc00 1
 100000 ~ ffe0000 1
 Pintos booting with: 
@@ -17,17 +17,19 @@ hd0:1: detected 20,160 sector (9 MB) disk, model "QEMU HARDDISK", serial "QM0000
 hd1:0: detected 100 sector (50 kB) disk, model "QEMU HARDDISK", serial "QM00003"
 Formatting file system...done.
 Boot complete.
-Putting 'bad-write' into the file system...
-Executing 'bad-write':
-(bad-write) begin
-bad-write: exit(-1)
-Execution of 'bad-write' complete.
-Timer: 72 ticks
-Thread: 35 idle ticks, 35 kernel ticks, 2 user ticks
+Putting 'create-normal' into the file system...
+Executing 'create-normal':
+(create-normal) begin
+(create-normal) create quux.dat
+(create-normal) end
+create-normal: exit(0)
+Execution of 'create-normal' complete.
+Timer: 73 ticks
+Thread: 41 idle ticks, 29 kernel ticks, 3 user ticks
 hd0:0: 0 reads, 0 writes
-hd0:1: 79 reads, 228 writes
+hd0:1: 101 reads, 240 writes
 hd1:0: 100 reads, 0 writes
-Console: 826 characters output
+Console: 906 characters output
 Keyboard: 0 keys pressed
-Exception: 1 page faults
+Exception: 0 page faults
 Powering off...
