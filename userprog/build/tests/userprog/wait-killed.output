@@ -5,13 +5,14 @@ iPXE (http://ipxe.org) 00:03.0 C980 PCI2.10 PnP PMM+0FF915A0+0FEF15A0 C980
 Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
 
 
-Booting from Hard Disk..Kernel command line: -q -f put wait-killed put child-bad run wait-killed
+Booting from Hard Disk...
+Kernel command line: -q -f put wait-killed put child-bad run wait-killed
 0 ~ 9fc00 1
 100000 ~ ffe0000 1
 Pintos booting with: 
 	base_mem: 0x0 ~ 0x9fc00 (Usable: 639 kB)
 	ext_mem: 0x100000 ~ 0xffe0000 (Usable: 260,992 kB)
-Calibrating timer...  104,755,200 loops/s.
+Calibrating timer...  19,635,200 loops/s.
 hd0:0: detected 321 sector (160 kB) disk, model "QEMU HARDDISK", serial "QM00001"
 hd0:1: detected 20,160 sector (9 MB) disk, model "QEMU HARDDISK", serial "QM00002"
 hd1:0: detected 200 sector (100 kB) disk, model "QEMU HARDDISK", serial "QM00003"
@@ -28,12 +29,17 @@ child-bad: exit(-1)
 (wait-killed) end
 wait-killed: exit(0)
 Execution of 'wait-killed' complete.
+<<<<<<< HEAD
 Timer: 85 ticks
 Thread: 39 idle ticks, 39 kernel ticks, 8 user ticks
+=======
+Timer: 120 ticks
+Thread: 30 idle ticks, 65 kernel ticks, 26 user ticks
+>>>>>>> 68ef26943f091678fb780e5f34098aa9aef23eb5
 hd0:0: 0 reads, 0 writes
 hd0:1: 169 reads, 438 writes
 hd1:0: 200 reads, 0 writes
-Console: 1013 characters output
+Console: 1014 characters output
 Keyboard: 0 keys pressed
 Exception: 0 page faults
 Powering off...

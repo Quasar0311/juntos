@@ -387,7 +387,7 @@ process_wait (tid_t child_tid) {
 	struct list child_list2 = thread_current() -> child_list;
 
 	// printf("size : %d\n", list_size(&child_list2));
-	// printf("current : %s")
+	// printf("current : %s\n", thread_current() -> name);
 	// printf("size : %d\n", list_size(child_list));
 	// printf("waiting : %d\n", child_tid);
 	if (list_empty(child_list)) {

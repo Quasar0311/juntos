@@ -11,7 +11,7 @@ Booting from Hard Disk..Kernel command line: -q -f put exec-arg put child-args r
 Pintos booting with: 
 	base_mem: 0x0 ~ 0x9fc00 (Usable: 639 kB)
 	ext_mem: 0x100000 ~ 0xffe0000 (Usable: 260,992 kB)
-Calibrating timer...  104,755,200 loops/s.
+Calibrating timer...  47,820,800 loops/s.
 hd0:0: detected 321 sector (160 kB) disk, model "QEMU HARDDISK", serial "QM00001"
 hd0:1: detected 20,160 sector (9 MB) disk, model "QEMU HARDDISK", serial "QM00002"
 hd1:0: detected 199 sector (99 kB) disk, model "QEMU HARDDISK", serial "QM00003"
@@ -30,12 +30,17 @@ Executing 'exec-arg':
 (args) end
 exec-arg: exit(0)
 Execution of 'exec-arg' complete.
+<<<<<<< HEAD
 Timer: 73 ticks
 Thread: 33 idle ticks, 35 kernel ticks, 6 user ticks
+=======
+Timer: 104 ticks
+Thread: 52 idle ticks, 43 kernel ticks, 10 user ticks
+>>>>>>> 68ef26943f091678fb780e5f34098aa9aef23eb5
 hd0:0: 0 reads, 0 writes
 hd0:1: 152 reads, 436 writes
 hd1:0: 199 reads, 0 writes
-Console: 1026 characters output
+Console: 1027 characters output
 Keyboard: 0 keys pressed
 Exception: 0 page faults
 Powering off...
