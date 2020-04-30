@@ -386,6 +386,7 @@ thread_tid (void) {
 void
 thread_exit (void) {
 	struct thread *curr = thread_current();
+	struct thread *parent = curr -> parent;
 	ASSERT (!intr_context ());
 
 #ifdef USERPROG

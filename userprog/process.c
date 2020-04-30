@@ -80,8 +80,9 @@ process_close_file(int fd){
 	f = process_get_file(fd);
 	//printf("hi : %d\n", fd);
 	if (f == NULL) return;
-	printf("fd : %d\n", fd);
-	printf("nextfd : %d\n", curr -> next_fd);
+	// printf("fd : %d\n", fd);
+	// printf("nextfd : %d\n", curr -> next_fd);
+	// printf("fd_table size : %d\n", list_size(&thread_current() -> fd_table));
 	file_close(f);
 
 	/*** delete entry of corresponding file descriptor ***/
@@ -94,11 +95,11 @@ process_close_file(int fd){
 	// printf("fd : %d, next_fd : %d\n", fd, curr -> next_fd);
 	file_p = list_entry(fp, struct file_pointer, file_elem);
 	file_p -> file = NULL;
-	//list_remove(fp);
-	//palloc_free_page(list_entry(fp, struct file_pointer, file_elem));
+	// list_remove(fp);
+	// palloc_free_page(list_entry(fp, struct file_pointer, file_elem));
 	
 	/*** decrease file descriptor for current thread ***/
-	
+	// curr -> next_fd--;
 
 }
 
@@ -277,14 +278,22 @@ __do_fork (void *aux) {
 	current->next_fd=parent->next_fd;
 	for (e = list_begin(&parent -> fd_table); e != list_end (&parent -> fd_table);
 	e = list_next(e)) {
-		new_file = file_duplicate(list_entry(e, struct file_pointer, file_elem) -> file);
-		fp -> file = new_file;
-		if (new_file != NULL) {
-			list_push_back(&current -> fd_table, &fp -> file_elem);
-		}
-		else {
+		if (list_entry(e, struct file_pointer, file_elem) -> file == NULL) {
+			// fp -> file = NULL;
+			// list_push_back(&current -> fd_table, &fp -> file_elem);
 			current -> next_fd--;
 		}
+		else {
+			new_file = file_duplicate(list_entry(e, struct file_pointer, file_elem) -> file);
+			fp -> file = new_file;
+			// if (new_file != NULL) {
+			list_push_back(&current -> fd_table, &fp -> file_elem);
+		}
+		
+		// }
+		// else {
+		// 	current -> next_fd--;
+		// }
 		
 	}
 	
@@ -375,23 +384,33 @@ process_wait (tid_t child_tid) {
 	struct list_elem *e;
 	struct list *child_list = &thread_current() -> child_list;
 	struct thread *child;
+	struct list child_list2 = thread_current() -> child_list;
 
-	
+	// printf("size : %d\n", list_size(&child_list2));
+	// printf("current : %s")
+	// printf("size : %d\n", list_size(child_list));
+	// printf("waiting : %d\n", child_tid);
 	if (list_empty(child_list)) {
 		return -1;
 	}
-
+	//printf("list size : %d\n", list_size(child_list));
+	// printf("waiting2 : %d\n", child_tid);
 	
 	for (e = list_begin(child_list); e != list_end(child_list); e = list_next(e)) {
 		child = list_entry(e, struct thread, child_elem);
 		if (child -> tid == child_tid) {
 			break;
 		}
+		else {
+			// printf("no, : %d \n", child -> tid);
+		}
 	}
+
+	// printf("waiting3 : %d\n", child_tid);
 	if (child -> tid != child_tid) {
 		return -1;
 	}
-	//printf("sema-down : %d\n", child -> tid);
+	// printf("sema-down : %d\n", child -> tid);
 	
 	sema_down(&child -> exit_sema);
 	// printf("doing : %d\n", child_tid);
@@ -415,7 +434,8 @@ process_wait (tid_t child_tid) {
 /* Exit the process. This function is called by thread_exit (). */
 void
 process_exit (void) {
-	struct thread *curr = thread_current ();	
+	struct thread *curr = thread_current ();
+	int i;
 
 	/* TODO: Your code goes here.
 	 * TODO: Implement process termination message (see
@@ -423,6 +443,9 @@ process_exit (void) {
 	 * TODO: We recommend you to implement process resource cleanup here. */
 	
 	/*** close all files of process ***/
+	// for (i = 2; i <= curr -> next_fd; i++) {
+	// 	process_close_file(curr -> next_fd);
+	// }
 	while(curr -> next_fd != 2){
 		process_close_file(curr -> next_fd);
 		curr -> next_fd--;
@@ -430,7 +453,7 @@ process_exit (void) {
 	}
 
 	/*** release file descriptor ***/
-	process_cleanup ();
+	// process_cleanup ();
 }
 
 /* Free the current process's resources. */
