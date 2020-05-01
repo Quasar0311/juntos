@@ -32,75 +32,112 @@ struct lock writable_lock;
 
 int 
 process_add_file(struct file *f){
+	// struct list_elem *fd; 
+	struct thread *curr=thread_current();
+	// struct file_pointer *file_p;
+
+	// struct file_pointer *fp = palloc_get_page(0);
+	// fp -> file = f;
+
 	if(f==NULL) {
 		//printf("file is null\n");
 		return -1;
 	}
+
 	/*** add file to file descriptor ***/
-	struct file_pointer *fp = palloc_get_page(0);
-	fp -> file = f;
-	list_push_back(&thread_current()->fd_table, &fp -> file_elem);
+	// list_push_back(&thread_current()->fd_table, &fp -> file_elem);
+	// fd=list_begin(&curr->fd_table);
+	// for(int i=3; i<curr->next_fd; i++){
+	// 	file_p=list_entry(fd, struct file_pointer, file_elem);
+	// 	if(file_p->file==NULL){
+	// 		file_p->file=f;
+	// 		return i;
+	// 	}
+	// 	fd=list_next(fd);
+	// }
+	for(int i=2; i<curr->next_fd; i++){ 
+		if(curr->fd_table[i]==NULL) curr->fd_table[i]=f;
+		return i;
+	}
 	//printf("list size : %d\n", list_size(&thread_current() -> fd_table));
+	// list_push_back(&thread_current()->fd_table, &fp -> file_elem);
+	curr->fd_table[curr->next_fd]=f;
 	/*** increment by 1 of max file descriptor ***/
-	thread_current()->next_fd++;
+	curr->next_fd++;
 	//printf("hi : %d\n", thread_current() -> next_fd);
 	//palloc_free_page((void *) fp);
 	/*** return file descriptor ***/
-	return thread_current() -> next_fd; 
+	return curr -> next_fd-1; 
 }
 
 struct file *
 process_get_file(int fd){
 	/*** return file corresponding to a file descriptor ***/
-	struct list_elem *fp;
-	struct file_pointer *f;
+	// struct list_elem *fp;
+	// struct file_pointer *f;
+	struct thread *curr=thread_current();
+	bool empty=true;
 
-	if(list_empty(&thread_current()->fd_table)) return NULL;
-
-	fp = list_begin(&thread_current()->fd_table);
-	for(int i=3; i<fd; i++){
-		fp=list_next(fp);
+	// if(list_empty(&thread_current()->fd_table)) return NULL;
+	for(int i=2; i<curr->next_fd; i++){
+		if(curr->fd_table[i]!=NULL) {
+			empty=false;
+			break;
+		}
 	}
+	if(empty) return NULL;
 
-	if (fp != NULL) {
-		f = list_entry(fp, struct file_pointer, file_elem);
-		return f -> file;
-	}
+	// fp = list_begin(&thread_current()->fd_table);
+	// for(int i=3; i<fd; i++){
+	// 	fp=list_next(fp);
+	// }
+
+	// if (fp != NULL) {
+	// 	f = list_entry(fp, struct file_pointer, file_elem);
+	// 	return f -> file;
+	// }
 	/*** if not return NULL ***/
-	else return NULL;
+	// else return NULL;
+	return curr->fd_table[fd];
 }
 
 void
 process_close_file(int fd){
 	/*** close file corressponding to file descriptor ***/
-	struct file *f;
-	struct list_elem *fp;
+	// struct file *f;
+	// struct list_elem *fp;
 	struct thread *curr = thread_current();
-	struct file_pointer *file_p;
-	f = process_get_file(fd);
+	// struct file_pointer *file_p;
+	// f = process_get_file(fd);
 	//printf("hi : %d\n", fd);
 	// if (f == NULL) return;
+	if(curr->fd_table[fd]==NULL) return;
+	// if(fd>=curr->next_fd) return;
 	// printf("fd : %d\n", fd);
 	// printf("nextfd : %d\n", curr -> next_fd);
 	// printf("fd_table size : %d\n", list_size(&thread_current() -> fd_table));
-	file_close(f);
+	// file_close(f);
+	file_close(curr->fd_table[fd]);
 
 	/*** delete entry of corresponding file descriptor ***/
-	if(list_empty(&thread_current()->fd_table)) return;
+	// if(list_empty(&thread_current()->fd_table)) return;
 
-	fp = list_begin(&thread_current()->fd_table);
-	for(int i=3; i<fd; i++){
-		fp=list_next(fp);
+	// fp = list_begin(&thread_current()->fd_table);
+	// for(int i=3; i<fd; i++){
+	// 	fp=list_next(fp);
+	// }
+	// // printf("fd : %d, next_fd : %d\n", fd, curr -> next_fd);
+	// file_p = list_entry(fp, struct file_pointer, file_elem);
+	// file_p -> file = NULL;
+	curr->fd_table[fd]=NULL;
+
+	if(fd==curr->next_fd-1){
+		// list_remove(fp);
+		// palloc_free_page(list_entry(fp, struct file_pointer, file_elem));
+		
+		/*** decrease file descriptor for current thread ***/
+		curr -> next_fd--;
 	}
-	// printf("fd : %d, next_fd : %d\n", fd, curr -> next_fd);
-	file_p = list_entry(fp, struct file_pointer, file_elem);
-	file_p -> file = NULL;
-	// list_remove(fp);
-	// palloc_free_page(list_entry(fp, struct file_pointer, file_elem));
-	
-	/*** decrease file descriptor for current thread ***/
-	// curr -> next_fd--;
-
 }
 
 struct thread *
@@ -244,8 +281,8 @@ __do_fork (void *aux) {
 	struct intr_frame if_;
 	struct thread *parent = thread_current() -> parent;
 	struct thread *current = thread_current ();
-	struct list_elem *e;
-	struct file_pointer *fp = palloc_get_page(0);
+	// struct list_elem *e;
+	// struct file_pointer *fp = palloc_get_page(0);
 	struct file *new_file;	
 
 	// list_push_back(&parent -> child_list, &current -> child_elem);
@@ -276,31 +313,42 @@ __do_fork (void *aux) {
 	 * TODO:       from the fork() until this function successfully duplicates
 	 * TODO:       the resources of parent.*/
 	current->next_fd=parent->next_fd;
-	for (e = list_begin(&parent -> fd_table); e != list_end (&parent -> fd_table);
-	e = list_next(e)) {
-		if (list_entry(e, struct file_pointer, file_elem) -> file == NULL) {
-			// fp -> file = NULL;
-			// list_push_back(&current -> fd_table, &fp -> file_elem);
-			printf("null file\n");
-			current -> next_fd--;
+	// current->fd_table=parent->fd_table;
+	// printf("parent next_fd: %d\n", parent->next_fd);
+	// for (e = list_begin(&parent -> fd_table); e != list_end (&parent -> fd_table);
+	// e = list_next(e)) {
+	// // e=list_begin(&parent->fd_table);
+	// // for(int i=3; i<parent->next_fd; i++){
+	// 	if (list_entry(e, struct file_pointer, file_elem) -> file == NULL) {
+	// 		// fp -> file = NULL;
+	// 		// list_push_back(&current -> fd_table, &fp -> file_elem);
+	// 		// printf("current next_fd: %d\n", current->next_fd);
+	// 		// printf("parent next_fd: %d\n", parent->next_fd);
+	// 		// printf("null file\n");
+	// 		// current -> next_fd--; 
+	// 	}
+	// 	else {
+	// 		printf("file duplicate\n");
+	// 		new_file = file_duplicate(list_entry(e, struct file_pointer, file_elem) -> file);
+	// 		fp -> file = new_file;
+	// 		if (new_file != NULL) {
+	// 			list_push_back(&current -> fd_table, &fp -> file_elem);
+	// 		}
+	// 		// process_add_file(new_file); 
+	// 	}
+	// 	// else {
+	// 	// 	current -> next_fd--;
+	// 	// }
+	// }
+	for(int i=2; i<parent->next_fd; i++){
+		if(parent->fd_table[i]==NULL) current->fd_table[i]=NULL;
+		else{
+			new_file=file_duplicate(parent->fd_table[i]);
+			current->fd_table[i]=new_file;
 		}
-		else {
-			printf("file duplicate\n");
-			new_file = file_duplicate(list_entry(e, struct file_pointer, file_elem) -> file);
-			fp -> file = new_file;
-			// if (new_file != NULL) {
-			list_push_back(&current -> fd_table, &fp -> file_elem);
-		}
-		
-		// }
-		// else {
-		// 	current -> next_fd--;
-		// }
-		
 	}
-	
 
-	current->process_load=true;	
+	// current->process_load=true;	
 
 	/*** if memory load finish, resume parent process ***/
 	sema_up(&thread_current()->parent->load_sema);
@@ -448,7 +496,7 @@ process_exit (void) {
 	// for (i = 2; i <= curr -> next_fd; i++) {
 	// 	process_close_file(curr -> next_fd);
 	// }
-	while(curr -> next_fd != 2){
+	while(curr -> next_fd != 1){
 		process_close_file(curr -> next_fd);
 		curr -> next_fd--;
 		//printf("fd : %d\n", curr -> next_fd);

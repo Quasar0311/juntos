@@ -277,9 +277,11 @@ thread_create (const char *name, int priority,
 	t->tf.eflags = FLAG_IF;
 
 	/*** initialize fd ***/
-	/*** allocate memory to fd table ***/
-	list_init(&t->fd_table);
+	// list_init(&t->fd_table);
 	t->next_fd=2;
+	// for(int i=0; i<512; i++) t->fd_table[i]=NULL;
+	/*** allocate memory to fd table ***/
+	t->fd_table=palloc_get_multiple(0, 2);
 
 	/*** initialize process descriptor ***/
 	t->process_load=false;
