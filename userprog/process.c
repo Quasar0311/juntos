@@ -28,7 +28,7 @@ static bool load (const char *file_name, struct intr_frame *if_);
 static void initd (void *f_name);
 static void __do_fork (void *);
 
-struct lock writable_lock;
+// extern struct lock writable_lock;
 
 int 
 process_add_file(struct file *f){
@@ -314,6 +314,8 @@ __do_fork (void *aux) {
 			//printf("file duplicate : %p, %p\n", parent->fd_table[i], new_file);
 		}
 	}
+	current->writable_lock=parent->writable_lock;
+
 	parent->process_load=true;	
 	/*** if memory load finish, resume parent process ***/
 	sema_up(&thread_current()->parent->load_sema);
@@ -352,7 +354,7 @@ process_exec (void *f_name) { //start_process
 	// // process_cleanup ();
 	// printf("before load : %s\n", file_name);
 	// /* And then load the binary */
-	lock_init(&writable_lock);
+	lock_init(&thread_current()->writable_lock);
 	success = load (file_name, &_if);
 	
 	/* If load failed, quit. */
@@ -573,7 +575,7 @@ load (const char *file_name, struct intr_frame *if_) {
 	int i;
 	
 	/*** Acquire lock for running file ***/
-	// lock_acquire(&writable_lock);
+	lock_acquire(&t->writable_lock);
 	/*** Arguments passing ***/
 	char *token, *save_ptr;
 	uint64_t argc = 0;
@@ -604,12 +606,15 @@ load (const char *file_name, struct intr_frame *if_) {
 				break;
 	}
 
+	// lock_acquire(&writable_lock);
+	// printf("lock acquire: %d\n", lock_held_by_current_thread(&t->writable_lock));
+
 	/* Open executable file. */
 	file = filesys_open (file_title);
 	if (file == NULL) {
 		/*** Release when file open fail ***/
-		//lock_release(&writable_lock);
-		printf ("load: %s: open failed\n", file_title);
+		lock_release(&t->writable_lock);
+		// printf ("load: %s: open failed\n", file_title);
 		goto done;
 	}
 
@@ -618,7 +623,9 @@ load (const char *file_name, struct intr_frame *if_) {
 		 Then release lock. ***/
 	t -> run_file = file;
 	file_deny_write(file);
-	// lock_release(&writable_lock);
+	// printf("lock release: %d\n", lock_held_by_current_thread(&t->writable_lock));
+	// if(lock_held_by_current_thread(&writable_lock)) 
+	lock_release(&t->writable_lock);
 
 	/* Read and verify executable header. */
 	if (file_read (file, &ehdr, sizeof ehdr) != sizeof ehdr

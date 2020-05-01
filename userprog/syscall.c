@@ -217,10 +217,18 @@ syscall_fork(const char *thread_name, struct intr_frame *parent_frame){
 int
 syscall_exec (const char *cmd_line) {
 	//printf("%s\n", cmd_line);
-	if(process_exec((void *) cmd_line)==-1){
+	// lock_acquire(&filesys_lock);
+	int ex;
+	
+	ex = process_exec((void *) cmd_line);
+
+	if (ex == -1) {
+		// lock_release(&filesys_lock);
 		syscall_exit(-1);
-		return -1;
 	}
+
+	// lock_release(&filesys_lock);
+	return ex;
 }
 
 int
