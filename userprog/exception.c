@@ -156,12 +156,12 @@ page_fault (struct intr_frame *f) {
 	if (vm_try_handle_fault (f, fault_addr, user, write, not_present))
 		return;
 #endif
-	syscall_exit(-1);
+	
 	/* Count page faults. */
 	page_fault_cnt++;
 	// printf("pf : %s\n", thread_current() -> name);
 	// palloc_free_page(thread_current() -> fd_table);
-	
+	syscall_exit(-1);
 
 	/* If the fault is true fault, show info and exit. */
 	printf ("Page fault at %p: %s error %s page in %s context.\n",

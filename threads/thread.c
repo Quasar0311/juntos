@@ -12,6 +12,7 @@
 #include "threads/synch.h"
 #include "threads/vaddr.h"
 #include "intrinsic.h"
+#include "threads/malloc.h"
 #ifdef USERPROG
 #include "userprog/process.h"
 #endif
@@ -281,7 +282,7 @@ thread_create (const char *name, int priority,
 	t->next_fd=2;
 	// for(int i=0; i<512; i++) t->fd_table[i]=NULL;
 	/*** allocate memory to fd table ***/
-	t->fd_table=palloc_get_multiple(0, 2);
+	t->fd_table=calloc(128, sizeof(struct file*));
 	if (t -> fd_table == NULL) {
 		return TID_ERROR;
 	}
@@ -844,7 +845,7 @@ do_schedule(int status) {
 }
 
 static void
-schedule (void) {
+schedule (void) { //thread_schedule_tail
 	struct thread *curr = running_thread ();
 	struct thread *next = next_thread_to_run ();
 
