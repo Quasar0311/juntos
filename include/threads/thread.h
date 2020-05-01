@@ -113,6 +113,7 @@ struct thread {
 
 	/*** file descriptor table ***/
 	struct list fd_table;
+	struct file **file_array;
 	/*** max fd of current table+ 1 ***/
 	int next_fd;
 

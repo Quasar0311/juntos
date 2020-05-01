@@ -281,6 +281,8 @@ thread_create (const char *name, int priority,
 	list_init(&t->fd_table);
 	t->next_fd=2;
 
+	t -> file_array = palloc_get_multiple(0, 2);
+	printf("file array : %p\n", t -> file_array[3]);
 	/*** initialize process descriptor ***/
 	t->process_load=false;
 	t->process_terminate=false;
