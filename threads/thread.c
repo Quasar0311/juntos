@@ -282,7 +282,12 @@ thread_create (const char *name, int priority,
 	// for(int i=0; i<512; i++) t->fd_table[i]=NULL;
 	/*** allocate memory to fd table ***/
 	t->fd_table=palloc_get_multiple(0, 2);
-	for(int i=0; i<512; i++) t->fd_table[i]=NULL;
+	if (t -> fd_table == NULL) {
+		return TID_ERROR;
+	}
+	for(int i=0; i<128; i++) t->fd_table[i]=NULL;
+
+	
 
 	/*** initialize process descriptor ***/
 	t->process_load=false;
@@ -390,6 +395,7 @@ thread_tid (void) {
 void
 thread_exit (void) {
 	struct thread *curr = thread_current();
+	struct list_elem *e;
 
 	ASSERT (!intr_context ());
 
@@ -399,6 +405,12 @@ thread_exit (void) {
 	// }
 	// printf("sema-up : %d\n", curr -> tid);
 	curr -> process_terminate = true;
+	for (e = list_begin(&curr -> child_list); e != list_end(&curr -> child_list)
+	; e = list_next(e)) {
+		struct thread *child = list_entry(e, struct thread, child_elem);
+		list_remove(e);
+		sema_up(&child -> child_sema);
+	}
 	sema_up(&curr -> exit_sema);
 	// sema_up(&curr -> child_sema);
 	sema_down(&curr -> child_sema);
