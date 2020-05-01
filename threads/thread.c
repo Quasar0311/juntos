@@ -262,7 +262,7 @@ thread_create (const char *name, int priority,
 	/*** parent process ***/
 	curr=thread_current();
 	t->parent=curr;
-	t -> exit_status = -1;
+	t -> exit_status = -2;
 
 
 	/* Call the kernel_thread if it scheduled.

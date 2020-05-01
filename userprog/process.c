@@ -39,8 +39,9 @@ process_add_file(struct file *f){
 	// struct file_pointer *fp = palloc_get_page(0);
 	// fp -> file = f;
 
-	if(f==NULL) {
+	if(f==NULL||curr->next_fd>513) {
 		//printf("file is null\n");
+		file_close(f);
 		return -1;
 	}
 
@@ -61,6 +62,7 @@ process_add_file(struct file *f){
 			return i;
 		}
 	}
+	// printf("curr next_fd : %d\n", curr -> next_fd);
 	//printf("list size : %d\n", list_size(&thread_current() -> fd_table));
 	// list_push_back(&thread_current()->fd_table, &fp -> file_elem);
 	curr->fd_table[curr->next_fd]=f;
@@ -225,9 +227,13 @@ process_fork (const char *name, struct intr_frame *if_) {
 	
 	/* Clone current thread to new thread.*/
 	tid= thread_create (name, PRI_DEFAULT, __do_fork, if_);
-	
+
 	/*** wait until child process loaded ***/
 	sema_down(&thread_current()->load_sema);
+	if (tid == TID_ERROR) {
+		palloc_free_page(name);
+		palloc_free_page(if_);
+	}
 	return tid;
 }
 
@@ -315,33 +321,7 @@ __do_fork (void *aux) {
 	 * TODO:       from the fork() until this function successfully duplicates
 	 * TODO:       the resources of parent.*/
 	current->next_fd=parent->next_fd;
-	// current->fd_table=parent->fd_table;
-	//printf("parent next_fd: %d\n", parent->next_fd);
-	// for (e = list_begin(&parent -> fd_table); e != list_end (&parent -> fd_table);
-	// e = list_next(e)) {
-	// // e=list_begin(&parent->fd_table);
-	// // for(int i=3; i<parent->next_fd; i++){
-	// 	if (list_entry(e, struct file_pointer, file_elem) -> file == NULL) {
-	// 		// fp -> file = NULL;
-	// 		// list_push_back(&current -> fd_table, &fp -> file_elem);
-	// 		// printf("current next_fd: %d\n", current->next_fd);
-	// 		// printf("parent next_fd: %d\n", parent->next_fd);
-	// 		// printf("null file\n");
-	// 		// current -> next_fd--; 
-	// 	}
-	// 	else {
-	// 		printf("file duplicate\n");
-	// 		new_file = file_duplicate(list_entry(e, struct file_pointer, file_elem) -> file);
-	// 		fp -> file = new_file;
-	// 		if (new_file != NULL) {
-	// 			list_push_back(&current -> fd_table, &fp -> file_elem);
-	// 		}
-	// 		// process_add_file(new_file); 
-	// 	}
-	// 	// else {
-	// 	// 	current -> next_fd--;
-	// 	// }
-	// }
+
 	for(int i=2; i<parent->next_fd; i++){
 		if(parent->fd_table[i]==NULL) {current->fd_table[i]=NULL;
 			printf("null file\n");
@@ -365,6 +345,7 @@ __do_fork (void *aux) {
 		do_iret (&if_);
 	}
 error:
+	// parent -> tf.R.rax = -1;
 	printf("err\n");
 	thread_exit ();
 }
@@ -390,24 +371,10 @@ process_exec (void *f_name) { //start_process
 	// /* And then load the binary */
 	lock_init(&writable_lock);
 	success = load (file_name, &_if);
-
-	/*** if load finish resume parent process by semaphore ***/
-	// p=thread_current()->parent;
-	// printf("thread name : %s\n", thread_current()->name);
-	// printf("parent name : %s\n", p->name);
-	// if (p -> tid != 1) {
-	// 	printf("name : %s\n", p -> name);
-	// 	sema_up(&p->load_sema);
-	// }
 	
-
 	/* If load failed, quit. */
 	// palloc_free_page (file_name);
 	if (!success){
-		/*** if load fail process descriptor memory load fail ***/
-		// thread_current()->process_load=false;
-		// thread_exit();
-		//syscall_exit(-1);
 		return -1;
 	}
 
@@ -416,6 +383,7 @@ process_exec (void *f_name) { //start_process
 
 	/* Start switched process. */
 	do_iret (&_if);
+	// palloc_free_page (file_name);
 	NOT_REACHED ();
 }
 
@@ -438,16 +406,10 @@ process_wait (tid_t child_tid) {
 	struct list *child_list = &thread_current() -> child_list;
 	struct thread *child;
 
-	// printf("size : %d\n", list_size(&child_list2));
-	// printf("current : %s\n", thread_current() -> name);
-	// printf("size : %d\n", list_size(child_list));
-	// printf("waiting : %d\n", child_tid);
-	if (list_empty(child_list)) {
+	if (list_empty(&thread_current() -> child_list)) {
 		return -1;
 	}
-	//printf("list size : %d\n", list_size(child_list));
-	// printf("waiting2 : %d\n", child_tid);
-	// printf("list size : %p\n", (&thread_current() -> child_list));
+
 	for (e = list_begin(&thread_current() -> child_list); e != list_end(&thread_current() -> child_list); e = list_next(e)) {
 		
 		child = list_entry(e, struct thread, child_elem);
@@ -471,9 +433,9 @@ process_wait (tid_t child_tid) {
 	// printf("doing : %d\n", child_tid);
 	// child_list = &thread_current() -> child_list;
 
-	for (e = list_begin(child_list); e != list_end(child_list); e = list_next(e)) {
+	for (e = list_begin(&thread_current() -> child_list); e != list_end(&thread_current() -> child_list); e = list_next(e)) {
 		child = list_entry(e, struct thread, child_elem);
-		if (child -> tid == child_tid && child -> exit_status != -1) {
+		if (child -> tid == child_tid && child -> exit_status != -2) {
 			list_remove(e);
 			sema_up(&child -> child_sema);
 
@@ -484,7 +446,7 @@ process_wait (tid_t child_tid) {
 			;
 		}
 	}
-
+	// printf("tid : %s\n", child -> name);
 	return -1;
 }
 
@@ -507,6 +469,7 @@ process_exit (void) {
 		curr -> next_fd--;
 		//printf("fd : %d\n", curr -> next_fd);
 	}
+	// palloc_free_page(curr -> fd_table);
 	// for (e = list_begin(&curr -> fd_table); e != list_end(&curr -> fd_table);
 	// e = list_next(e)) {
 	// 	fp = list_entry(e, struct file_pointer, file_elem);
