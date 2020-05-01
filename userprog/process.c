@@ -340,6 +340,7 @@ int
 process_exec (void *f_name) { //start_process
 	char *file_name = f_name;
 	bool success;
+	struct list_elem *e;
 	//printf("fn : %s\n", file_name);
 	/* We cannot use the intr_frame in the thread structure.
 	 * This is because when current thread rescheduled,
@@ -353,7 +354,19 @@ process_exec (void *f_name) { //start_process
 	// // process_cleanup ();
 	// printf("before load : %s\n", file_name);
 	// /* And then load the binary */
-	lock_init(&writable_lock);
+	
+	// if (thread_current() -> tid > 3) {
+	// 	for (e = list_begin(&thread_current() -> parent -> child_list);
+	// 	e != list_end(&thread_current() -> parent -> child_list); e = list_next(e)) {
+			
+	// 		struct thread *child = list_entry(e, struct thread, child_elem);
+	// 		if (child -> tid == thread_current() -> tid) {
+	// 			printf("sdf\n");
+	// 			sema_down(&child -> writable_lock);
+	// 		}
+	// 	}
+	// }
+
 	success = load (file_name, &_if);
 	
 	/* If load failed, quit. */
@@ -420,20 +433,20 @@ process_wait (tid_t child_tid) {
 	for (e = list_begin(&thread_current() -> child_list); e != list_end(&thread_current() -> child_list); e = list_next(e)) {
 		child = list_entry(e, struct thread, child_elem);
 		if (child -> tid == child_tid && child -> exit_status != -2 && child -> exit_status != -1) {
-			list_remove(e);
 			sema_up(&child -> child_sema);
-
+			list_remove(e);
 			// printf("name, wait1 : %s\n", child -> name);
 			return child -> exit_status;
 		}
 		else if (child -> tid == child_tid && child -> exit_status == -1) {
 			// printf("name, wait2 : %s\n", child -> name);
-			list_remove(e);
 			sema_up(&child -> child_sema);
+			list_remove(e);
 			return -1;
 		}
 	}
 	// printf("tid : %s\n", child -> name);
+	// sema_up(&child -> child_sema);
 	return -1;
 }
 
@@ -573,7 +586,7 @@ load (const char *file_name, struct intr_frame *if_) {
 	int i;
 	
 	/*** Acquire lock for running file ***/
-	// lock_acquire(&writable_lock);
+	// lock_acquire(&thread_current() -> writable_lock);
 	/*** Arguments passing ***/
 	char *token, *save_ptr;
 	uint64_t argc = 0;
@@ -608,7 +621,7 @@ load (const char *file_name, struct intr_frame *if_) {
 	file = filesys_open (file_title);
 	if (file == NULL) {
 		/*** Release when file open fail ***/
-		//lock_release(&writable_lock);
+		// lock_release(&thread_current() -> writable_lock);
 		printf ("load: %s: open failed\n", file_title);
 		goto done;
 	}
@@ -702,7 +715,7 @@ load (const char *file_name, struct intr_frame *if_) {
 	}
 	//printf("argc : %d\n", argc);
 
-	char **argv = palloc_get_page(0);
+	char **argv = calloc(32, sizeof(char *));
 
 	argc = 0;
 
@@ -754,7 +767,7 @@ load (const char *file_name, struct intr_frame *if_) {
 	palloc_free_page(file_copy_argc);
 	palloc_free_page(file_copy_argv);
 	palloc_free_page(file_title);
-	palloc_free_page(argv);
+	free(argv);
 	success = true;
 
 done:
