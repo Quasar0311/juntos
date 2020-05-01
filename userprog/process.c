@@ -302,7 +302,6 @@ __do_fork (void *aux) {
 			// printf("null file\n");
 		}
 		else{
-			
 			new_file=file_duplicate(parent->fd_table[i]);
 			// file_close(new_file);
 			if (new_file == NULL) {
@@ -315,7 +314,6 @@ __do_fork (void *aux) {
 			//printf("file duplicate : %p, %p\n", parent->fd_table[i], new_file);
 		}
 	}
-	// free(new_file);
 	parent->process_load=true;	
 	/*** if memory load finish, resume parent process ***/
 	sema_up(&thread_current()->parent->load_sema);
@@ -326,6 +324,7 @@ __do_fork (void *aux) {
 		do_iret (&if_);
 	}
 error:
+	// palloc_free_page(current->pml4);
 	// printf("name : %s\n", thread_current() -> name);
 	// list_remove(&current -> child_elem);
 	parent->process_load=false;
@@ -462,7 +461,8 @@ process_exit (void) {
 	
 	/*** close all files of process ***/
 	// printf("nextfd : %d\n", curr -> next_fd);
-	while(curr -> next_fd >= 3){ //0-511 512개개 [ , , o]1개 인덱스2 nextfd3 510 511 512
+	while(curr -> next_fd >= 3){
+	// while(curr -> next_fd != 2){
 		process_close_file(curr -> next_fd - 1);
 		curr -> next_fd--;
 		// printf("fd : %d\n", curr -> next_fd);
