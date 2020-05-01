@@ -435,15 +435,18 @@ process_wait (tid_t child_tid) {
 
 	for (e = list_begin(&thread_current() -> child_list); e != list_end(&thread_current() -> child_list); e = list_next(e)) {
 		child = list_entry(e, struct thread, child_elem);
-		if (child -> tid == child_tid && child -> exit_status != -2) {
+		if (child -> tid == child_tid && child -> exit_status != -2 && child -> exit_status != -1) {
 			list_remove(e);
 			sema_up(&child -> child_sema);
 
-			// printf("removed\n");
+			// printf("name, wait1 : %s\n", child -> name);
 			return child -> exit_status;
 		}
-		else {
-			;
+		else if (child -> tid == child_tid && child -> exit_status == -1) {
+			// printf("name, wait2 : %s\n", child -> name);
+			list_remove(e);
+			sema_up(&child -> child_sema);
+			return -1;
 		}
 	}
 	// printf("tid : %s\n", child -> name);
