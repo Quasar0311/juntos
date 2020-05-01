@@ -17,7 +17,7 @@
 #include "threads/thread.h"
 #include "threads/mmu.h"
 #include "threads/vaddr.h"
-
+#include "threads/malloc.h"
 #include "intrinsic.h"
 #ifdef VM
 #include "vm/vm.h"
@@ -38,8 +38,8 @@ process_add_file(struct file *f){
 
 	// struct file_pointer *fp = palloc_get_page(0);
 	// fp -> file = f;
-
-	if(f==NULL||curr->next_fd>513) {
+	
+	if(f==NULL||curr->next_fd>127) {
 		//printf("file is null\n");
 		file_close(f);
 		return -1;
@@ -91,15 +91,6 @@ process_get_file(int fd){
 	}
 	if(empty) return NULL;
 
-	// fp = list_begin(&thread_current()->fd_table);
-	// for(int i=3; i<fd; i++){
-	// 	fp=list_next(fp);
-	// }
-
-	// if (fp != NULL) {
-	// 	f = list_entry(fp, struct file_pointer, file_elem);
-	// 	return f -> file;
-	// }
 	/*** if not return NULL ***/
 	// else return NULL;
 	return curr->fd_table[fd];
@@ -111,28 +102,11 @@ process_close_file(int fd){
 	// struct file *f;
 	// struct list_elem *fp;
 	struct thread *curr = thread_current();
-	// struct file_pointer *file_p;
-	// f = process_get_file(fd);
-	//printf("hi : %d\n", fd);
-	// if (f == NULL) return;
+
 	if(curr->fd_table[fd]==NULL) return;
-	// if(fd>=curr->next_fd) return;
-	// printf("fd : %d\n", fd);
-	// printf("nextfd : %d\n", curr -> next_fd);
-	// printf("fd_table size : %d\n", list_size(&thread_current() -> fd_table));
-	// file_close(f);
+
 	file_close(curr->fd_table[fd]);
 
-	/*** delete entry of corresponding file descriptor ***/
-	// if(list_empty(&thread_current()->fd_table)) return;
-
-	// fp = list_begin(&thread_current()->fd_table);
-	// for(int i=3; i<fd; i++){
-	// 	fp=list_next(fp);
-	// }
-	// // printf("fd : %d, next_fd : %d\n", fd, curr -> next_fd);
-	// file_p = list_entry(fp, struct file_pointer, file_elem);
-	// file_p -> file = NULL;
 	curr->fd_table[fd]=NULL;
 
 	if(fd==curr->next_fd-1){
@@ -142,6 +116,7 @@ process_close_file(int fd){
 		/*** decrease file descriptor for current thread ***/
 		curr -> next_fd--;
 	}
+	// printf("close : %d\n", fd);
 }
 
 struct thread *
@@ -224,18 +199,25 @@ tid_t
 process_fork (const char *name, struct intr_frame *if_) {
 	struct thread *parent=thread_current();
 	tid_t tid = 0;
+	struct thread *parent=thread_current();
 	if_ -> R.rax = 0;
+
 	
 	/* Clone current thread to new thread.*/
 	tid= thread_create (name, PRI_DEFAULT, __do_fork, if_);
-
+	
 	/*** wait until child process loaded ***/
 	sema_down(&thread_current()->load_sema);
+	
 	if (tid == TID_ERROR||parent->process_load==false) {
-		palloc_free_page(name);
-		palloc_free_page(if_);
+		// printf("parent : %s\n", parent -> name);
+		// palloc_free_page(name);
+		// palloc_free_page(if_);
+		// printf("here : %s\n", thread_current() -> name);
+		sema_up(&thread_current() -> load_sema);
 		return TID_ERROR;
 	}
+	// printf("fork : %d\n", tid);
 	return tid;
 }
 
@@ -249,6 +231,7 @@ duplicate_pte (uint64_t *pte, void *va, void *aux) {
 	void *parent_page;
 	void *newpage;
 	bool writable;
+	// printf("name1 : %s\n", current -> name);
 	
 	/* 1. TODO: If the parent_page is kernel page, then return immediately. */
 	if(is_kern_pte(pte)) {
@@ -271,12 +254,14 @@ duplicate_pte (uint64_t *pte, void *va, void *aux) {
 	else {
 		writable = false;
 	}
+
 	/* 5. Add new page to child's page table at address VA with WRITABLE
 	 *    permission. */
 	
 	if (!pml4_set_page (current->pml4, va, newpage, writable)) {
 		/* 6. TODO: if fail to insert page, do error handling. */
-		thread_exit();
+		//printf("error handasdfle\n");
+		return false;
 	}
 	return true;
 }
@@ -294,20 +279,19 @@ __do_fork (void *aux) {
 	// struct list_elem *e;
 	// struct file_pointer *fp = palloc_get_page(0);
 	struct file *new_file;	
-
+	printf("parent : %s, %d, child : %s\n", parent -> name, parent -> next_fd, current -> name);
 	// list_push_back(&parent -> child_list, &current -> child_elem);
 	/* TODO: somehow pass the parent_if. (i.e. process_fork()'s if_) */
 	struct intr_frame *parent_if = aux;
 	bool succ = true;
 	/* 1. Read the cpu context to local stack. */
 	memcpy (&if_, parent_if, sizeof (struct intr_frame));
-
 	/* 2. Duplicate PT */
 	current->pml4 = pml4_create();
 	if (current->pml4 == NULL)
 		goto error;
-	
 	process_activate (current);
+
 #ifdef VM
 	supplemental_page_table_init (&current->spt);
 	if (!supplemental_page_table_copy (&current->spt, &parent->spt))
@@ -332,12 +316,12 @@ __do_fork (void *aux) {
 			
 			new_file=file_duplicate(parent->fd_table[i]);
 			current->fd_table[i]=new_file;
+			
 			//printf("file duplicate : %p, %p\n", parent->fd_table[i], new_file);
 		}
 	}
-
+	// free(new_file);
 	parent->process_load=true;	
-
 	/*** if memory load finish, resume parent process ***/
 	sema_up(&thread_current()->parent->load_sema);
 	process_init ();
@@ -347,9 +331,9 @@ __do_fork (void *aux) {
 		do_iret (&if_);
 	}
 error:
+	// printf("name : %s\n", thread_current() -> name);
 	parent->process_load=false;
-	// parent -> tf.R.rax = -1;
-	printf("err\n");
+	sema_up(&thread_current()->parent->load_sema);
 	thread_exit ();
 }
 
@@ -467,15 +451,14 @@ process_exit (void) {
 	 * TODO: We recommend you to implement process resource cleanup here. */
 	
 	/*** close all files of process ***/
-	// for (i = 2; i <= curr -> next_fd; i++) {
-	// 	process_close_file(curr -> next_fd);
-	// }
-	while(curr -> next_fd != 1){
-		process_close_file(curr -> next_fd);
+	// printf("nextfd : %d\n", curr -> next_fd);
+	while(curr -> next_fd != 2){ //0-511 512개개 [ , , o]1개 인덱스2 nextfd3 510 511 512
+		process_close_file(curr -> next_fd - 1);
 		curr -> next_fd--;
-		//printf("fd : %d\n", curr -> next_fd);
+		// printf("fd : %d\n", curr -> next_fd);
 	}
-	// palloc_free_page(curr -> fd_table);
+	palloc_free_page(curr -> fd_table);
+	// printf("nextfd2 : %d\n", curr -> next_fd);
 	// for (e = list_begin(&curr -> fd_table); e != list_end(&curr -> fd_table);
 	// e = list_next(e)) {
 	// 	fp = list_entry(e, struct file_pointer, file_elem);
