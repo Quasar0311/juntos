@@ -35,6 +35,7 @@ int syscall_write(int fd, void *buffer, unsigned size);
 void syscall_seek(int fd, unsigned position);
 unsigned syscall_tell(int fd);
 void syscall_close(int fd);
+int syscall_dup2(int oldfd, int newfd);
 
 
 /* System call.
@@ -117,6 +118,7 @@ syscall_handler (struct intr_frame *f) {
 		case 6:
 			break;
 
+		/*** SYS_OPEN ***/
 		case 7:
 			check_address(f -> R.rdi);
 			f -> R.rax = syscall_open((char *)f->R.rdi);
@@ -146,12 +148,17 @@ syscall_handler (struct intr_frame *f) {
 		
 		/*** SYS_TELL ***/
 		case 12:
-			syscall_tell((int)f->R.rdi);
+			f->R.rax=syscall_tell((int)f->R.rdi);
 			break;
 		
 		/*** SYS_CLOSE ***/
 		case 13:
 			syscall_close((int)f->R.rdi);
+			break;
+		
+		/*** SYS_DUP2 ***/
+		case 21:
+			f->R.rax=syscall_dup2((int)f->R.rdi, (int)f->R.rsi);
 			break;
 
 		default:
@@ -332,12 +339,21 @@ void
 syscall_seek(int fd, unsigned position){
 	/*** get file by using file descriptor ***/
 	struct file *f=process_get_file(fd);
+	struct thread *curr=thread_current();
+	printf("file: %p\n", f);
 
 	/*** move offset of file by position ***/
-	file_seek(f, position);
+	// file_seek(f, position);
+	for(int i=0; i<curr->next_fd; i++){
+		if(process_get_file(i)==f&&process_get_file(i)!=NULL) {
+			file_seek(process_get_file(i), position);
+			printf("seek file: %d, duplicated file: %d\n", fd, i);
+		}
+	}
 }
 
-unsigned syscall_tell(int fd){
+unsigned 
+syscall_tell(int fd){
 	/*** get file by using file descriptor ***/
 	struct file *f=process_get_file(fd);
 
@@ -345,8 +361,32 @@ unsigned syscall_tell(int fd){
 	return file_tell(f);
 }
 
-void syscall_close(int fd){
+void 
+syscall_close(int fd){
 	/*** close file by using file descriptor 
 	and initialize entry ***/
 	process_close_file(fd);
+}
+
+int 
+syscall_dup2(int oldfd, int newfd){
+	struct file *new_file;
+	struct thread *curr=thread_current();
+	int duplicate=1;
+
+	printf("old fd: %d, new fd: %d\n", oldfd, newfd);
+
+	if(oldfd<0||curr->fd_table[oldfd]==NULL) return -1; 
+	else if(oldfd==newfd) return newfd;
+
+	new_file=file_duplicate(curr->fd_table[oldfd]);
+	if(curr->fd_table[newfd]!=NULL) process_close_file(newfd);
+	curr->fd_table[newfd]=new_file;
+	printf("duplicated\n");
+	if(newfd>curr->next_fd) curr->next_fd=newfd+1;
+	printf("next_fd: %d\n", curr->next_fd);
+	// if(filsys_open(process_get_file(oldfd))==filesys_open(process_get_file(newfd))) duplicate=0;
+	printf("file duplicated: %d\n", duplicate);
+
+	return newfd;
 }

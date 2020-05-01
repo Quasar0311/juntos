@@ -222,6 +222,7 @@ initd (void *f_name) {
  * TID_ERROR if the thread cannot be created. */
 tid_t
 process_fork (const char *name, struct intr_frame *if_) {
+	struct thread *parent=thread_current();
 	tid_t tid = 0;
 	if_ -> R.rax = 0;
 	
@@ -230,9 +231,10 @@ process_fork (const char *name, struct intr_frame *if_) {
 
 	/*** wait until child process loaded ***/
 	sema_down(&thread_current()->load_sema);
-	if (tid == TID_ERROR) {
+	if (tid == TID_ERROR||parent->process_load==false) {
 		palloc_free_page(name);
 		palloc_free_page(if_);
+		return TID_ERROR;
 	}
 	return tid;
 }
@@ -324,7 +326,7 @@ __do_fork (void *aux) {
 
 	for(int i=2; i<parent->next_fd; i++){
 		if(parent->fd_table[i]==NULL) {current->fd_table[i]=NULL;
-			printf("null file\n");
+			// printf("null file\n");
 		}
 		else{
 			
@@ -334,7 +336,7 @@ __do_fork (void *aux) {
 		}
 	}
 
-	// current->process_load=true;	
+	parent->process_load=true;	
 
 	/*** if memory load finish, resume parent process ***/
 	sema_up(&thread_current()->parent->load_sema);
@@ -345,6 +347,7 @@ __do_fork (void *aux) {
 		do_iret (&if_);
 	}
 error:
+	parent->process_load=false;
 	// parent -> tf.R.rax = -1;
 	printf("err\n");
 	thread_exit ();
@@ -403,7 +406,7 @@ process_wait (tid_t child_tid) {
 	 * XXX:       to add infinite loop here before
 	 * XXX:       implementing the process_wait. */
 	struct list_elem *e;
-	struct list *child_list = &thread_current() -> child_list;
+	// struct list *child_list = &thread_current() -> child_list;
 	struct thread *child;
 
 	if (list_empty(&thread_current() -> child_list)) {
@@ -476,7 +479,7 @@ process_exit (void) {
 	// for (e = list_begin(&curr -> fd_table); e != list_end(&curr -> fd_table);
 	// e = list_next(e)) {
 	// 	fp = list_entry(e, struct file_pointer, file_elem);
-	// 	palloc_free_page((void *) fp);
+		// palloc_free_page((void *) fp);
 	// 	printf("free\n");
 	// }
 	//palloc_free_page((void *) &curr -> fd_table);
