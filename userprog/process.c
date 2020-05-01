@@ -408,7 +408,7 @@ process_wait (tid_t child_tid) {
 	 * XXX:       to add infinite loop here before
 	 * XXX:       implementing the process_wait. */
 	struct list_elem *e;
-	struct list *child_list = &thread_current() -> child_list;
+	// struct list *child_list = &thread_current() -> child_list;
 	struct thread *child;
 
 	if (list_empty(&thread_current() -> child_list)) {
