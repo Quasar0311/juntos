@@ -844,7 +844,7 @@ do_schedule(int status) {
 }
 
 static void
-schedule (void) {
+schedule (void) { //thread_schedule_tail
 	struct thread *curr = running_thread ();
 	struct thread *next = next_thread_to_run ();
 
