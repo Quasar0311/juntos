@@ -804,6 +804,7 @@ load (const char *file_name, struct intr_frame *if_) {
 	if_ -> R.rdi = argc;
 	//printf("argc : %d\n", if_->R.rdi);
 	strlcpy((char *) &if_ -> R.rsi, (char *) &argv_addr, sizeof(char*));
+	if_ -> R.rsi = argv_addr;
 	
 	// hex_dump(if_ -> rsp, (void *) if_ -> rsp, 0x47480000 - (if_ -> rsp), true);
 	palloc_free_page(file_copy_argc);
