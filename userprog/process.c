@@ -316,7 +316,7 @@ __do_fork (void *aux) {
 	 * TODO:       the resources of parent.*/
 	current->next_fd=parent->next_fd;
 	// current->fd_table=parent->fd_table;
-	//printf("parent next_fd: %d\n", parent->next_fd);
+	printf("parent next_fd: %d\n", parent->next_fd);
 	// for (e = list_begin(&parent -> fd_table); e != list_end (&parent -> fd_table);
 	// e = list_next(e)) {
 	// // e=list_begin(&parent->fd_table);
@@ -347,10 +347,10 @@ __do_fork (void *aux) {
 			printf("null file\n");
 		}
 		else{
-			
 			new_file=file_duplicate(parent->fd_table[i]);
-			current->fd_table[i]=new_file;
-			//printf("file duplicate : %p, %p\n", parent->fd_table[i], new_file);
+			if(new_file!=NULL) current->fd_table[i]=new_file;
+			printf("file duplicate : %p, %p\n", parent->fd_table[i], new_file);
+			printf("current next_fd: %d\n", current->next_fd);
 		}
 	}
 
@@ -794,6 +794,7 @@ load (const char *file_name, struct intr_frame *if_) {
 	if_ -> R.rdi = argc;
 	//printf("argc : %d\n", if_->R.rdi);
 	strlcpy((char *) &if_ -> R.rsi, (char *) &argv_addr, sizeof(char*));
+	if_ -> R.rsi = argv_addr;
 	
 	// hex_dump(if_ -> rsp, (void *) if_ -> rsp, 0x47480000 - (if_ -> rsp), true);
 	palloc_free_page(file_copy_argc);

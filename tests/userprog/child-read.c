@@ -23,9 +23,13 @@ main (int argc UNUSED, char *argv[])
   int byte_cnt;
   char *buffer;
   msg ("begin");
+
+  msg("isdigit:%d", *argv[1]);
  
   if (!isdigit (*argv[1]))
     fail ("bad command-line arguments");
+
+  msg("open"); 
   
   handle1 = atoi (argv[1]);
   CHECK ((handle2 = open ("sample.txt")) > 1 && handle2 != handle1,

@@ -1,0 +1,15 @@
+FAIL
+Test output failed to match any acceptable form.
+
+Acceptable output:
+  (open-missing) begin
+  (open-missing) end
+  open-missing: exit(0)
+Differences in `diff -u' format:
+  (open-missing) begin
++ open
++ file name: no-such-file
++ got fd : -1
++ fd: -1, file open : 2
+  (open-missing) end
+  open-missing: exit(0)

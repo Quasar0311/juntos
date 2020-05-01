@@ -243,9 +243,10 @@ syscall_open(const char *file){
 	struct file *f;
 	int fd=-1;
 	struct thread *curr = thread_current();
+	printf("open\n");
 	
 	lock_acquire(&filesys_lock);
-	//printf("file name: %s\n", file);
+	printf("file name: %s\n", file);
 	
 	f=filesys_open(file);
 	fd=process_add_file(f);
@@ -255,8 +256,8 @@ syscall_open(const char *file){
 
 	// curr -> run_file = f;
 	// file_deny_write(f);
-	//printf("got fd : %d\n",fd);
-	//printf("fd: %d, file open : %d\n", fd, thread_current() -> next_fd);
+	printf("got fd : %d\n",fd);
+	printf("fd: %d, file open : %d\n", fd, thread_current() -> next_fd);
 	lock_release(&filesys_lock);
 
 	return fd;
