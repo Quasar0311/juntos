@@ -186,6 +186,7 @@ initd (void *f_name) {
  * TID_ERROR if the thread cannot be created. */
 tid_t
 process_fork (const char *name, struct intr_frame *if_) {
+	struct thread *parent=thread_current();
 	tid_t tid = 0;
 	struct thread *parent=thread_current();
 	if_ -> R.rax = 0;
@@ -379,6 +380,7 @@ process_wait (tid_t child_tid) {
 	 * XXX:       to add infinite loop here before
 	 * XXX:       implementing the process_wait. */
 	struct list_elem *e;
+	// struct list *child_list = &thread_current() -> child_list;
 	struct thread *child;
 
 	if (list_empty(&thread_current() -> child_list)) {
@@ -446,7 +448,6 @@ process_exit (void) {
 		// printf("fd : %d\n", curr -> next_fd);
 	}
 	palloc_free_page(curr -> fd_table);
-
 	/*** release file descriptor ***/
 	process_cleanup ();
 }
