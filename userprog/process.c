@@ -199,7 +199,6 @@ tid_t
 process_fork (const char *name, struct intr_frame *if_) {
 	struct thread *parent=thread_current();
 	tid_t tid = 0;
-	struct thread *parent=thread_current();
 	if_ -> R.rax = 0;
 
 	
