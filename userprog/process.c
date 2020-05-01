@@ -93,18 +93,18 @@ process_close_file(int fd){
 	struct thread *curr = thread_current();
 
 	if(curr->fd_table[fd]==NULL) return;
-
+	
 	file_close(curr->fd_table[fd]);
 
 	curr->fd_table[fd]=NULL;
 
-	if(fd==curr->next_fd-1){
-		// list_remove(fp);
-		// palloc_free_page(list_entry(fp, struct file_pointer, file_elem));
+	// if(fd==curr->next_fd-1){
+	// 	// list_remove(fp);
+	// 	// palloc_free_page(list_entry(fp, struct file_pointer, file_elem));
 		
-		/*** decrease file descriptor for current thread ***/
-		curr -> next_fd--;
-	}
+	// 	/*** decrease file descriptor for current thread ***/
+	// 	curr -> next_fd--;
+	// }
 	// printf("close : %d\n", fd);
 }
 
@@ -188,7 +188,6 @@ tid_t
 process_fork (const char *name, struct intr_frame *if_) {
 	struct thread *parent=thread_current();
 	tid_t tid = 0;
-	struct thread *parent=thread_current();
 	if_ -> R.rax = 0;
 
 	
@@ -268,7 +267,7 @@ __do_fork (void *aux) {
 	// struct list_elem *e;
 	// struct file_pointer *fp = palloc_get_page(0);
 	struct file *new_file;	
-	printf("parent : %s, %d, child : %s\n", parent -> name, parent -> next_fd, current -> name);
+	// printf("parent : %s, %d, child : %s\n", parent -> name, parent -> next_fd, current -> name);
 	// list_push_back(&parent -> child_list, &current -> child_elem);
 	/* TODO: somehow pass the parent_if. (i.e. process_fork()'s if_) */
 	struct intr_frame *parent_if = aux;
@@ -298,14 +297,20 @@ __do_fork (void *aux) {
 	current->next_fd=parent->next_fd;
 
 	for(int i=2; i<parent->next_fd; i++){
-		if(parent->fd_table[i]==NULL) {current->fd_table[i]=NULL;
+		if(parent->fd_table[i]==NULL) {
+			current->fd_table[i]=NULL;
 			// printf("null file\n");
 		}
 		else{
 			
 			new_file=file_duplicate(parent->fd_table[i]);
 			// file_close(new_file);
+			if (new_file == NULL) {
+				printf("dup error\n");
+				goto error;
+			}
 			current->fd_table[i]=new_file;
+
 			
 			//printf("file duplicate : %p, %p\n", parent->fd_table[i], new_file);
 		}
@@ -322,9 +327,11 @@ __do_fork (void *aux) {
 	}
 error:
 	// printf("name : %s\n", thread_current() -> name);
+	// list_remove(&current -> child_elem);
 	parent->process_load=false;
 	sema_up(&thread_current()->parent->load_sema);
 	thread_exit ();
+	
 }
 
 /* Switch the current execution context to the f_name.
@@ -442,12 +449,15 @@ process_exit (void) {
 	
 	/*** close all files of process ***/
 	// printf("nextfd : %d\n", curr -> next_fd);
-	while(curr -> next_fd != 2){ //0-511 512개개 [ , , o]1개 인덱스2 nextfd3 510 511 512
+	while(curr -> next_fd >= 3){ //0-511 512개개 [ , , o]1개 인덱스2 nextfd3 510 511 512
 		process_close_file(curr -> next_fd - 1);
 		curr -> next_fd--;
 		// printf("fd : %d\n", curr -> next_fd);
 	}
-	palloc_free_page(curr -> fd_table);
+	
+	// palloc_free_page(curr -> fd_table);
+	// palloc_free_multiple(curr -> fd_table, 2);
+	free(curr -> fd_table);
 	/*** release file descriptor ***/
 	process_cleanup ();
 }

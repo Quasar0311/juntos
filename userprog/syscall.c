@@ -340,14 +340,14 @@ syscall_seek(int fd, unsigned position){
 	/*** get file by using file descriptor ***/
 	struct file *f=process_get_file(fd);
 	struct thread *curr=thread_current();
-	printf("file: %p\n", f);
+	// printf("file: %p\n", f);
 
 	/*** move offset of file by position ***/
 	// file_seek(f, position);
 	for(int i=0; i<curr->next_fd; i++){
 		if(process_get_file(i)==f&&process_get_file(i)!=NULL) {
 			file_seek(process_get_file(i), position);
-			printf("seek file: %d, duplicated file: %d\n", fd, i);
+			// printf("seek file: %d, duplicated file: %d\n", fd, i);
 		}
 	}
 }
