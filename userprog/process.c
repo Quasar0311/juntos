@@ -39,8 +39,9 @@ process_add_file(struct file *f){
 	// struct file_pointer *fp = palloc_get_page(0);
 	// fp -> file = f;
 
-	if(f==NULL) {
+	if(f==NULL||curr->next_fd>513) {
 		//printf("file is null\n");
+		file_close(f);
 		return -1;
 	}
 
@@ -222,12 +223,21 @@ tid_t
 process_fork (const char *name, struct intr_frame *if_) {
 	tid_t tid = 0;
 	if_ -> R.rax = 0;
+	struct thread *parent=thread_current();
 	
 	/* Clone current thread to new thread.*/
 	tid= thread_create (name, PRI_DEFAULT, __do_fork, if_);
 	
 	/*** wait until child process loaded ***/
 	sema_down(&thread_current()->load_sema);
+
+	if(tid==TID_ERROR||parent->process_load==false){
+	// if(tid==TID_ERROR){
+		palloc_free_page(&name);
+		palloc_free_page(if_);
+		return TID_ERROR;
+	}
+
 	return tid;
 }
 
@@ -344,17 +354,16 @@ __do_fork (void *aux) {
 	// }
 	for(int i=2; i<parent->next_fd; i++){
 		if(parent->fd_table[i]==NULL) {current->fd_table[i]=NULL;
-			printf("null file\n");
+			// printf("null file\n");
 		}
 		else{
-			
 			new_file=file_duplicate(parent->fd_table[i]);
-			current->fd_table[i]=new_file;
+			if(new_file!=NULL) current->fd_table[i]=new_file;
 			//printf("file duplicate : %p, %p\n", parent->fd_table[i], new_file);
 		}
 	}
-
-	// current->process_load=true;	
+	
+	parent->process_load=true;	
 
 	/*** if memory load finish, resume parent process ***/
 	sema_up(&thread_current()->parent->load_sema);
@@ -365,6 +374,7 @@ __do_fork (void *aux) {
 		do_iret (&if_);
 	}
 error:
+	parent->process_load=false;
 	printf("err\n");
 	thread_exit ();
 }
@@ -408,6 +418,7 @@ process_exec (void *f_name) { //start_process
 		// thread_current()->process_load=false;
 		// thread_exit();
 		//syscall_exit(-1);
+		// palloc_free_page (file_name);
 		return -1;
 	}
 
@@ -416,6 +427,7 @@ process_exec (void *f_name) { //start_process
 
 	/* Start switched process. */
 	do_iret (&_if);
+	// palloc_free_page (file_name);
 	NOT_REACHED ();
 }
 
@@ -473,7 +485,7 @@ process_wait (tid_t child_tid) {
 
 	for (e = list_begin(child_list); e != list_end(child_list); e = list_next(e)) {
 		child = list_entry(e, struct thread, child_elem);
-		if (child -> tid == child_tid && child -> exit_status != -1) {
+		if (child -> tid == child_tid && child -> exit_status != -2) {
 			list_remove(e);
 			sema_up(&child -> child_sema);
 
@@ -513,7 +525,8 @@ process_exit (void) {
 	// 	palloc_free_page((void *) fp);
 	// 	printf("free\n");
 	// }
-	//palloc_free_page((void *) &curr -> fd_table);
+	// palloc_free_page((void *) &curr -> fd_table);
+
 	/*** release file descriptor ***/
 	process_cleanup ();
 }
@@ -543,6 +556,8 @@ process_cleanup (void) {
 		pml4_activate (NULL);
 		pml4_destroy (pml4);
 	}
+
+	palloc_free_page(curr -> fd_table);
 }
 
 /* Sets up the CPU for running user code in the nest thread.

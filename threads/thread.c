@@ -262,7 +262,7 @@ thread_create (const char *name, int priority,
 	/*** parent process ***/
 	curr=thread_current();
 	t->parent=curr;
-	t -> exit_status = -1;
+	t -> exit_status = -2;
 
 
 	/* Call the kernel_thread if it scheduled.
@@ -283,6 +283,12 @@ thread_create (const char *name, int priority,
 	/*** allocate memory to fd table ***/
 	t->fd_table=palloc_get_multiple(0, 2);
 	for(int i=0; i<512; i++) t->fd_table[i]=NULL;
+
+	if(t->fd_table==NULL){
+		palloc_free_page(t->fd_table);
+		palloc_free_page(t);
+		return TID_ERROR;
+	}
 
 	/*** initialize process descriptor ***/
 	t->process_load=false;
@@ -402,8 +408,10 @@ thread_exit (void) {
 	sema_up(&curr -> exit_sema);
 	// sema_up(&curr -> child_sema);
 	sema_down(&curr -> child_sema);
-	
+
 	process_exit ();
+	// palloc_free_page(&curr->fd_table);
+
 #endif
 
 	/* Just set our status to dying and schedule another process.
