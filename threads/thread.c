@@ -282,6 +282,7 @@ thread_create (const char *name, int priority,
 	// for(int i=0; i<512; i++) t->fd_table[i]=NULL;
 	/*** allocate memory to fd table ***/
 	t->fd_table=palloc_get_multiple(0, 2);
+	for(int i=0; i<512; i++) t->fd_table[i]=NULL;
 
 	/*** initialize process descriptor ***/
 	t->process_load=false;
@@ -388,7 +389,7 @@ thread_tid (void) {
 void
 thread_exit (void) {
 	struct thread *curr = thread_current();
-	struct thread *parent = curr -> parent;
+
 	ASSERT (!intr_context ());
 
 #ifdef USERPROG

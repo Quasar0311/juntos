@@ -213,7 +213,7 @@ syscall_exec (const char *cmd_line) {
 	if(process_exec((void *) cmd_line)==-1){
 		syscall_exit(-1);
 		return -1;
-	};
+	}
 }
 
 int
@@ -244,7 +244,6 @@ syscall_open(const char *file){
 	int fd=-1;
 	struct thread *curr = thread_current();
 	
-
 	lock_acquire(&filesys_lock);
 	//printf("file name: %s\n", file);
 	
@@ -266,7 +265,7 @@ syscall_open(const char *file){
 int
 syscall_filesize(int fd){
 	struct file *f;
-	off_t len;
+
 	f = process_get_file(fd);
 	if (f == NULL) {
 		return -1;

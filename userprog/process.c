@@ -56,8 +56,10 @@ process_add_file(struct file *f){
 	// 	fd=list_next(fd);
 	// }
 	for(int i=2; i<curr->next_fd; i++){ 
-		if(curr->fd_table[i]==NULL) curr->fd_table[i]=f;
-		return i;
+		if(curr->fd_table[i]==NULL){
+			curr->fd_table[i]=f;
+			return i;
+		}
 	}
 	//printf("list size : %d\n", list_size(&thread_current() -> fd_table));
 	// list_push_back(&thread_current()->fd_table, &fp -> file_elem);
@@ -314,7 +316,7 @@ __do_fork (void *aux) {
 	 * TODO:       the resources of parent.*/
 	current->next_fd=parent->next_fd;
 	// current->fd_table=parent->fd_table;
-	// printf("parent next_fd: %d\n", parent->next_fd);
+	//printf("parent next_fd: %d\n", parent->next_fd);
 	// for (e = list_begin(&parent -> fd_table); e != list_end (&parent -> fd_table);
 	// e = list_next(e)) {
 	// // e=list_begin(&parent->fd_table);
@@ -341,10 +343,14 @@ __do_fork (void *aux) {
 	// 	// }
 	// }
 	for(int i=2; i<parent->next_fd; i++){
-		if(parent->fd_table[i]==NULL) current->fd_table[i]=NULL;
+		if(parent->fd_table[i]==NULL) {current->fd_table[i]=NULL;
+			printf("null file\n");
+		}
 		else{
+			
 			new_file=file_duplicate(parent->fd_table[i]);
 			current->fd_table[i]=new_file;
+			//printf("file duplicate : %p, %p\n", parent->fd_table[i], new_file);
 		}
 	}
 
@@ -370,7 +376,6 @@ int
 process_exec (void *f_name) { //start_process
 	char *file_name = f_name;
 	bool success;
-	struct thread *p;
 	//printf("fn : %s\n", file_name);
 	/* We cannot use the intr_frame in the thread structure.
 	 * This is because when current thread rescheduled,
@@ -430,11 +435,9 @@ process_wait (tid_t child_tid) {
 	/* XXX: Hint) The pintos exit if process_wait (initd), we recommend you
 	 * XXX:       to add infinite loop here before
 	 * XXX:       implementing the process_wait. */
-	int i;
 	struct list_elem *e;
 	struct list *child_list = &thread_current() -> child_list;
 	struct thread *child;
-	struct list child_list2 = thread_current() -> child_list;
 
 	// printf("size : %d\n", list_size(&child_list2));
 	// printf("current : %s\n", thread_current() -> name);
@@ -485,7 +488,6 @@ process_wait (tid_t child_tid) {
 void
 process_exit (void) {
 	struct thread *curr = thread_current ();
-	int i;
 
 	/* TODO: Your code goes here.
 	 * TODO: Implement process termination message (see
