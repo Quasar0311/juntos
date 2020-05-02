@@ -217,7 +217,6 @@ syscall_fork(const char *thread_name, struct intr_frame *parent_frame){
 int
 syscall_exec (const char *cmd_line) {
 	int ex;
-	struct list_elem *e;
 
 	// printf("parent : %d\n", thread_current() -> tid);
 	// for (e = list_begin(&thread_current() -> parent -> child_list);
@@ -257,7 +256,6 @@ syscall_create (const char *file, unsigned initial_size) {
 		return 0;
 	}
 	else {
-		printf("filesize : %d\n", strlen(file));
 		return filesys_create(file, (off_t) initial_size);
 	}
 	
@@ -298,6 +296,7 @@ syscall_filesize(int fd){
 	return file_length(f);
 }
 
+/*** Reads size bytes from the file open as fd into buffer ***/
 int
 syscall_read(int fd, void *buffer, unsigned size){
 	struct file *f;
@@ -326,6 +325,7 @@ syscall_read(int fd, void *buffer, unsigned size){
 	return bytes_read;
 }
 
+/*** Writes size bytes from buffer to the open file fd ***/
 int
 syscall_write(int fd, void *buffer, unsigned size){
 	struct file *f;
@@ -357,20 +357,11 @@ void
 syscall_seek(int fd, unsigned position){
 	/*** get file by using file descriptor ***/
 	struct file *f=process_get_file(fd);
-	struct thread *curr=thread_current();
 
 	lock_acquire(&filesys_lock);
 
 	/*** move offset of file by position ***/
 	if(f!=NULL) file_seek(f, position);
-	// for(int i=0; i<curr->next_fd; i++){
-	// 	if(process_get_file(i)!=NULL && 
-	// 	// 	file_same(f, process_get_file(i))) {
-	// 		curr->fd_table[fd]==curr->fd_table[i]){
-	// 			file_seek(process_get_file(i), position);
-	// 			printf("seek file: %d, duplicated file: %d\n", fd, i);
-	// 	}
-	// }
 
 	lock_release(&filesys_lock);
 }
@@ -388,19 +379,14 @@ void
 syscall_close(int fd){
 	/*** close file by using file descriptor 
 	and initialize entry ***/
-	printf("syscall close, fd: %d, next_fd: %d\n", 
-		fd, thread_current()->next_fd);
 	process_close_file(fd);
 }
 
 int 
 syscall_dup2(int oldfd, int newfd){
-	struct file *new_file;
 	struct thread *curr=thread_current();
-	printf("oldfd: %d, newfd: %d\n", oldfd, newfd);
 
 	if(oldfd<0||curr->fd_table[oldfd]==NULL) {
-		printf("err\n");
 		return -1; 
 	}
 	else if(oldfd==newfd) return newfd;

@@ -95,13 +95,16 @@ process_close_file(int fd){
 
 	if(curr->fd_table[fd]==NULL) return;
 	
-	file_close(curr->fd_table[fd]);
+	// file_close(curr->fd_table[fd]);
 
 	for (int i = 2; i < curr -> next_fd; i++) {
 		if (deleted == curr -> fd_table[i]) {
-			curr -> fd_table[i] = NULL;
+			curr->fd_table[fd]=NULL;
+			return;
 		}
 	}
+
+	file_close(curr->fd_table[fd]);
 
 	// if(fd==curr->next_fd-1){
 	// 	// list_remove(fp);
@@ -316,22 +319,19 @@ __do_fork (void *aux) {
 	// 	}
 	// }
 
-	printf("parent next fd: %d\n", parent->next_fd);
 
 	for(int fd=parent->next_fd-1; fd>=0; fd--){
 		for(int i=fd+1; i<parent->next_fd; i++){
 			if(parent->fd_table[fd]!=NULL &&
 				parent->fd_table[fd]==parent->fd_table[i]){
 					current->fd_table[fd]=current->fd_table[i];
-					printf("fork %d: %p, %d: %p\n", 
-						fd, current->fd_table[fd], i, current->fd_table[i]);
 			}
 		}
 		
 		if(parent->fd_table[fd]==NULL){
 			current->fd_table[fd]=NULL;
 		}
-		
+
 		else{
 			new_file=file_duplicate(parent->fd_table[fd]);
 			if(new_file==NULL) goto error;

@@ -28,40 +28,32 @@ main (int argc UNUSED, char *argv[] UNUSED) {
 
   close (0);
 
-  CHECK ((fd1 = open ("sample.txt")) > -1, "open \"sample.txt\""); //open(2)
-  CHECK ((fd2 = open ("sample.txt")) > -1, "open \"sample.txt\""); //open(3)
+  CHECK ((fd1 = open ("sample.txt")) > -1, "open \"sample.txt\"");
+  CHECK ((fd2 = open ("sample.txt")) > -1, "open \"sample.txt\"");
 
   buffer = get_boundary_area () - sizeof sample / 2;
 
   byte_cnt += read (fd1, buffer + byte_cnt, 10);
 
-  seek (fd2, 10); //seek file:3, duplicated file:3
-  msg("buffer: %s\n", buffer);
+  seek (fd2, 10);
   byte_cnt += read (fd2, buffer + byte_cnt, 10);
 
-  CHECK (dup2 (fd2, fd3) > 1, "first dup2()"); //dup2(3, 462)
+  CHECK (dup2 (fd2, fd3) > 1, "first dup2()");
 
   byte_cnt += read (fd3, buffer + byte_cnt, 10);
 
-  seek (fd1, 15); //seek file:2 duplicated file:2
-    msg("buffer: %s\n", buffer);
-
-
+  seek (fd1, 15);
   byte_cnt += (read (fd1, buffer + 15, 30) - 15);
 
-  dup2 (dup2 (fd3, fd3), dup2 (fd1, fd2)); //dup2(dup2(462, 462), dup2(2, 3))=dup2(462, 3)
+  dup2 (dup2 (fd3, fd3), dup2 (fd1, fd2));
   seek (fd2, tell (fd1));
-    msg("buffer: %s\n", buffer);
-
   
-  byte_cnt += read (fd2, buffer + byte_cnt, 17 + 2 * dup2 (fd4, fd1)); //dup2(-12647968, 2)
+  byte_cnt += read (fd2, buffer + byte_cnt, 17 + 2 * dup2 (fd4, fd1));
 
-  close (fd1); //close(2)
+  close (fd1);
   close (fd2);
 
   seek (fd3, 60);
-    msg("buffer: %s\n", buffer);
-
   byte_cnt += read (fd3, buffer + byte_cnt, 10);
 
   dup2 (dup2 (fd3, fd2), fd1);
@@ -69,7 +61,7 @@ main (int argc UNUSED, char *argv[] UNUSED) {
   byte_cnt += read (fd1, buffer + byte_cnt, 10);
 
   for (fd5 = 10; fd5 == fd1 || fd5 == fd2 || fd5 == fd3 || fd5 == fd4; fd5++){}
-  dup2 (1, fd5); //dup2(1, 10)
+  dup2 (1, fd5);
 
   write (fd5, magic, sizeof magic - 1);
 
@@ -79,7 +71,7 @@ main (int argc UNUSED, char *argv[] UNUSED) {
   fd4 = open ("cheer");
   fd6 = open ("up");
 
-  dup2 (fd6, 1); //dup2(5, 1)
+  dup2 (fd6, 1);
 
   msg ("%d", byte_cnt);
   snprintf (magic, sizeof magic, "%d", byte_cnt);
@@ -94,8 +86,6 @@ main (int argc UNUSED, char *argv[] UNUSED) {
     dup2 (fd3, fd1);
 
     seek (fd2, 0);
-    msg("child buffer: %s\n", buffer);
-
     byte_cnt = read (fd2, magic, 3);
     msg ("%d", byte_cnt);
     byte_cnt = atoi (magic);
@@ -103,7 +93,6 @@ main (int argc UNUSED, char *argv[] UNUSED) {
     
     read (fd1, buffer, 20);
     seek (fd4, 0);
-    msg("child buffer: %s\n", buffer);
     int write_cnt = write (fd4, buffer, 20);
 
     byte_cnt += write_cnt;
@@ -114,8 +103,6 @@ main (int argc UNUSED, char *argv[] UNUSED) {
     close (fd5);
     close (fd6);
     seek (fd4, 0);
-        msg("child buffer: %s\n", buffer);
-
 
 	  msg ("child end");
     exit (byte_cnt);
@@ -126,19 +113,13 @@ main (int argc UNUSED, char *argv[] UNUSED) {
   dup2 (fd5, 1);
   
   seek (fd4, 0);
-    msg("parent buffer: %s\n", buffer);
-
   byte_cnt += read (fd4, buffer + byte_cnt, 20);
   close (fd4);
 
   seek (fd2, cur_pos);
-    msg("parent buffer: %s\n", buffer);
-
   byte_cnt += read (fd2, buffer + byte_cnt , sizeof sample - byte_cnt);
 
   seek (1, 0);
-    msg("parent buffer: %s\n", buffer);
-
 
   if (strcmp (sample, buffer)) {
     msg ("expected text:\n%s", sample);
