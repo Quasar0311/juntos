@@ -28,7 +28,7 @@ static bool load (const char *file_name, struct intr_frame *if_);
 static void initd (void *f_name);
 static void __do_fork (void *);
 
-// extern struct lock writable_lock;
+struct lock writable_lock;
 
 int 
 process_add_file(struct file *f){
@@ -315,7 +315,6 @@ __do_fork (void *aux) {
 			//printf("file duplicate : %p, %p\n", parent->fd_table[i], new_file);
 		}
 	}
-	current->writable_lock=parent->writable_lock;
 
 	parent->process_load=true;	
 	/*** if memory load finish, resume parent process ***/
