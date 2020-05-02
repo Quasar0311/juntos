@@ -39,7 +39,7 @@ process_add_file(struct file *f){
 	// struct file_pointer *fp = palloc_get_page(0);
 	// fp -> file = f;
 	
-	if(f==NULL||curr->next_fd>127) {
+	if(f==NULL||curr->next_fd>511) {
 		//printf("file is null\n");
 		file_close(f);
 		return -1;
@@ -614,7 +614,7 @@ load (const char *file_name, struct intr_frame *if_) {
 	if (file == NULL) {
 		/*** Release when file open fail ***/
 		lock_release(&t->writable_lock);
-		// printf ("load: %s: open failed\n", file_title);
+		printf ("load: %s: open failed\n", file_title);
 		goto done;
 	}
 

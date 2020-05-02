@@ -28,29 +28,29 @@ main (int argc UNUSED, char *argv[] UNUSED) {
 
   close (0);
 
-  CHECK ((fd1 = open ("sample.txt")) > -1, "open \"sample.txt\"");
-  CHECK ((fd2 = open ("sample.txt")) > -1, "open \"sample.txt\"");
+  CHECK ((fd1 = open ("sample.txt")) > -1, "open \"sample.txt\""); //open(2)
+  CHECK ((fd2 = open ("sample.txt")) > -1, "open \"sample.txt\""); //open(3)
 
   buffer = get_boundary_area () - sizeof sample / 2;
 
   byte_cnt += read (fd1, buffer + byte_cnt, 10);
 
-  seek (fd2, 10);
+  seek (fd2, 10); //seek file:3, duplicated file:3
   byte_cnt += read (fd2, buffer + byte_cnt, 10);
 
-  CHECK (dup2 (fd2, fd3) > 1, "first dup2()");
+  CHECK (dup2 (fd2, fd3) > 1, "first dup2()"); //dup2(3, 462)
 
   byte_cnt += read (fd3, buffer + byte_cnt, 10);
 
-  seek (fd1, 15);
+  seek (fd1, 15); //seek file:2 duplicated file:2
   byte_cnt += (read (fd1, buffer + 15, 30) - 15);
 
-  dup2 (dup2 (fd3, fd3), dup2 (fd1, fd2));
+  dup2 (dup2 (fd3, fd3), dup2 (fd1, fd2)); //dup2(dup2(462, 462), dup2(2, 3))=dup2(462, 3)
   seek (fd2, tell (fd1));
   
-  byte_cnt += read (fd2, buffer + byte_cnt, 17 + 2 * dup2 (fd4, fd1));
+  byte_cnt += read (fd2, buffer + byte_cnt, 17 + 2 * dup2 (fd4, fd1)); //dup2(-12647968, 2)
 
-  close (fd1);
+  close (fd1); //close(2)
   close (fd2);
 
   seek (fd3, 60);
@@ -61,7 +61,7 @@ main (int argc UNUSED, char *argv[] UNUSED) {
   byte_cnt += read (fd1, buffer + byte_cnt, 10);
 
   for (fd5 = 10; fd5 == fd1 || fd5 == fd2 || fd5 == fd3 || fd5 == fd4; fd5++){}
-  dup2 (1, fd5);
+  dup2 (1, fd5); //dup2(1, 10)
 
   write (fd5, magic, sizeof magic - 1);
 
@@ -71,7 +71,7 @@ main (int argc UNUSED, char *argv[] UNUSED) {
   fd4 = open ("cheer");
   fd6 = open ("up");
 
-  dup2 (fd6, 1);
+  dup2 (fd6, 1); //dup2(5, 1)
 
   msg ("%d", byte_cnt);
   snprintf (magic, sizeof magic, "%d", byte_cnt);
