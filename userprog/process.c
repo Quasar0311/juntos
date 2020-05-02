@@ -91,12 +91,17 @@ process_close_file(int fd){
 	// struct file *f;
 	// struct list_elem *fp;
 	struct thread *curr = thread_current();
+	struct file *deleted = curr -> fd_table[fd];
 
 	if(curr->fd_table[fd]==NULL) return;
 	
 	file_close(curr->fd_table[fd]);
 
-	curr->fd_table[fd]=NULL;
+	for (int i = 2; i < curr -> next_fd; i++) {
+		if (deleted == curr -> fd_table[i]) {
+			curr -> fd_table[i] = NULL;
+		}
+	}
 
 	// if(fd==curr->next_fd-1){
 	// 	// list_remove(fp);
@@ -297,24 +302,43 @@ __do_fork (void *aux) {
 	 * TODO:       the resources of parent.*/
 	current->next_fd=parent->next_fd;
 
-	for(int i=2; i<parent->next_fd; i++){
-		if(parent->fd_table[i]==NULL) {
-			current->fd_table[i]=NULL;
-			// printf("null file\n");
-		}
-		else{
-			new_file=file_duplicate(parent->fd_table[i]);
-			// file_close(new_file);
-			if (new_file == NULL) {
-				printf("dup error\n");
-				goto error;
-			}
-			current->fd_table[i]=new_file;
+	// for(int i=2; i<parent->next_fd; i++){
+	// 	if(parent->fd_table[i]==NULL) {
+	// 		current->fd_table[i]=NULL;
+	// 	}
+	// 	else{
+	// 		new_file=file_duplicate(parent->fd_table[i]);
+	// 		if (new_file == NULL) {
+	// 			printf("dup error\n");
+	// 			goto error;
+	// 		}
+	// 		current->fd_table[i]=new_file;
+	// 	}
+	// }
 
-			
-			//printf("file duplicate : %p, %p\n", parent->fd_table[i], new_file);
+	printf("parent next fd: %d\n", parent->next_fd);
+
+	for(int fd=parent->next_fd-1; fd>=0; fd--){
+		for(int i=fd+1; i<parent->next_fd; i++){
+			if(parent->fd_table[fd]!=NULL &&
+				parent->fd_table[fd]==parent->fd_table[i]){
+					current->fd_table[fd]=current->fd_table[i];
+					printf("fork %d: %p, %d: %p\n", 
+						fd, current->fd_table[fd], i, current->fd_table[i]);
+			}
+		}
+		
+		if(parent->fd_table[fd]==NULL){
+			current->fd_table[fd]=NULL;
+		}
+		
+		else{
+			new_file=file_duplicate(parent->fd_table[fd]);
+			if(new_file==NULL) goto error;
+			current->fd_table[fd]=new_file;
 		}
 	}
+
 	parent->process_load=true;	
 	/*** if memory load finish, resume parent process ***/
 	sema_up(&thread_current()->parent->load_sema);
