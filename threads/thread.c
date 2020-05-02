@@ -302,7 +302,8 @@ thread_create (const char *name, int priority,
 	list_push_back(&curr->child_list, &t->child_elem);
 
 	t->pid=t->tid;
-	// sema_down(&curr -> load_sema);
+
+	t -> std_close = false;
 	/* Add to run queue. */
 	thread_unblock (t);
 

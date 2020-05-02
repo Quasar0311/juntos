@@ -276,10 +276,14 @@ syscall_open(const char *file){
 		file_deny_write(f);
 	}
 
-	// curr -> run_file = f;
-	// file_deny_write(f);
-	//printf("got fd : %d\n",fd);
-	//printf("fd: %d, file open : %d\n", fd, thread_current() -> next_fd);
+	// for(int i=2; i<curr->next_fd; i++){
+	// 	if(curr->fd_table[fd]==curr->fd_table[i] && i!=fd){
+	// 		// printf("there is same file pointer\n");
+	// 		curr->fd_table[fd]=f;
+	// 	}
+	// }
+
+	// printf("fd: %d, file open : %p\n", fd, thread_current() -> fd_table[fd]);
 	lock_release(&filesys_lock);
 
 	return fd;
@@ -301,16 +305,20 @@ int
 syscall_read(int fd, void *buffer, unsigned size){
 	struct file *f;
 	off_t bytes_read;
+	struct thread *curr=thread_current();
 
 	lock_acquire(&filesys_lock);
 
-	if(fd==0){
+	if(fd==0 && !curr -> std_close){
+	// for(int i=0; i<thread_current()->next_fd; i++){
+		// if(thread_current()->fd_table[i]==thread_current()->fd_table[0]){
 		/*** invalid use of void expression ***/
 		uint8_t *buf=(uint8_t *)buffer;
 		for(unsigned i=0; i<size; i++) 
 			buf[i]=input_getc();
 		lock_release(&filesys_lock);
 		return size;
+		// }
 	}
 
 	f=process_get_file(fd);
@@ -330,13 +338,35 @@ int
 syscall_write(int fd, void *buffer, unsigned size){
 	struct file *f;
 	off_t bytes_read;
-	// printf("fd : %d\n", fd);
+	struct thread *curr=thread_current();
+	
+	// printf("write fd : %d, %p\n", fd, thread_current()->fd_table[fd]);
 	lock_acquire(&filesys_lock);
 
-	if(fd==1){
+	// if(fd==1 && !curr -> std_close){
+	// 	putbuf((char *)buffer, size);
+	// 	lock_release(&filesys_lock);
+	// 	return size;
+	// }
+
+	// if (curr -> fd_table[fd] == 0 && curr -> std_close) {
+	// 	putbuf((char *)buffer, size);
+	// 	lock_release(&filesys_lock);
+	// 	return size;
+	// }
+
+	// if(fd==1||thread_current()->fd_table[fd]==1){
+	// for(int i=0; i<thread_current()->next_fd; i++){
+	if(thread_current()->fd_table[fd]==thread_current()->fd_table[1]
+		&& !curr -> std_close){
 		putbuf((char *)buffer, size);
+			// if(thread_current()->fd_table[fd]==1) {
+			// 	// printf("make null\n");
+			// 	thread_current()->fd_table[fd]=NULL;
+			// }
 		lock_release(&filesys_lock);
 		return size;
+		// }
 	}
 
 	/*** get file by using file descriptor ***/
@@ -379,27 +409,48 @@ void
 syscall_close(int fd){
 	/*** close file by using file descriptor 
 	and initialize entry ***/
+	// printf("close: %d\n", fd);
 	process_close_file(fd);
+	
 }
 
 int 
 syscall_dup2(int oldfd, int newfd){
+	struct file *new_file;
 	struct thread *curr=thread_current();
-
+	// printf("oldfd: %d, newfd: %d\n", oldfd, newfd);
+	
+	// if (oldfd == 1) {
+	// 	printf("st\n");
+	// }
 	if(oldfd<0||curr->fd_table[oldfd]==NULL) {
+		// printf("err\n");
 		return -1; 
 	}
 	else if(oldfd==newfd) return newfd;
+	// else if(oldfd==1) {
+	// 	syscall_close(1);
+	// }
 
 	// new_file=file_duplicate(curr->fd_table[oldfd]);
-	if(curr->fd_table[newfd]!=NULL) curr->fd_table[newfd]=NULL;
-
+	if(curr->fd_table[newfd]!=NULL) {
+		// syscall_close(newfd);
+		// process_close_file(newfd);
+		curr -> fd_table[newfd] = NULL;
+	}
+	// if (oldfd == 1) {
+	// 	// printf("stdout\n");
+	// 	curr -> fd_table[newfd] = 1;
+	// }
+	// if(newfd==1) return 1;
 	// curr->fd_table[newfd]=new_file;
-	curr->fd_table[newfd]=curr->fd_table[oldfd];
-	// curr->fd_table[newfd]=new_file;
+	else curr->fd_table[newfd]=curr->fd_table[oldfd];
+	if((curr->fd_table[newfd]) == (curr->fd_table[oldfd])) 
+		// printf("duplicated\n");
 
-
-	if(newfd>curr->next_fd) curr->next_fd=newfd+1;
+	if(newfd>=curr->next_fd) {
+		curr->next_fd=newfd+1;
+	}
 
 	return newfd;
 }

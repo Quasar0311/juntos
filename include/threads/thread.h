@@ -139,6 +139,8 @@ struct thread {
 	struct file *run_file;
 	struct semaphore writable_lock;
 
+	bool std_close;
+
 #endif
 #ifdef VM
 	/* Table for whole virtual memory owned by thread. */

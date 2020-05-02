@@ -93,18 +93,23 @@ process_close_file(int fd){
 	struct thread *curr = thread_current();
 	struct file *deleted = curr -> fd_table[fd];
 
+	if (fd == 0 || fd == 1) {
+		curr -> std_close = true;
+		return;
+	}
+
 	if(curr->fd_table[fd]==NULL) return;
 	
-	// file_close(curr->fd_table[fd]);
-
-	for (int i = 2; i < curr -> next_fd; i++) {
-		if (deleted == curr -> fd_table[i]) {
+	for (int i = 0; i < curr -> next_fd; i++) {
+		if (deleted == curr -> fd_table[i] && fd!=i) {
+			// printf("fd: %d, i: %d, %p, next_fd: %d\n", fd, i, curr->fd_table[i], curr->next_fd);
 			curr->fd_table[fd]=NULL;
 			return;
 		}
 	}
 
 	file_close(curr->fd_table[fd]);
+	curr->fd_table[fd]=NULL;
 
 	// if(fd==curr->next_fd-1){
 	// 	// list_remove(fp);
@@ -304,6 +309,7 @@ __do_fork (void *aux) {
 	 * TODO:       from the fork() until this function successfully duplicates
 	 * TODO:       the resources of parent.*/
 	current->next_fd=parent->next_fd;
+	current -> std_close = parent -> std_close;
 
 	// for(int i=2; i<parent->next_fd; i++){
 	// 	if(parent->fd_table[i]==NULL) {
@@ -319,7 +325,6 @@ __do_fork (void *aux) {
 	// 	}
 	// }
 
-
 	for(int fd=parent->next_fd-1; fd>=0; fd--){
 		for(int i=fd+1; i<parent->next_fd; i++){
 			if(parent->fd_table[fd]!=NULL &&
@@ -330,12 +335,14 @@ __do_fork (void *aux) {
 		
 		if(parent->fd_table[fd]==NULL){
 			current->fd_table[fd]=NULL;
+			// printf("fd[%d]: %p\n", fd, current->fd_table[fd]);
 		}
 
 		else{
 			new_file=file_duplicate(parent->fd_table[fd]);
 			if(new_file==NULL) goto error;
 			current->fd_table[fd]=new_file;
+			// printf("fd[%d]: %p\n", fd, current->fd_table[fd]);
 		}
 	}
 
