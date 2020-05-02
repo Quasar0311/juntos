@@ -216,18 +216,28 @@ syscall_fork(const char *thread_name, struct intr_frame *parent_frame){
 
 int
 syscall_exec (const char *cmd_line) {
-	//printf("%s\n", cmd_line);
-	// lock_acquire(&filesys_lock);
 	int ex;
-	
+	struct list_elem *e;
+
+	// printf("parent : %d\n", thread_current() -> tid);
+	// for (e = list_begin(&thread_current() -> parent -> child_list);
+	// e != list_end(&thread_current() -> parent -> child_list); e = list_next(e)) {
+	// 	printf("name : %s\n", thread_current() -> parent -> name);
+	// 	struct thread *child = list_entry(e, struct thread, child_elem);
+	// 	if (child -> tid == ex) {
+	// 		printf("sdf\n");
+	// 		sema_down(&child -> load_sema);
+	// 	}
+	// }
+	// sema_down(&thread_current() -> child_sema);
+	// lock_acquire(&filesys_lock);
+	// printf("working : %s\n", thread_current() -> name);
+	// lock_acquire(&thread_current() -> writable_lock);
 	ex = process_exec((void *) cmd_line);
-
+	
 	if (ex == -1) {
-		// lock_release(&filesys_lock);
-		syscall_exit(-1);
+		return TID_ERROR;
 	}
-
-	// lock_release(&filesys_lock);
 	return ex;
 }
 
@@ -399,9 +409,8 @@ syscall_dup2(int oldfd, int newfd){
 
 	// new_file=file_duplicate(curr->fd_table[oldfd]);
 	if(curr->fd_table[newfd]!=NULL) {
-		printf("newfd is not null\n");
-		// process_close_file(newfd);
-		curr->fd_table[newfd]=NULL;
+		printf("newfd is null\n");
+		process_close_file(newfd);
 		}
 
 	// curr->fd_table[newfd]=new_file;

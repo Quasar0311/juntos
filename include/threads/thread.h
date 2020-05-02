@@ -137,7 +137,6 @@ struct thread {
 	pid_t pid;
 
 	struct file *run_file;
-	struct lock writable_lock;
 
 #endif
 #ifdef VM

@@ -282,13 +282,12 @@ thread_create (const char *name, int priority,
 	t->next_fd=2;
 	// for(int i=0; i<512; i++) t->fd_table[i]=NULL;
 	/*** allocate memory to fd table ***/
-	// t->fd_table=calloc(128, sizeof(struct file*));
-	t->fd_table=calloc(512, sizeof(struct file*));
 	if (t -> fd_table == NULL) {
 		return TID_ERROR;
 	}
-	// for(int i=0; i<128; i++) t->fd_table[i]=NULL;
 	for(int i=0; i<512; i++) t->fd_table[i]=NULL;
+
+	
 
 	/*** initialize process descriptor ***/
 	t->process_load=false;
@@ -296,7 +295,6 @@ thread_create (const char *name, int priority,
 	sema_init(&t->exit_sema, 0);
 	sema_init(&t->load_sema, 0);
 	sema_init(&t -> child_sema, 0);
-	// lock_init(&t->writable_lock);
 
 	/*** add to child_list ***/
 	list_push_back(&curr->child_list, &t->child_elem);
@@ -413,9 +411,11 @@ thread_exit (void) {
 		list_remove(e);
 		sema_up(&child -> child_sema);
 	}
+	// sema_up(&curr -> writable_lock);
 	sema_up(&curr -> exit_sema);
 	// sema_up(&curr -> child_sema);
 	sema_down(&curr -> child_sema);
+	// sema_up(&curr -> writable_lock);
 	
 	process_exit ();
 #endif
