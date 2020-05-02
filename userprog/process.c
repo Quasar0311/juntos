@@ -146,6 +146,7 @@ process_create_initd (const char *file_name) { //process_execute
 	strlcpy(file_title, file_name, strlen(file_name) + 1);
 	char *token, *save_ptr;
 
+	lock_init(&writable_lock);
 	for (token = strtok_r(file_title, " ", &save_ptr); token != NULL;
 	token = strtok_r(NULL, " ", &save_ptr)) {
 		strlcpy(file_title, token, strlen(token) + 1);
@@ -190,7 +191,7 @@ process_fork (const char *name, struct intr_frame *if_) {
 	tid_t tid = 0;
 	if_ -> R.rax = 0;
 
-	
+	lock_release(&writable_lock);
 	/* Clone current thread to new thread.*/
 	tid= thread_create (name, PRI_DEFAULT, __do_fork, if_);
 	
@@ -352,33 +353,30 @@ process_exec (void *f_name) { //start_process
 	// /* We first kill the current context */
 	// // process_cleanup ();
 	// printf("before load : %s\n", file_name);
-	// /* And then load the binary */
+	/* And then load the binary */
+	// printf("acquire : %d\n", thread_current() -> tid);
+	if (thread_current() -> tid > 3) lock_acquire(&writable_lock);
 	
-	// if (thread_current() -> tid > 3) {
-	// 	for (e = list_begin(&thread_current() -> parent -> child_list);
-	// 	e != list_end(&thread_current() -> parent -> child_list); e = list_next(e)) {
-			
-	// 		struct thread *child = list_entry(e, struct thread, child_elem);
-	// 		if (child -> tid == thread_current() -> tid) {
-	// 			printf("sdf\n");
-	// 			sema_down(&child -> writable_lock);
-	// 		}
-	// 	}
-	// }
-
 	success = load (file_name, &_if);
+	// printf("release : %d\n", thread_current() -> tid);
 	
 	/* If load failed, quit. */
 	// palloc_free_page (file_name);
+	// printf("name : %d\n", thread_current() -> tid);
+	
 	if (!success){
 		return -1;
 	}
+	// lock_release(&writable_lock);
+
 
 	/*** if load success process descriptor memory load success ***/
 	// if(success) thread_current()->process_load=true;
 
 	/* Start switched process. */
 	do_iret (&_if);
+	
+
 	// palloc_free_page (file_name);
 	NOT_REACHED ();
 }
@@ -405,11 +403,12 @@ process_wait (tid_t child_tid) {
 	if (list_empty(&thread_current() -> child_list)) {
 		return -1;
 	}
-
+	
 	for (e = list_begin(&thread_current() -> child_list); e != list_end(&thread_current() -> child_list); e = list_next(e)) {
 		
 		child = list_entry(e, struct thread, child_elem);
 		// printf("child tid : %d\n", child -> tid);
+		// sema_down(&child -> writable_lock);
 		if (child -> tid == child_tid) {
 			break;
 		}	
@@ -458,7 +457,7 @@ process_exit (void) {
 	 * TODO: Implement process termination message (see
 	 * TODO: project2/process_termination.html).
 	 * TODO: We recommend you to implement process resource cleanup here. */
-	
+	// lock_acquire(&writable_lock);
 	/*** close all files of process ***/
 	// printf("nextfd : %d\n", curr -> next_fd);
 	while(curr -> next_fd >= 3){
@@ -471,7 +470,9 @@ process_exit (void) {
 	// palloc_free_page(curr -> fd_table);
 	// palloc_free_multiple(curr -> fd_table, 2);
 	free(curr -> fd_table);
+	lock_release(&writable_lock);
 	/*** release file descriptor ***/
+	// lock_release(&writable_lock);
 	process_cleanup ();
 }
 
@@ -585,6 +586,9 @@ load (const char *file_name, struct intr_frame *if_) {
 	bool success = false;
 	int i;
 	
+	// if (t -> tid > 1) lock_acquire(&writable_lock);
+	
+
 	/*** Acquire lock for running file ***/
 	// lock_acquire(&thread_current() -> writable_lock);
 	/*** Arguments passing ***/
@@ -616,12 +620,15 @@ load (const char *file_name, struct intr_frame *if_) {
 				strlcpy(file_title, token, token_len + 1);
 				break;
 	}
-
+	// lock_acquire(&writable_lock);
+	// printf("opening : %s\n", file_title);
 	/* Open executable file. */
 	file = filesys_open (file_title);
+	// lock_release(&writable_lock);
 	if (file == NULL) {
 		/*** Release when file open fail ***/
-		// lock_release(&thread_current() -> writable_lock);
+		// printf("fail : %d\n", thread_current() -> tid);
+		//lock_release(&writable_lock);
 		printf ("load: %s: open failed\n", file_title);
 		goto done;
 	}
@@ -631,7 +638,7 @@ load (const char *file_name, struct intr_frame *if_) {
 		 Then release lock. ***/
 	t -> run_file = file;
 	file_deny_write(file);
-	// lock_release(&writable_lock);
+	
 
 	/* Read and verify executable header. */
 	if (file_read (file, &ehdr, sizeof ehdr) != sizeof ehdr
@@ -768,6 +775,8 @@ load (const char *file_name, struct intr_frame *if_) {
 	palloc_free_page(file_copy_argv);
 	palloc_free_page(file_title);
 	free(argv);
+	// lock_release(&writable_lock);
+
 	success = true;
 
 done:

@@ -218,11 +218,8 @@ int
 syscall_exec (const char *cmd_line) {
 	int ex;
 	struct list_elem *e;
-	// lock_acquire(&filesys_lock);
-	// printf("working : %s\n", thread_current() -> name);
-	// lock_acquire(&thread_current() -> writable_lock);
-	ex = process_exec((void *) cmd_line);
-	// printf("parent : %s\n", thread_current() -> parent -> name);
+
+	// printf("parent : %d\n", thread_current() -> tid);
 	// for (e = list_begin(&thread_current() -> parent -> child_list);
 	// e != list_end(&thread_current() -> parent -> child_list); e = list_next(e)) {
 	// 	printf("name : %s\n", thread_current() -> parent -> name);
@@ -232,6 +229,12 @@ syscall_exec (const char *cmd_line) {
 	// 		sema_down(&child -> load_sema);
 	// 	}
 	// }
+	// sema_down(&thread_current() -> child_sema);
+	// lock_acquire(&filesys_lock);
+	// printf("working : %s\n", thread_current() -> name);
+	// lock_acquire(&thread_current() -> writable_lock);
+	ex = process_exec((void *) cmd_line);
+	
 	if (ex == -1) {
 		return TID_ERROR;
 	}

@@ -413,6 +413,7 @@ thread_exit (void) {
 		list_remove(e);
 		sema_up(&child -> child_sema);
 	}
+	// sema_up(&curr -> writable_lock);
 	sema_up(&curr -> exit_sema);
 	// sema_up(&curr -> child_sema);
 	sema_down(&curr -> child_sema);
