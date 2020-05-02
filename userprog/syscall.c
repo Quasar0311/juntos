@@ -1,5 +1,4 @@
 #include "userprog/syscall.h"
-// #include "lib/user/syscall.h"
 #include <stdio.h>
 #include <syscall-nr.h>
 #include <string.h>
@@ -75,7 +74,6 @@ syscall_handler (struct intr_frame *f) {
 	/*** implement syscall_handgler using 
 	system call number stored in the user stack ***/
 	int *number=(int *)&f->R.rax;
-	//printf("system call no. : %d\n", *number);
 	
 	switch(*number){
 		/*** SYS_HALT ***/
@@ -91,9 +89,6 @@ syscall_handler (struct intr_frame *f) {
 		/*** SYS_FORK ***/
 		case 2:
 			check_address((uint64_t)f->R.rdi);
-			
-			// memcpy(&thread_current()->fork_frame, &f, sizeof(struct intr_frame));
-			// intr_dump_frame(f);
 			fork=syscall_fork((char *)f->R.rdi, f);
 			f->R.rax = fork;
 			break;
@@ -168,11 +163,6 @@ syscall_handler (struct intr_frame *f) {
 
 	/*** check if stack pointer is user virtual address
 	check if argument pointer is user virtual address ***/
-	
-	// printf("syscall num : %d\n", (int *)(f->R.rax));
-	// printf ("system call!\n");
-	
-	//thread_exit ();
 }
 
 void
@@ -180,7 +170,6 @@ check_address (uint64_t reg) {
 	/*** check if the address is in user address ***/
 	
 	if ((char *) reg == NULL) {
-		//printf("null\n");
 		syscall_exit(-1);
 	}
 	
@@ -205,10 +194,6 @@ syscall_exit (int status) {
 
 pid_t
 syscall_fork(const char *thread_name, struct intr_frame *parent_frame){
-
-	// struct intr_frame *frame = &thread_current() -> fork_frame;
-	// printf("parent rdi : %s\n", thread_current() -> tf.R.rdi);
-	// memcpy(parent_frame, &thread_current() -> tf, sizeof(struct intr_frame));
 	struct intr_frame *parent_copy = parent_frame;
 	return process_fork(thread_name, parent_copy);
 
@@ -239,7 +224,6 @@ syscall_create (const char *file, unsigned initial_size) {
 		return false;
 	}
 	else if (strlen(file) >= 511) {
-		//printf("hi : %d\n", false);
 		return 0;
 	}
 	else {
@@ -255,7 +239,6 @@ syscall_open(const char *file){
 	struct thread *curr = thread_current();
 	
 	lock_acquire(&filesys_lock);
-	//printf("file name: %s\n", file);
 	
 	f=filesys_open(file);
 	fd=process_add_file(f);
@@ -263,10 +246,6 @@ syscall_open(const char *file){
 		file_deny_write(f);
 	}
 
-	// curr -> run_file = f;
-	// file_deny_write(f);
-	//printf("got fd : %d\n",fd);
-	//printf("fd: %d, file open : %d\n", fd, thread_current() -> next_fd);
 	lock_release(&filesys_lock);
 
 	return fd;
@@ -319,27 +298,18 @@ syscall_write(int fd, void *buffer, unsigned size){
 	struct file *f;
 	off_t bytes_read;
 	struct thread *curr = thread_current();
-	// printf("fd : %d\n", fd);
+
 	lock_acquire(&filesys_lock);
-	// printf("fd : %d, std_close : %d\n", fd, curr -> std_close);
+
 	if (fd == 0) {
 		syscall_exit(-1);
 	}
 
-	if(fd==1 && curr -> std_out == 0){
+	if(fd==1 && curr -> std_out == 1){
 		putbuf((char *)buffer, size);
 		lock_release(&filesys_lock);
 		return size;
 	}
-	// if(fd==1&&curr->std_close!=0){
-	// 	printf("std close: %d\n",  curr -> std_close);
-	// 	f=process_get_file(curr -> std_close);
-	// 	printf("file : %p\n", curr -> fd_table[curr -> std_close]);
-	// 	bytes_read=file_write(f, buffer, size);
-	// 	// lock_release(&filesys_lock);
-	// 	// return bytes_read;
-	// }
-	
 
 	if (curr -> std_out == fd) {
 		putbuf((char *)buffer, size);
@@ -355,9 +325,7 @@ syscall_write(int fd, void *buffer, unsigned size){
 	}
 	
 	else {
-		// printf("write : %d\n", fd);
 		bytes_read=file_write(f, buffer, size);
-		// printf("br %d\n", bytes_read);
 	}
 	lock_release(&filesys_lock);
 	return bytes_read;
@@ -377,7 +345,6 @@ syscall_seek(int fd, unsigned position){
 	/*** move offset of file by position ***/
 	file_seek(f, position);
 
-
 	lock_release(&filesys_lock);
 }
 
@@ -394,55 +361,26 @@ void
 syscall_close(int fd){
 	/*** close file by using file descriptor 
 	and initialize entry ***/
-	// printf("syscall close, fd: %d, next_fd: %d\n", 
-		// fd, thread_current()->next_fd);
 	process_close_file(fd);
 }
 
 int 
 syscall_dup2(int oldfd, int newfd){
 	struct thread *curr=thread_current();
-	// printf("oldfd: %d, newfd: %d\n", oldfd, newfd);
-	printf("of : %d, nf : %d, std_close : %d\n", oldfd, newfd, curr -> std_out);
+
 	if(oldfd==newfd) return newfd;
-	// if (newfd == 128) return -1;
-	if (oldfd == 0) {
-		if (curr -> std_in == 0) curr -> std_in = newfd;
-	}
-	// if(oldfd==curr->std_in) curr->std_in=newfd;
-	else if (oldfd == 1) {
-		if (curr -> std_out == 0) curr -> std_out = newfd;
-	}
-	// if(oldfd==curr->std_out) curr->std_out=newfd;
-	// if (oldfd == 1 || oldfd == 0) {
-	// 	if (curr -> std_close == 0) curr -> std_close = newfd;
-	// }
-	// else if (newfd == 1 || newfd == 0) {
-	// 	if (curr -> std_close == oldfd) {
-	// 		curr -> std_close = 0;
-	// 	}
-	// }
-	else if (newfd == 0) {
-		if (curr -> std_in == oldfd) curr -> std_in = 0;
-	}
-	else if (newfd == 1) {
-		if (curr -> std_out == oldfd) curr -> std_out = 0;
-	}
+
+	if(oldfd==curr->std_in) curr->std_in=newfd;
+	if(oldfd==curr->std_out) curr->std_out=newfd; 
 
 	else if(oldfd<0||curr->fd_table[oldfd]==NULL) {
-		// printf("err\n");
 		return -1; 
 	}
 	
-
-	// new_file=file_duplicate(curr->fd_table[oldfd]);
 	if(curr->fd_table[newfd]!=NULL) {
-		// printf("newfd is already exist.\n");
 		process_close_file(newfd);
-		// curr -> fd_table[newfd] = NULL;
 	}
 
-	// curr->fd_table[newfd]=new_file;
 	curr->fd_table[newfd]=curr->fd_table[oldfd];
 
 	if(newfd>=curr->next_fd) {

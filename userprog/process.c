@@ -81,7 +81,6 @@ process_close_file(int fd){
 	struct file **fdt = curr -> fd_table;
 
 	if (fd == 0 || fd == 1) {
-		// curr -> std_close = 0;
 		return;
 	}
 	if(curr->fd_table[fd]==NULL) return;
@@ -230,7 +229,6 @@ duplicate_pte (uint64_t *pte, void *va, void *aux) {
 	
 	if (!pml4_set_page (current->pml4, va, newpage, writable)) {
 		/* 6. TODO: if fail to insert page, do error handling. */
-		//printf("error handasdfle\n");
 		return false;
 	}
 	return true;
@@ -246,11 +244,8 @@ __do_fork (void *aux) {
 	struct intr_frame if_;
 	struct thread *parent = thread_current() -> parent;
 	struct thread *current = thread_current ();
-	// struct list_elem *e;
-	// struct file_pointer *fp = palloc_get_page(0);
 	struct file *new_file;	
-	// printf("parent : %s, %d, child : %s\n", parent -> name, parent -> next_fd, current -> name);
-	// list_push_back(&parent -> child_list, &current -> child_elem);
+
 	/* TODO: somehow pass the parent_if. (i.e. process_fork()'s if_) */
 	struct intr_frame *parent_if = aux;
 	bool succ = true;
@@ -279,24 +274,7 @@ __do_fork (void *aux) {
 	current->next_fd=parent->next_fd;
 	current -> std_out = parent -> std_out;
 	current -> std_in = parent -> std_in;
-	// for(int i=2; i<parent->next_fd; i++){
-	// 	if(parent->fd_table[i]==NULL) {
-	// 		current->fd_table[i]=NULL;
-	// 		// printf("null file\n");
-	// 	}
-	// 	else{
-	// 		new_file=file_duplicate(parent->fd_table[i]);
-	// 		// file_close(new_file);
-	// 		if (new_file == NULL) {
-	// 			printf("dup error\n");
-	// 			goto error;
-	// 		}
-	// 		current->fd_table[i]=new_file;
 
-			
-	// 		//printf("file duplicate : %p, %p\n", parent->fd_table[i], new_file);
-	// 	}
-	// }
 	for(int fd=parent->next_fd-1; fd>=0; fd--){
 		for(int i=fd+1; i<parent->next_fd; i++){
 			if(parent->fd_table[fd]!=NULL &&
@@ -307,18 +285,15 @@ __do_fork (void *aux) {
 		
 		if(parent->fd_table[fd]==NULL){
 			current->fd_table[fd]=NULL;
-			// printf("fd[%d]: %p\n", fd, current->fd_table[fd]);
 		}
+
 		else{
 			new_file=file_duplicate(parent->fd_table[fd]);
 			if(new_file==NULL) goto error;
 			current->fd_table[fd]=new_file;
-			// new_file=file_duplicate(parent->fd_table[fd]);
-			// if(new_file==NULL) goto error;
-			// current->fd_table[fd]=new_file;
-			// printf("fd[%d]: %p\n", fd, current->fd_table[fd]);
 		}
 	}
+
 	parent->process_load=true;	
 	/*** if memory load finish, resume parent process ***/
 	sema_up(&thread_current()->parent->load_sema);
@@ -328,10 +303,8 @@ __do_fork (void *aux) {
 	if (succ) {
 		do_iret (&if_);
 	}
+
 error:
-	// palloc_free_page(current->pml4);
-	// printf("name : %s\n", thread_current() -> name);
-	// list_remove(&current -> child_elem);
 	parent->process_load=false;
 	sema_up(&thread_current()->parent->load_sema);
 	thread_exit ();
@@ -345,43 +318,31 @@ process_exec (void *f_name) { //start_process
 	char *file_name = f_name;
 	bool success;
 	struct list_elem *e;
-	//printf("fn : %s\n", file_name);
 	/* We cannot use the intr_frame in the thread structure.
 	 * This is because when current thread rescheduled,
 	 * it stores the execution information to the member. */
 	struct intr_frame _if;
 	_if.ds = _if.es = _if.ss = SEL_UDSEG;
 	_if.cs = SEL_UCSEG;
+
 	_if.eflags = FLAG_IF | FLAG_MBS;
-	// printf("before load1 : %s\n", file_name);
-	// /* We first kill the current context */
-	// // process_cleanup ();
-	// printf("before load : %s\n", file_name);
+	/* We first kill the current context */
+	// process_cleanup ();
 	/* And then load the binary */
-	// printf("acquire : %d\n", thread_current() -> tid);
 	if (thread_current() -> tid > 3) lock_acquire(&writable_lock);
 	
 	success = load (file_name, &_if);
-	// printf("release : %d\n", thread_current() -> tid);
 	
 	/* If load failed, quit. */
-	// palloc_free_page (file_name);
-	// printf("name : %d\n", thread_current() -> tid);
-	
 	if (!success){
 		return -1;
 	}
-	// lock_release(&writable_lock);
-
 
 	/*** if load success process descriptor memory load success ***/
-	// if(success) thread_current()->process_load=true;
 
 	/* Start switched process. */
 	do_iret (&_if);
 	
-
-	// palloc_free_page (file_name);
 	NOT_REACHED ();
 }
 
@@ -401,7 +362,6 @@ process_wait (tid_t child_tid) {
 	 * XXX:       to add infinite loop here before
 	 * XXX:       implementing the process_wait. */
 	struct list_elem *e;
-	// struct list *child_list = &thread_current() -> child_list;
 	struct thread *child;
 	
 	if (list_empty(&thread_current() -> child_list)) {
@@ -411,44 +371,31 @@ process_wait (tid_t child_tid) {
 	for (e = list_begin(&thread_current() -> child_list); e != list_end(&thread_current() -> child_list); e = list_next(e)) {
 		
 		child = list_entry(e, struct thread, child_elem);
-		// printf("child tid : %d\n", child -> tid);
-		// sema_down(&child -> writable_lock);
 		if (child -> tid == child_tid) {
 			break;
 		}	
-		
-		// else {
-		// 	// printf("no, : %d \n", child -> tid);
-		// }
 	}
 
-	// printf("waiting3 : %d\n", child_tid);
 	if (child -> tid != child_tid) {
 		return -1;
 	}
-	// printf("sema-down : %d\n", child -> tid);
 	
 	sema_down(&child -> exit_sema);
-	// printf("doing : %d\n", child_tid);
-	// child_list = &thread_current() -> child_list;
 
 	for (e = list_begin(&thread_current() -> child_list); e != list_end(&thread_current() -> child_list); e = list_next(e)) {
 		child = list_entry(e, struct thread, child_elem);
 		if (child -> tid == child_tid && child -> exit_status != -2 && child -> exit_status != -1) {
 			sema_up(&child -> child_sema);
 			list_remove(e);
-			// printf("name, wait1 : %s\n", child -> name);
 			return child -> exit_status;
 		}
+
 		else if (child -> tid == child_tid && child -> exit_status == -1) {
-			// printf("name, wait2 : %s\n", child -> name);
 			sema_up(&child -> child_sema);
 			list_remove(e);
 			return -1;
 		}
 	}
-	// printf("tid : %s\n", child -> name);
-	// sema_up(&child -> child_sema);
 	return -1;
 }
 
@@ -461,23 +408,17 @@ process_exit (void) {
 	 * TODO: Implement process termination message (see
 	 * TODO: project2/process_termination.html).
 	 * TODO: We recommend you to implement process resource cleanup here. */
-	// lock_acquire(&writable_lock);
+
 	/*** close all files of process ***/
-	// printf("nextfd : %d\n", curr -> next_fd);
 	while(curr -> next_fd >= 3){
-	// while(curr -> next_fd != 2){
 		process_close_file(curr -> next_fd - 1);
 		curr -> next_fd--;
-		// printf("fd : %d\n", curr -> next_fd);
 	}
 	
-	// palloc_free_page(curr -> fd_table);
-	// palloc_free_multiple(curr -> fd_table, 2);
 	free(curr -> fd_table);
 	lock_release(&writable_lock);
-	// curr -> std_close = 0;
+
 	/*** release file descriptor ***/
-	// lock_release(&writable_lock);
 	process_cleanup ();
 }
 
@@ -591,18 +532,12 @@ load (const char *file_name, struct intr_frame *if_) {
 	bool success = false;
 	int i;
 	
-	// if (t -> tid > 1) lock_acquire(&writable_lock);
-	
-
-	/*** Acquire lock for running file ***/
-	// lock_acquire(&thread_current() -> writable_lock);
 	/*** Arguments passing ***/
 	char *token, *save_ptr;
 	uint64_t argc = 0;
 	char zero = 0;
 	size_t token_len;
 	char *argv_addr;
-	//char *file_copy_argc = malloc(strlen(file_name) + 1);
 	char *file_copy_argc = palloc_get_page(0);
 	char *file_copy_argv = palloc_get_page(0);
 	char *file_title = palloc_get_page(0);
@@ -616,8 +551,7 @@ load (const char *file_name, struct intr_frame *if_) {
 		goto done;
 	process_activate (thread_current ());
 
-	//printf("file name : %s\n", file_title);
-		/*** give proper file name to FILE_NAME ***/
+	/*** give proper file name to FILE_NAME ***/
 	for (token = strtok_r(file_title, " ", &save_ptr); token != NULL;
 			token = strtok_r(NULL, " ", &save_ptr)) {
 				/*** if token == NULL? ***/
@@ -625,15 +559,11 @@ load (const char *file_name, struct intr_frame *if_) {
 				strlcpy(file_title, token, token_len + 1);
 				break;
 	}
-	// lock_acquire(&writable_lock);
-	// printf("opening : %s\n", file_title);
+
 	/* Open executable file. */
 	file = filesys_open (file_title);
-	// lock_release(&writable_lock);
+
 	if (file == NULL) {
-		/*** Release when file open fail ***/
-		// printf("fail : %d\n", thread_current() -> tid);
-		//lock_release(&writable_lock);
 		printf ("load: %s: open failed\n", file_title);
 		goto done;
 	}
@@ -720,12 +650,10 @@ load (const char *file_name, struct intr_frame *if_) {
 	/* TODO: Your code goes here.
 	 * TODO: Implement argument passing (see project2/argument_passing.html). */
 	
-
 	for (token = strtok_r(file_copy_argc, " ", &save_ptr); token != NULL;
 			token = strtok_r(NULL, " ", &save_ptr)) {
 			argc++;
 	}
-	//printf("argc : %d\n", argc);
 
 	char **argv = calloc(32, sizeof(char *));
 
@@ -735,14 +663,11 @@ load (const char *file_name, struct intr_frame *if_) {
 	for (token = strtok_r(file_copy_argv, " ", &save_ptr); token != NULL;
 			token = strtok_r(NULL, " ", &save_ptr)) {
 				token_len = strlen(token);
-				//printf("strlen : %d\n", strlen(token));
 				if_ -> rsp -= token_len + 1;
 				strlcpy((char *) if_ -> rsp, token, strlen(token) + 1);
 				argv[argc] = (char *) if_ -> rsp;
 				argc++;
 	}
-
-	//argv[argc] = zero;
 
 	while (if_ -> rsp % 8 != 0) {
 		if_ -> rsp -= 1;
@@ -759,34 +684,23 @@ load (const char *file_name, struct intr_frame *if_) {
 		if_ -> rsp -= sizeof(char*);
 		strlcpy((char *) if_ -> rsp, (char *) &argv[i], sizeof(char*));
 	}
-	//printf("argc3 : %p\n", if_ -> rsp);
-	//printf("if rsp : %p\n", if_ -> rsp);
 	argv_addr = (char *) if_ -> rsp;
 
 	if_ -> rsp -= sizeof(void*);
-	//argc -= 1;
-	//printf("argv at argument : %p\n", argv_addr);
-	//printf("argc : %d\n", argc);
 	strlcpy((char *) if_ -> rsp, (char *) &argc, sizeof(void*));
-	// printf("argc : %d\n", argc);
-	//strlcpy((char *) &if_ -> R.rdi, (char *) &argc, sizeof(char *));
 	if_ -> R.rdi = argc;
-	//printf("argc : %d\n", if_->R.rdi);
 	strlcpy((char *) &if_ -> R.rsi, (char *) &argv_addr, sizeof(char*));
 	if_ -> R.rsi = argv_addr;
 	
-	// hex_dump(if_ -> rsp, (void *) if_ -> rsp, 0x47480000 - (if_ -> rsp), true);
 	palloc_free_page(file_copy_argc);
 	palloc_free_page(file_copy_argv);
 	palloc_free_page(file_title);
 	free(argv);
-	// lock_release(&writable_lock);
 
 	success = true;
 
 done:
 	/* We arrive here whether the load is successful or not. */
-	//printf("file title : %s\n", file_title);
 	file_close (file);
 	return success;
 }

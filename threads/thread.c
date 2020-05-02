@@ -278,9 +278,8 @@ thread_create (const char *name, int priority,
 	t->tf.eflags = FLAG_IF;
 
 	/*** initialize fd ***/
-	// list_init(&t->fd_table);
 	t->next_fd=2;
-	// for(int i=0; i<512; i++) t->fd_table[i]=NULL;
+
 	/*** allocate memory to fd table ***/
 	t->fd_table=calloc(512, sizeof(struct file*));
 	if (t -> fd_table == NULL) {
@@ -294,17 +293,16 @@ thread_create (const char *name, int priority,
 	t->process_load=false;
 	t->process_terminate=false;
 	t -> std_in = 0;
-	t -> std_out = 0;
+	t -> std_out = 1;
 	sema_init(&t->exit_sema, 0);
 	sema_init(&t->load_sema, 0);
 	sema_init(&t -> child_sema, 0);
-	sema_init(&t -> writable_lock, 0);
 
 	/*** add to child_list ***/
 	list_push_back(&curr->child_list, &t->child_elem);
 
 	t->pid=t->tid;
-	// sema_down(&curr -> load_sema);
+
 	/* Add to run queue. */
 	thread_unblock (t);
 
@@ -315,8 +313,6 @@ thread_create (const char *name, int priority,
 			thread_yield();
 		}
 	}
-	// printf("making thread %s...\n", t -> name);
-	// printf("parent pid in thread_create = %d\n", curr -> tid);
 	return tid;
 }
 
@@ -404,10 +400,7 @@ thread_exit (void) {
 	ASSERT (!intr_context ());
 
 #ifdef USERPROG
-	// if (thread_current() -> parent != NULL) {
-	// 	parent = thread_current() -> parent;
-	// }
-	// printf("sema-up : %d\n", curr -> tid);
+
 	curr -> process_terminate = true;
 	for (e = list_begin(&curr -> child_list); e != list_end(&curr -> child_list)
 	; e = list_next(e)) {
@@ -415,11 +408,8 @@ thread_exit (void) {
 		list_remove(e);
 		sema_up(&child -> child_sema);
 	}
-	// sema_up(&curr -> writable_lock);
 	sema_up(&curr -> exit_sema);
-	// sema_up(&curr -> child_sema);
 	sema_down(&curr -> child_sema);
-	// sema_up(&curr -> writable_lock);
 	
 	process_exit ();
 #endif
@@ -492,10 +482,6 @@ cmp_max_priority(void){
 		return;
 	}
 
-	// if (list_entry(list_front(&ready_list), struct thread, elem) -> priority
-	//  > thread_current() -> priority) {
-	// 	 thread_yield();
-	//  }
 	if(list_entry(list_max(&ready_list, priority_less_func, NULL), struct thread, elem)->priority
 	> thread_get_priority()) {
 		if (!intr_context()) {

@@ -63,7 +63,7 @@ main (int argc UNUSED, char *argv[] UNUSED) {
   for (fd5 = 10; fd5 == fd1 || fd5 == fd2 || fd5 == fd3 || fd5 == fd4; fd5++){}
   dup2 (1, fd5);
 
-  write (fd5, magic, sizeof magic - 1);
+  write (fd5, magic, sizeof magic - 1); //lock
 
   create ("cheer", sizeof sample);
   create ("up", sizeof sample);

@@ -112,7 +112,6 @@ struct thread {
 	uint64_t *pml4;                     /* Page map level 4 */
 
 	/*** file descriptor table ***/
-	// struct list fd_table;
 	struct file **fd_table;
 	/*** max fd of current table+ 1 ***/
 	int next_fd;
@@ -137,7 +136,6 @@ struct thread {
 	pid_t pid;
 
 	struct file *run_file;
-	struct semaphore writable_lock;
 	int std_out;
 	int std_in;
 
