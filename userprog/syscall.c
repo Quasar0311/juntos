@@ -219,20 +219,6 @@ syscall_exec (const char *cmd_line) {
 	int ex;
 	struct list_elem *e;
 
-	// printf("parent : %d\n", thread_current() -> tid);
-	// for (e = list_begin(&thread_current() -> parent -> child_list);
-	// e != list_end(&thread_current() -> parent -> child_list); e = list_next(e)) {
-	// 	printf("name : %s\n", thread_current() -> parent -> name);
-	// 	struct thread *child = list_entry(e, struct thread, child_elem);
-	// 	if (child -> tid == ex) {
-	// 		printf("sdf\n");
-	// 		sema_down(&child -> load_sema);
-	// 	}
-	// }
-	// sema_down(&thread_current() -> child_sema);
-	// lock_acquire(&filesys_lock);
-	// printf("working : %s\n", thread_current() -> name);
-	// lock_acquire(&thread_current() -> writable_lock);
 	ex = process_exec((void *) cmd_line);
 	
 	if (ex == -1) {
@@ -257,7 +243,6 @@ syscall_create (const char *file, unsigned initial_size) {
 		return 0;
 	}
 	else {
-		//printf("filesize : %d\n", strlen(file));
 		return filesys_create(file, (off_t) initial_size);
 	}
 	
@@ -302,6 +287,7 @@ int
 syscall_read(int fd, void *buffer, unsigned size){
 	struct file *f;
 	off_t bytes_read;
+	struct thread *curr = thread_current();
 
 	lock_acquire(&filesys_lock);
 
@@ -320,7 +306,9 @@ syscall_read(int fd, void *buffer, unsigned size){
 		return -1;
 	}
 	
-	else bytes_read=file_read(f, buffer, (off_t) size);
+	else {
+		bytes_read=file_read(f, buffer, (off_t) size);
+	}
 	lock_release(&filesys_lock);
 
 	return bytes_read;
@@ -330,10 +318,30 @@ int
 syscall_write(int fd, void *buffer, unsigned size){
 	struct file *f;
 	off_t bytes_read;
+	struct thread *curr = thread_current();
 	// printf("fd : %d\n", fd);
 	lock_acquire(&filesys_lock);
+	// printf("fd : %d, std_close : %d\n", fd, curr -> std_close);
+	if (fd == 0) {
+		syscall_exit(-1);
+	}
 
-	if(fd==1){
+	if(fd==1 && curr -> std_out == 0){
+		putbuf((char *)buffer, size);
+		lock_release(&filesys_lock);
+		return size;
+	}
+	// if(fd==1&&curr->std_close!=0){
+	// 	printf("std close: %d\n",  curr -> std_close);
+	// 	f=process_get_file(curr -> std_close);
+	// 	printf("file : %p\n", curr -> fd_table[curr -> std_close]);
+	// 	bytes_read=file_write(f, buffer, size);
+	// 	// lock_release(&filesys_lock);
+	// 	// return bytes_read;
+	// }
+	
+
+	if (curr -> std_out == fd) {
 		putbuf((char *)buffer, size);
 		lock_release(&filesys_lock);
 		return size;
@@ -347,7 +355,9 @@ syscall_write(int fd, void *buffer, unsigned size){
 	}
 	
 	else {
+		// printf("write : %d\n", fd);
 		bytes_read=file_write(f, buffer, size);
+		// printf("br %d\n", bytes_read);
 	}
 	lock_release(&filesys_lock);
 	return bytes_read;
@@ -356,21 +366,17 @@ syscall_write(int fd, void *buffer, unsigned size){
 void
 syscall_seek(int fd, unsigned position){
 	/*** get file by using file descriptor ***/
-	// struct file *f=process_get_file(fd);
+	struct file *f=process_get_file(fd);
+	if (f == NULL) {
+		return;
+	}
 	struct thread *curr=thread_current();
 
 	lock_acquire(&filesys_lock);
 
 	/*** move offset of file by position ***/
-	// file_seek(f, position);
-	for(int i=2; i<curr->next_fd; i++){
-		if(process_get_file(i)!=NULL && 
-		// 	file_same(f, process_get_file(i))) {
-			curr->fd_table[fd]==curr->fd_table[i]){
-				file_seek(process_get_file(i), position);
-				printf("seek file: %d, duplicated file: %d\n", fd, i);
-		}
-	}
+	file_seek(f, position);
+
 
 	lock_release(&filesys_lock);
 }
@@ -388,35 +394,60 @@ void
 syscall_close(int fd){
 	/*** close file by using file descriptor 
 	and initialize entry ***/
-	printf("syscall close, fd: %d, next_fd: %d\n", 
-		fd, thread_current()->next_fd);
+	// printf("syscall close, fd: %d, next_fd: %d\n", 
+		// fd, thread_current()->next_fd);
 	process_close_file(fd);
 }
 
 int 
 syscall_dup2(int oldfd, int newfd){
-	struct file *new_file;
 	struct thread *curr=thread_current();
-	printf("oldfd: %d, newfd: %d\n", oldfd, newfd);
+	// printf("oldfd: %d, newfd: %d\n", oldfd, newfd);
+	printf("of : %d, nf : %d, std_close : %d\n", oldfd, newfd, curr -> std_out);
+	if(oldfd==newfd) return newfd;
+	// if (newfd == 128) return -1;
+	if (oldfd == 0) {
+		if (curr -> std_in == 0) curr -> std_in = newfd;
+	}
+	// if(oldfd==curr->std_in) curr->std_in=newfd;
+	else if (oldfd == 1) {
+		if (curr -> std_out == 0) curr -> std_out = newfd;
+	}
+	// if(oldfd==curr->std_out) curr->std_out=newfd;
+	// if (oldfd == 1 || oldfd == 0) {
+	// 	if (curr -> std_close == 0) curr -> std_close = newfd;
+	// }
+	// else if (newfd == 1 || newfd == 0) {
+	// 	if (curr -> std_close == oldfd) {
+	// 		curr -> std_close = 0;
+	// 	}
+	// }
+	else if (newfd == 0) {
+		if (curr -> std_in == oldfd) curr -> std_in = 0;
+	}
+	else if (newfd == 1) {
+		if (curr -> std_out == oldfd) curr -> std_out = 0;
+	}
 
-	if(oldfd<0||curr->fd_table[oldfd]==NULL) {
-		printf("err\n");
+	else if(oldfd<0||curr->fd_table[oldfd]==NULL) {
+		// printf("err\n");
 		return -1; 
 	}
-	else if(oldfd==newfd) return newfd;
+	
 
 	// new_file=file_duplicate(curr->fd_table[oldfd]);
 	if(curr->fd_table[newfd]!=NULL) {
-		printf("newfd is null\n");
+		// printf("newfd is already exist.\n");
 		process_close_file(newfd);
-		}
+		// curr -> fd_table[newfd] = NULL;
+	}
 
 	// curr->fd_table[newfd]=new_file;
 	curr->fd_table[newfd]=curr->fd_table[oldfd];
-	if((curr->fd_table[newfd]) = (curr->fd_table[oldfd])) 
-		printf("duplicated\n");
 
-	if(newfd>curr->next_fd) curr->next_fd=newfd+1;
+	if(newfd>=curr->next_fd) {
+		curr->next_fd=newfd+1;
+	}
 
 	return newfd;
 }

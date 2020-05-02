@@ -293,6 +293,8 @@ thread_create (const char *name, int priority,
 	/*** initialize process descriptor ***/
 	t->process_load=false;
 	t->process_terminate=false;
+	t -> std_in = 0;
+	t -> std_out = 0;
 	sema_init(&t->exit_sema, 0);
 	sema_init(&t->load_sema, 0);
 	sema_init(&t -> child_sema, 0);

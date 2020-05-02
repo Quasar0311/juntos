@@ -138,6 +138,8 @@ struct thread {
 
 	struct file *run_file;
 	struct semaphore writable_lock;
+	int std_out;
+	int std_in;
 
 #endif
 #ifdef VM
