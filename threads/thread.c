@@ -281,11 +281,11 @@ thread_create (const char *name, int priority,
 	t->next_fd=2;
 
 	/*** allocate memory to fd table ***/
-	t->fd_table=calloc(512, sizeof(struct file*));
+	t->fd_table=calloc(128, sizeof(struct file*));
 	if (t -> fd_table == NULL) {
 		return TID_ERROR;
 	}
-	for(int i=0; i<512; i++) t->fd_table[i]=NULL;
+	for(int i=0; i<128; i++) t->fd_table[i]=NULL;
 
 	
 

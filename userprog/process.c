@@ -34,7 +34,7 @@ int
 process_add_file(struct file *f){
 	struct thread *curr=thread_current();
 	
-	if(f==NULL||curr->next_fd>511) {
+	if(f==NULL||curr->next_fd>127) {
 		file_close(f);
 		return -1;
 	}
@@ -79,7 +79,7 @@ process_close_file(int fd){
 	struct thread *curr = thread_current();
 	struct file *deleted = curr -> fd_table[fd];
 	struct file **fdt = curr -> fd_table;
-
+	
 	if (fd == 0 || fd == 1) {
 		return;
 	}
