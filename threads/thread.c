@@ -279,15 +279,14 @@ thread_create (const char *name, int priority,
 
 	/*** initialize fd ***/
 	t->next_fd=2;
+	t->max_fd=256;
 
 	/*** allocate memory to fd table ***/
-	t->fd_table=calloc(512, sizeof(struct file*));
+	t->fd_table=calloc(256, sizeof(struct file*));
 	if (t -> fd_table == NULL) {
 		return TID_ERROR;
 	}
-	for(int i=0; i<512; i++) t->fd_table[i]=NULL;
-
-	
+	for(int i=0; i<256; i++) t->fd_table[i]=NULL;
 
 	/*** initialize process descriptor ***/
 	t->process_load=false;

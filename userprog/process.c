@@ -34,9 +34,18 @@ int
 process_add_file(struct file *f){
 	struct thread *curr=thread_current();
 	
-	if(f==NULL||curr->next_fd>511) {
-		file_close(f);
-		return -1;
+	if(curr -> max_fd == 256){
+		if(f==NULL||curr->next_fd>255) {
+			file_close(f);
+			return -1;
+		}
+	}
+
+	if(curr->max_fd==512){
+		if(f==NULL||curr->next_fd>511) {
+			file_close(f);
+			return -1;
+		}
 	}
 
 	/*** add file to file descriptor ***/
@@ -78,7 +87,6 @@ process_close_file(int fd){
 	/*** close file corressponding to file descriptor ***/
 	struct thread *curr = thread_current();
 	struct file *deleted = curr -> fd_table[fd];
-	struct file **fdt = curr -> fd_table;
 
 	if (fd == 0 || fd == 1) {
 		return;
@@ -272,6 +280,16 @@ __do_fork (void *aux) {
 	 * TODO:       from the fork() until this function successfully duplicates
 	 * TODO:       the resources of parent.*/
 	current->next_fd=parent->next_fd;
+	current->max_fd=parent->max_fd;
+	// printf("parent max fd: %d\n", parent->max_fd);
+
+	if(parent->max_fd==512){
+		free(current->fd_table);
+		current->fd_table=calloc(512, sizeof(struct file*));
+		for(int i=0; i<512; i++) 
+			current->fd_table[i]=NULL;
+	}
+
 	current -> std_out = parent -> std_out;
 	current -> std_in = parent -> std_in;
 
@@ -295,6 +313,7 @@ __do_fork (void *aux) {
 	}
 
 	parent->process_load=true;	
+
 	/*** if memory load finish, resume parent process ***/
 	sema_up(&thread_current()->parent->load_sema);
 	process_init ();
@@ -317,7 +336,6 @@ int
 process_exec (void *f_name) { //start_process
 	char *file_name = f_name;
 	bool success;
-	struct list_elem *e;
 	/* We cannot use the intr_frame in the thread structure.
 	 * This is because when current thread rescheduled,
 	 * it stores the execution information to the member. */

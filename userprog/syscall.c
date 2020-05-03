@@ -16,6 +16,9 @@
 #include "include/filesys/file.h"
 #include "include/devices/input.h"
 #include "threads/palloc.h"
+#include "filesys/file.h"
+#include "filesys/filesys.h"
+#include "threads/malloc.h"
 
 struct lock filesys_lock;
 
@@ -202,7 +205,6 @@ syscall_fork(const char *thread_name, struct intr_frame *parent_frame){
 int
 syscall_exec (const char *cmd_line) {
 	int ex;
-	struct list_elem *e;
 
 	ex = process_exec((void *) cmd_line);
 	
@@ -266,7 +268,6 @@ int
 syscall_read(int fd, void *buffer, unsigned size){
 	struct file *f;
 	off_t bytes_read;
-	struct thread *curr = thread_current();
 
 	lock_acquire(&filesys_lock);
 
@@ -338,7 +339,6 @@ syscall_seek(int fd, unsigned position){
 	if (f == NULL) {
 		return;
 	}
-	struct thread *curr=thread_current();
 
 	lock_acquire(&filesys_lock);
 
@@ -367,6 +367,17 @@ syscall_close(int fd){
 int 
 syscall_dup2(int oldfd, int newfd){
 	struct thread *curr=thread_current();
+	struct file **copy_fd;
+	
+	if(curr->max_fd==256 && newfd>=256){
+		copy_fd=calloc(512, sizeof(struct file*));
+		for(int i=0; i<256; i++) copy_fd[i] = curr -> fd_table[i];
+		for(int i=256; i<512; i++) copy_fd[i]=NULL;
+
+		free(curr -> fd_table);
+		curr -> fd_table = copy_fd;
+		curr->max_fd=512;
+	}
 
 	if(oldfd==newfd) return newfd;
 

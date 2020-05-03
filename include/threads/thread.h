@@ -113,8 +113,9 @@ struct thread {
 
 	/*** file descriptor table ***/
 	struct file **fd_table;
-	/*** max fd of current table+ 1 ***/
+	/*** size of fd of current table+ 1 ***/
 	int next_fd;
+	int max_fd;
 
 	/*** parent descriptor, pointer of parent process ***/
 	struct thread *parent;
