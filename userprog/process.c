@@ -342,8 +342,10 @@ process_exec (void *f_name) { //start_process
 	struct intr_frame _if;
 	_if.ds = _if.es = _if.ss = SEL_UDSEG;
 	_if.cs = SEL_UCSEG;
-
 	_if.eflags = FLAG_IF | FLAG_MBS;
+
+	vm_init();
+
 	/* We first kill the current context */
 	// process_cleanup ();
 	/* And then load the binary */
@@ -355,8 +357,6 @@ process_exec (void *f_name) { //start_process
 	if (!success){
 		return -1;
 	}
-
-	/*** if load success process descriptor memory load success ***/
 
 	/* Start switched process. */
 	do_iret (&_if);
@@ -434,6 +434,9 @@ process_exit (void) {
 	}
 	
 	free(curr -> fd_table);
+	
+	supplemental_page_table_kill(&curr->spt);
+
 	lock_release(&writable_lock);
 
 	/*** release file descriptor ***/
