@@ -3,10 +3,12 @@
 
 #include "threads/thread.h"
 
-struct file_pointer{
-    struct file * file;
-    struct list_elem file_elem;
-};
+struct load_file{
+    struct file *file;
+    off_t ofs;
+    size_t read_bytes;
+    size_t zero_bytes;
+}
 
 /*** create file descriptor for a file object ***/
 int process_add_file(struct file *f);
