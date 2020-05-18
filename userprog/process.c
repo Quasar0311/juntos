@@ -281,7 +281,6 @@ __do_fork (void *aux) {
 	 * TODO:       the resources of parent.*/
 	current->next_fd=parent->next_fd;
 	current->max_fd=parent->max_fd;
-	// printf("parent max fd: %d\n", parent->max_fd);
 
 	if(parent->max_fd==512){
 		free(current->fd_table);
