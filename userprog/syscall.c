@@ -169,6 +169,7 @@ syscall_handler (struct intr_frame *f) {
 }
 
 void
+// struct page *
 check_address (uint64_t reg) {
 	/*** check if the address is in user address ***/
 	
@@ -180,6 +181,8 @@ check_address (uint64_t reg) {
 		printf("bad address for address : %p\n", &reg);
 		syscall_exit(-1);
 	}
+
+	// return spt_find_page(&thread_current()->spt, (void *)&reg);
 }
 
 void

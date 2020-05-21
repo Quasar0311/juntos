@@ -8,7 +8,7 @@ struct load_file{
     off_t ofs;
     size_t read_bytes;
     size_t zero_bytes;
-}
+};
 
 /*** create file descriptor for a file object ***/
 int process_add_file(struct file *f);
