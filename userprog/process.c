@@ -343,7 +343,8 @@ process_exec (void *f_name) { //start_process
 	_if.cs = SEL_UCSEG;
 	_if.eflags = FLAG_IF | FLAG_MBS;
 
-	vm_init();
+	// vm_init();
+	// supplemental_page_table_init(&thread_current() -> spt);
 
 	/* We first kill the current context */
 	// process_cleanup ();
@@ -915,16 +916,17 @@ load_segment (struct file *file, off_t ofs, uint8_t *upage,
 		 * and zero the final PAGE_ZERO_BYTES bytes. */
 		size_t page_read_bytes = read_bytes < PGSIZE ? read_bytes : PGSIZE;
 		size_t page_zero_bytes = PGSIZE - page_read_bytes;
-
+		
 		/* TODO: Set up aux to pass information to the lazy_load_segment. */
-		struct load_file *load_file=NULL;
+		struct load_file *load_file=(struct load_file *) malloc(sizeof(struct load_file));
 
 		load_file->file=file;
 		load_file->ofs=ofs;
 		load_file->read_bytes=page_read_bytes;
 		load_file->zero_bytes=page_zero_bytes;
-
+		
 		void *aux = load_file;
+		
 		if (!vm_alloc_page_with_initializer (VM_ANON, upage,
 					writable, lazy_load_segment, aux))
 			return false;

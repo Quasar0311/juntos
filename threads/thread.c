@@ -281,6 +281,8 @@ thread_create (const char *name, int priority,
 	t->next_fd=2;
 	t->max_fd=256;
 
+	// supplemental_page_table_init(&t -> spt);
+
 	/*** allocate memory to fd table ***/
 	t->fd_table=calloc(256, sizeof(struct file*));
 	if (t -> fd_table == NULL) {

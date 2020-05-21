@@ -210,7 +210,7 @@ intr_init (void) {
 static void
 register_handler (uint8_t vec_no, int dpl, enum intr_level level,
 		intr_handler_func *handler, const char *name) {
-	// ASSERT (intr_handlers[vec_no] == NULL);
+	ASSERT (intr_handlers[vec_no] == NULL);
 	if (level == INTR_ON) {
 		make_trap_gate(&idt[vec_no], intr_stubs[vec_no], dpl);
 	}
