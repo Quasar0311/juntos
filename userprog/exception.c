@@ -144,12 +144,12 @@ page_fault (struct intr_frame *f) {
 
 	/*** page fault in the kernel merely sets rax to -1 
 	and copies its former value into %rip ***/
-	if(!user){
-		f->rip=f->R.rax;
-		f->R.rax=-1;
-		/*** exit(-1) if page fault ***/
-		syscall_exit(-1);
-	}
+	// if(!user){
+	// 	f->rip=f->R.rax;
+	// 	f->R.rax=-1;
+	// 	/*** exit(-1) if page fault ***/
+	// 	syscall_exit(-1);
+	// }
 
 #ifdef VM
 	/* For project 3 and later. */
