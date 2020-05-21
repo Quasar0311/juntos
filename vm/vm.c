@@ -1,11 +1,13 @@
 /* vm.c: Generic interface for virtual memory objects. */
 
 #include "threads/malloc.h"
+#include "threads/thread.h"
 #include "vm/vm.h"
 #include "vm/inspect.h"
 #include <hash.h>
 #include "threads/vaddr.h"
 #include "threads/mmu.h"
+#include <stdio.h>
 
 /* Initializes the virtual memory subsystem by invoking each subsystem's
  * intialize codes. */
@@ -60,6 +62,8 @@ vm_alloc_page_with_initializer (enum vm_type type, void *upage, bool writable,
 		uninit_page->writable=writable;
 		uninit_page->is_loaded=false;
 
+		printf("type : %d\n", type);
+		
 		switch(type){
 			case VM_ANON:
 				uninit_new(uninit_page, upage, init, type, aux, anon_initializer);
@@ -72,9 +76,11 @@ vm_alloc_page_with_initializer (enum vm_type type, void *upage, bool writable,
 			case VM_PAGE_CACHE:
 				break;
 		}
-
+		printf("vmtype : %d\n", uninit_page -> uninit.type);
 		/* TODO: Insert the page into the spt. */
 		spt_insert_page(spt, uninit_page);
+		
+		return true;
 	}
 err:
 	return false;
@@ -87,6 +93,9 @@ spt_find_page (struct supplemental_page_table *spt, void *va) { //find_vme
 	/* TODO: Fill this function. */
 	struct hash_elem *e;
 
+	if (hash_empty(&spt -> vm)) {
+		return NULL;
+	}
 	page.va=pg_round_down(va);
 	e=hash_find(&spt->vm, &page.page_elem);
 
@@ -98,10 +107,14 @@ bool
 spt_insert_page (struct supplemental_page_table *spt,
 		struct page *page) {
 	int succ = false;
+	printf("insert\n");
 	/* TODO: Fill this function. */
-	if(hash_insert(&spt->vm, &page->page_elem)!=NULL) 
-		succ=true;
-		
+	if(hash_insert(&spt->vm, &page->page_elem)!= NULL) {
+		printf("succ\n");
+		succ = true;
+	}
+
+	printf("insert2\n");
 	return succ;
 }
 
@@ -231,7 +244,7 @@ vm_hash_func(const struct hash_elem *e, void *aux UNUSED){
 	struct page *p;
 	
 	p=hash_entry(e, struct page, page_elem);
-	return hash_int(*(int *)p->va);
+	return hash_int ((int) p -> va);
 }
 
 /*** hash_less_func in hash_init ***/
@@ -243,7 +256,8 @@ vm_less_func(const struct hash_elem *a, const struct hash_elem *b, void *aux UNU
 
 /* Initialize new supplemental page table */
 void
-supplemental_page_table_init (struct supplemental_page_table *spt UNUSED) {
+supplemental_page_table_init (struct supplemental_page_table *spt) {
+	spt = (struct supplemental_page_table *) malloc(sizeof(struct hash));
 	hash_init(&spt->vm, vm_hash_func, vm_less_func, NULL);
 }
 
