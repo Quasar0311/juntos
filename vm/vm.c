@@ -52,7 +52,6 @@ vm_alloc_page_with_initializer (enum vm_type type, void *upage, bool writable,
 
 	struct supplemental_page_table *spt = &thread_current ()->spt;
 	struct hash *h=&spt->vm;
-	printf("alloc initializer: %zx\n", h->bucket_cnt);
 
 	/* Check wheter the upage is already occupied or not. */
 	if (spt_find_page (spt, upage) == NULL) {
@@ -65,8 +64,9 @@ vm_alloc_page_with_initializer (enum vm_type type, void *upage, bool writable,
 
 		switch(type){
 			case VM_ANON:
+			case VM_MARKER_0:
 				uninit_new(uninit_page, upage, init, type, aux, anon_initializer);
-				printf("uninit new\n");
+				printf("uninit new?\n");
 				break;
 
 			case VM_FILE:
@@ -97,10 +97,11 @@ spt_find_page (struct supplemental_page_table *spt, void *va) { //find_vme
 	if (hash_empty(&spt -> vm)) {
 		return NULL;
 	}
-	printf("spt find page\n");
+	printf("spt find page : %ld\n", va);
 
 	page.va=pg_round_down(va);
 	e=hash_find(&spt->vm, &page.page_elem);
+	if (e == NULL) return NULL;
 
 	return hash_entry(e, struct page, page_elem);
 }
@@ -184,6 +185,7 @@ bool
 vm_try_handle_fault (struct intr_frame *f, void *addr,
 		bool user, bool write, bool not_present) {
 	struct supplemental_page_table *spt = &thread_current ()->spt;
+	printf("handle fault\n");
 	struct page *page = spt_find_page(spt, addr);
 	/* TODO: Validate the fault */
 	/* TODO: Your code goes here */
@@ -211,9 +213,11 @@ bool
 vm_claim_page (void *va) {
 	struct page *page;
 	/* TODO: Fill this function */
+	printf("we have to find : %ld\n", va);
 	struct thread *curr=thread_current();
-
+	
 	page=spt_find_page(&curr->spt, va);
+	printf("spt find page asdf : %ld\n", page -> va);
 	if(page==NULL) return false;
 
 	return vm_do_claim_page (page);
@@ -224,18 +228,19 @@ static bool
 vm_do_claim_page (struct page *page) {
 	struct frame *frame = vm_get_frame ();
 	struct thread *curr=thread_current();
-
+	printf("page : %ld\n", page -> va);
+	
 	/* Set links */
 	frame->page = page;
 	page->frame = frame;
 
 	/* TODO: Insert page table entry to map page's VA to frame's PA. */
-	if(!pml4_set_page(curr->pml4, page->va, frame->pa, page->writable)){
+	if(!pml4_set_page(curr->pml4, page->va, frame->kva, page->writable)){
 		palloc_free_page(frame->kva);
 		free(frame);
 		return false;
 	}
-
+	
 	return swap_in (page, frame->kva);
 }
 
@@ -243,7 +248,6 @@ vm_do_claim_page (struct page *page) {
 static uint64_t
 vm_hash_func(const struct hash_elem *e, void *aux UNUSED){
 	struct page *p;
-	printf("vm_hash_func h->hash\n");
 	
 	p=hash_entry(e, struct page, page_elem);
 	return hash_int((int)p->va);

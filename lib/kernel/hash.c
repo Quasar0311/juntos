@@ -275,17 +275,13 @@ hash_string (const char *s_) {
 /* Returns a hash of integer I. */
 uint64_t
 hash_int (int i) {
-	printf("hash int\n");
 	return hash_bytes (&i, sizeof i);
 }
 
 /* Returns the bucket in H that E belongs in. */
 static struct list *
 find_bucket (struct hash *h, struct hash_elem *e) {
-	printf("find_bucket bucket_cnt: %zx\n", h->bucket_cnt);
-	printf("find_bucket h->hash: %llu\n", h->hash(e, h->aux));
 	size_t bucket_idx = h->hash (e, h->aux) & (h->bucket_cnt - 1);
-	printf("find_bucket bucket_idx: %zx\n", bucket_idx);
 	return &h->buckets[bucket_idx];
 }
 
