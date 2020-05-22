@@ -1,11 +1,13 @@
 /* vm.c: Generic interface for virtual memory objects. */
 
 #include "threads/malloc.h"
+#include "threads/thread.h"
 #include "vm/vm.h"
 #include "vm/inspect.h"
 #include <hash.h>
 #include "threads/vaddr.h"
 #include "threads/mmu.h"
+#include <stdio.h>
 
 /* Initializes the virtual memory subsystem by invoking each subsystem's
  * intialize codes. */
@@ -46,10 +48,11 @@ static struct frame *vm_evict_frame (void);
 bool
 vm_alloc_page_with_initializer (enum vm_type type, void *upage, bool writable,
 		vm_initializer *init, void *aux) {
-
 	ASSERT (VM_TYPE(type) != VM_UNINIT)
 
 	struct supplemental_page_table *spt = &thread_current ()->spt;
+	struct hash *h=&spt->vm;
+	printf("alloc initializer: %zx\n", h->bucket_cnt);
 
 	/* Check wheter the upage is already occupied or not. */
 	if (spt_find_page (spt, upage) == NULL) {
@@ -63,6 +66,7 @@ vm_alloc_page_with_initializer (enum vm_type type, void *upage, bool writable,
 		switch(type){
 			case VM_ANON:
 				uninit_new(uninit_page, upage, init, type, aux, anon_initializer);
+				printf("uninit new\n");
 				break;
 
 			case VM_FILE:
@@ -74,8 +78,11 @@ vm_alloc_page_with_initializer (enum vm_type type, void *upage, bool writable,
 		}
 
 		/* TODO: Insert the page into the spt. */
+		printf("vm_alloc_page_with_initializer call spt_insert_page\n");
 		spt_insert_page(spt, uninit_page);
+		printf("insert 됐니?\n");
 	}
+	return true;
 err:
 	return false;
 }
@@ -86,6 +93,11 @@ spt_find_page (struct supplemental_page_table *spt, void *va) { //find_vme
 	struct page page;
 	/* TODO: Fill this function. */
 	struct hash_elem *e;
+
+	if (hash_empty(&spt -> vm)) {
+		return NULL;
+	}
+	printf("spt find page\n");
 
 	page.va=pg_round_down(va);
 	e=hash_find(&spt->vm, &page.page_elem);
@@ -99,6 +111,8 @@ spt_insert_page (struct supplemental_page_table *spt,
 		struct page *page) {
 	int succ = false;
 	/* TODO: Fill this function. */
+	if(&spt->vm==NULL) printf("vm is null\n");
+	if(&page->page_elem==NULL) printf("page elem is null\n");
 	if(hash_insert(&spt->vm, &page->page_elem)!=NULL) 
 		succ=true;
 		
@@ -229,9 +243,10 @@ vm_do_claim_page (struct page *page) {
 static uint64_t
 vm_hash_func(const struct hash_elem *e, void *aux UNUSED){
 	struct page *p;
+	printf("vm_hash_func h->hash\n");
 	
 	p=hash_entry(e, struct page, page_elem);
-	return hash_int(*(int *)p->va);
+	return hash_int((int)p->va);
 }
 
 /*** hash_less_func in hash_init ***/
@@ -243,7 +258,9 @@ vm_less_func(const struct hash_elem *a, const struct hash_elem *b, void *aux UNU
 
 /* Initialize new supplemental page table */
 void
-supplemental_page_table_init (struct supplemental_page_table *spt UNUSED) {
+supplemental_page_table_init (struct supplemental_page_table *spt) { //vm_init
+	printf("hash init\n");
+	// spt = (struct supplemental_page_table *) malloc(sizeof(struct hash));
 	hash_init(&spt->vm, vm_hash_func, vm_less_func, NULL);
 }
 

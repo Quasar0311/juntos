@@ -167,9 +167,10 @@ process_create_initd (const char *file_name) { //process_execute
 static void
 initd (void *f_name) {
 #ifdef VM
+	printf("vm\n");
 	supplemental_page_table_init (&thread_current ()->spt);
 #endif
-
+	printf("page table init\n");
 	process_init ();
 
 	if (process_exec (f_name) < 0)
@@ -339,21 +340,25 @@ process_exec (void *f_name) { //start_process
 	 * This is because when current thread rescheduled,
 	 * it stores the execution information to the member. */
 	struct intr_frame _if;
+	struct thread *curr=thread_current();
+
 	_if.ds = _if.es = _if.ss = SEL_UDSEG;
 	_if.cs = SEL_UCSEG;
 	_if.eflags = FLAG_IF | FLAG_MBS;
 
-	vm_init();
+	/*** initialize hash table ***/
+	// supplemental_page_table_init(&curr->spt);
 
 	/* We first kill the current context */
 	// process_cleanup ();
 	/* And then load the binary */
-	if (thread_current() -> tid > 3) lock_acquire(&writable_lock);
+	if (curr -> tid > 3) lock_acquire(&writable_lock);
 	
 	success = load (file_name, &_if);
 	
 	/* If load failed, quit. */
 	if (!success){
+		printf("load failed\n");
 		return -1;
 	}
 
@@ -917,7 +922,8 @@ load_segment (struct file *file, off_t ofs, uint8_t *upage,
 		size_t page_zero_bytes = PGSIZE - page_read_bytes;
 
 		/* TODO: Set up aux to pass information to the lazy_load_segment. */
-		struct load_file *load_file=NULL;
+		struct load_file *load_file=
+			(struct load_file *) malloc(sizeof(struct load_file));
 
 		load_file->file=file;
 		load_file->ofs=ofs;
@@ -925,9 +931,11 @@ load_segment (struct file *file, off_t ofs, uint8_t *upage,
 		load_file->zero_bytes=page_zero_bytes;
 
 		void *aux = load_file;
+		printf("call alloc\n");
 		if (!vm_alloc_page_with_initializer (VM_ANON, upage,
 					writable, lazy_load_segment, aux))
 			return false;
+		printf("initialize 끝났니?\n");
 
 		/* Advance. */
 		read_bytes -= page_read_bytes;

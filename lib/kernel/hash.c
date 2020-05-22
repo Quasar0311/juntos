@@ -8,6 +8,7 @@
 #include "hash.h"
 #include "../debug.h"
 #include "threads/malloc.h"
+#include <stdio.h>
 
 #define list_elem_to_hash_elem(LIST_ELEM)                       \
 	list_entry(LIST_ELEM, struct hash_elem, list_elem)
@@ -92,6 +93,7 @@ struct hash_elem *
 hash_insert (struct hash *h, struct hash_elem *new) {
 	struct list *bucket = find_bucket (h, new);
 	struct hash_elem *old = find_elem (h, bucket, new);
+	printf("hash insert\n");
 
 	if (old == NULL)
 		insert_elem (h, bucket, new);
@@ -273,13 +275,17 @@ hash_string (const char *s_) {
 /* Returns a hash of integer I. */
 uint64_t
 hash_int (int i) {
+	printf("hash int\n");
 	return hash_bytes (&i, sizeof i);
 }
 
 /* Returns the bucket in H that E belongs in. */
 static struct list *
 find_bucket (struct hash *h, struct hash_elem *e) {
+	printf("find_bucket bucket_cnt: %zx\n", h->bucket_cnt);
+	printf("find_bucket h->hash: %llu\n", h->hash(e, h->aux));
 	size_t bucket_idx = h->hash (e, h->aux) & (h->bucket_cnt - 1);
+	printf("find_bucket bucket_idx: %zx\n", bucket_idx);
 	return &h->buckets[bucket_idx];
 }
 
