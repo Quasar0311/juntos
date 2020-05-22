@@ -956,13 +956,15 @@ setup_stack (struct intr_frame *if_) {
 	 * TODO: If success, set the rsp accordingly.
 	 * TODO: You should mark the page is stack. */
 	/* TODO: Your code goes here */ 
-
+	printf("setup stack claim page\n");
+	vm_alloc_page_with_initializer(VM_ANON, stack_bottom, true, NULL, NULL);
 	success=vm_claim_page(stack_bottom);
 	if(success){
 		if_->rsp=USER_STACK;
 		spt_find_page(&curr->spt, stack_bottom)->is_loaded=true;
 	}
-
+	printf("success? : %d\n", success);
+	
 	return success;
 }
 #endif /* VM */
