@@ -28,10 +28,12 @@ vm_anon_init (void) {
 bool
 anon_initializer (struct page *page, enum vm_type type, void *kva) {
 	/* Set up the handler */
-	printf("hi anon\n");
+	printf("hi anon kva : %ld\n", kva);
 	page->operations = &anon_ops;
 
 	struct anon_page *anon_page = &page->anon;
+
+	return true;
 }
 
 /* Swap in the page by read contents from the swap disk. */
