@@ -49,6 +49,7 @@ bool
 vm_alloc_page_with_initializer (enum vm_type type, void *upage, bool writable,
 		vm_initializer *init, void *aux) {
 	ASSERT (VM_TYPE(type) != VM_UNINIT)
+	printf("vm alloc page with initializer\n");
 
 	struct supplemental_page_table *spt = &thread_current ()->spt;
 	struct hash *h=&spt->vm;
@@ -191,10 +192,10 @@ vm_try_handle_fault (struct intr_frame *f, void *addr,
 	/* TODO: Your code goes here */
 
 	/*** valid page fault ***/
-	if(page==NULL || is_kernel_vaddr(addr)|| write==false){
-		if(page!=NULL) free(page);
-		return false;
-	}
+	// if(page==NULL || is_kernel_vaddr(addr)|| write==false){
+	// 	if(page!=NULL) free(page);
+	// 	return false;
+	// }
 
 	/*** bogus page fault ***/
 	return vm_do_claim_page (page); 
@@ -240,7 +241,7 @@ vm_do_claim_page (struct page *page) {
 		free(frame);
 		return false;
 	}
-	
+	printf("swap in\n");
 	return swap_in (page, frame->kva);
 }
 

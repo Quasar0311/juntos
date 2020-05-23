@@ -885,11 +885,13 @@ lazy_load_segment (struct page *page, void *aux) {
 	/* TODO: VA is available when calling this function. */
 	struct load_file *f=aux;
 	void *pa=page->frame->pa;
+	printf("pa: %p, read_bytes: %ld, ofs: %d\n", pa, f->read_bytes, f->ofs);
 
 	if(file_read_at(f->file, pa, (off_t)f->read_bytes, f->ofs)!=0)
 		return false;
-
+		
 	memset(pa+f->read_bytes, 0, f->zero_bytes);
+	printf("memset: %p, zero_bytes: %ld\n", pa+f->read_bytes, f->zero_bytes);
 	return true;
 }
 
@@ -933,8 +935,11 @@ load_segment (struct file *file, off_t ofs, uint8_t *upage,
 		void *aux = load_file;
 		printf("call alloc\n");
 		if (!vm_alloc_page_with_initializer (VM_ANON, upage,
-					writable, lazy_load_segment, aux))
-			return false;
+					writable, lazy_load_segment, aux)){
+						printf("initialize failed\n");
+						return false;
+					}
+			
 		printf("initialize 끝났니?\n");
 
 		/* Advance. */
