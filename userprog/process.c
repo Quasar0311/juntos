@@ -361,7 +361,7 @@ process_exec (void *f_name) { //start_process
 		printf("load failed\n");
 		return -1;
 	}
-
+	
 	/* Start switched process. */
 	do_iret (&_if);
 	
@@ -671,7 +671,7 @@ load (const char *file_name, struct intr_frame *if_) {
 
 	/* Start address. */
 	if_->rip = ehdr.e_entry;
-
+	
 	/* TODO: Your code goes here.
 	 * TODO: Implement argument passing (see project2/argument_passing.html). */
 	
@@ -683,7 +683,7 @@ load (const char *file_name, struct intr_frame *if_) {
 	char **argv = calloc(32, sizeof(char *));
 
 	argc = 0;
-
+	
 	/*** push argument ***/
 	for (token = strtok_r(file_copy_argv, " ", &save_ptr); token != NULL;
 			token = strtok_r(NULL, " ", &save_ptr)) {
@@ -885,13 +885,12 @@ lazy_load_segment (struct page *page, void *aux) {
 	/* TODO: VA is available when calling this function. */
 	struct load_file *f=aux;
 	void *pa=page->frame->pa;
-	printf("pa: %p, read_bytes: %ld, ofs: %d\n", pa, f->read_bytes, f->ofs);
-
+	printf("lazy load ofs : %d\n", f -> read_bytes);
 	if(file_read_at(f->file, pa, (off_t)f->read_bytes, f->ofs)!=0)
 		return false;
-		
+	
 	memset(pa+f->read_bytes, 0, f->zero_bytes);
-	printf("memset: %p, zero_bytes: %ld\n", pa+f->read_bytes, f->zero_bytes);
+	
 	return true;
 }
 
@@ -934,6 +933,7 @@ load_segment (struct file *file, off_t ofs, uint8_t *upage,
 
 		void *aux = load_file;
 		printf("call alloc\n");
+		printf("upage at load seg : %ld\n", upage);
 		if (!vm_alloc_page_with_initializer (VM_ANON, upage,
 					writable, lazy_load_segment, aux)){
 						printf("initialize failed\n");
