@@ -884,13 +884,14 @@ lazy_load_segment (struct page *page, void *aux) {
 	/* TODO: This called when the first page fault occurs on address VA. */
 	/* TODO: VA is available when calling this function. */
 	struct load_file *f=aux;
-	void *pa=page->frame->pa;
-	printf("lazy load ofs : %d\n", f -> read_bytes);
+	void *pa=page->frame->kva;
+	printf("lazy load : %016x\n", page -> va);
+	printf("lazy load pa : %016x\n", pa);
 	if(file_read_at(f->file, pa, (off_t)f->read_bytes, f->ofs)!=0)
 		return false;
 	
 	memset(pa+f->read_bytes, 0, f->zero_bytes);
-	
+	printf("lazy 1\n");
 	return true;
 }
 
@@ -925,6 +926,7 @@ load_segment (struct file *file, off_t ofs, uint8_t *upage,
 		/* TODO: Set up aux to pass information to the lazy_load_segment. */
 		struct load_file *load_file=
 			(struct load_file *) malloc(sizeof(struct load_file));
+		if (load_file == NULL) return false;
 
 		load_file->file=file;
 		load_file->ofs=ofs;
@@ -933,11 +935,12 @@ load_segment (struct file *file, off_t ofs, uint8_t *upage,
 
 		void *aux = load_file;
 		printf("call alloc\n");
-		printf("upage at load seg : %ld\n", upage);
+		printf("upage at load seg : %016x\n", upage);
+		printf("writable?? : %d\n", writable);
 		if (!vm_alloc_page_with_initializer (VM_ANON, upage,
 					writable, lazy_load_segment, aux))
 			return false;
-		printf("initialize 끝났니?\n");
+		printf("initialize 끝났니? upage1 : %016x\n", upage);
 
 		/* Advance. */
 		read_bytes -= page_read_bytes;
