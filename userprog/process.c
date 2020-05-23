@@ -167,10 +167,8 @@ process_create_initd (const char *file_name) { //process_execute
 static void
 initd (void *f_name) {
 #ifdef VM
-	printf("vm\n");
 	supplemental_page_table_init (&thread_current ()->spt);
 #endif
-	printf("page table init\n");
 	process_init ();
 
 	if (process_exec (f_name) < 0)
@@ -726,7 +724,8 @@ load (const char *file_name, struct intr_frame *if_) {
 
 done:
 	/* We arrive here whether the load is successful or not. */
-	file_close (file);
+	file_close (file); 
+	printf("load finished\n");
 	return success;
 }
 
@@ -884,13 +883,15 @@ lazy_load_segment (struct page *page, void *aux) {
 	/* TODO: This called when the first page fault occurs on address VA. */
 	/* TODO: VA is available when calling this function. */
 	struct load_file *f=aux;
-	void *pa=page->frame->pa;
-	printf("lazy load ofs : %d\n", f -> read_bytes);
-	if(file_read_at(f->file, pa, (off_t)f->read_bytes, f->ofs)!=0)
+	void *kva=page->frame->kva;
+	struct file *file=file_open(f->inode);
+	printf("lazy load segment start\n");
+	
+	// file_open(f->inode);
+	if(file_read_at(file, kva, (off_t)f->read_bytes, f->ofs)!=0)
 		return false;
 	
-	memset(pa+f->read_bytes, 0, f->zero_bytes);
-	
+	memset(kva+f->read_bytes, 0, f->zero_bytes);
 	return true;
 }
 
@@ -914,6 +915,7 @@ load_segment (struct file *file, off_t ofs, uint8_t *upage,
 	ASSERT ((read_bytes + zero_bytes) % PGSIZE == 0);
 	ASSERT (pg_ofs (upage) == 0);
 	ASSERT (ofs % PGSIZE == 0);
+	printf("load_segment\n");
 
 	while (read_bytes > 0 || zero_bytes > 0) {
 		/* Do calculate how to fill this page.
@@ -929,19 +931,16 @@ load_segment (struct file *file, off_t ofs, uint8_t *upage,
 		load_file->file=file;
 		load_file->ofs=ofs;
 		load_file->read_bytes=page_read_bytes;
-		load_file->zero_bytes=page_zero_bytes;
+		load_file->zero_bytes=page_zero_bytes; 
+		load_file->inode=file_get_inode(file);
 
 		void *aux = load_file;
-		printf("call alloc\n");
-		printf("upage at load seg : %ld\n", upage);
+		printf("call lazy load segment\n");
 		if (!vm_alloc_page_with_initializer (VM_ANON, upage,
 					writable, lazy_load_segment, aux)){
-						printf("initialize failed\n");
 						return false;
 					}
 			
-		printf("initialize 끝났니?\n");
-
 		/* Advance. */
 		read_bytes -= page_read_bytes;
 		zero_bytes -= page_zero_bytes;
@@ -961,14 +960,12 @@ setup_stack (struct intr_frame *if_) {
 	 * TODO: If success, set the rsp accordingly.
 	 * TODO: You should mark the page is stack. */
 	/* TODO: Your code goes here */ 
-	printf("setup stack claim page\n");
 	vm_alloc_page_with_initializer(VM_ANON, stack_bottom, true, NULL, NULL);
 	success=vm_claim_page(stack_bottom);
 	if(success){
 		if_->rsp=USER_STACK;
 		spt_find_page(&curr->spt, stack_bottom)->is_loaded=true;
 	}
-	printf("success? : %d\n", success);
 	
 	return success;
 }

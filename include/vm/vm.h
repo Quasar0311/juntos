@@ -63,7 +63,7 @@ struct page {
 /* The representation of "frame" */
 struct frame {
 	void *kva;
-	void *pa;
+	// void *pa;
 	struct page *page;
 	enum vm_type type;
 };

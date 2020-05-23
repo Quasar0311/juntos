@@ -49,7 +49,6 @@ bool
 vm_alloc_page_with_initializer (enum vm_type type, void *upage, bool writable,
 		vm_initializer *init, void *aux) {
 	ASSERT (VM_TYPE(type) != VM_UNINIT)
-	printf("vm alloc page with initializer\n");
 
 	struct supplemental_page_table *spt = &thread_current ()->spt;
 	struct hash *h=&spt->vm;
@@ -60,14 +59,11 @@ vm_alloc_page_with_initializer (enum vm_type type, void *upage, bool writable,
 		 * TODO: and then create "uninit" page struct by calling uninit_new. You
 		 * TODO: should modify the field after calling the uninit_new. */
 		struct page *uninit_page=(struct page *)malloc(PGSIZE);
-		uninit_page->writable=writable;
-		uninit_page->is_loaded=false;
 
 		switch(type){
 			case VM_ANON:
 			case VM_MARKER_0:
 				uninit_new(uninit_page, upage, init, type, aux, anon_initializer);
-				printf("uninit new?\n");
 				break;
 
 			case VM_FILE:
@@ -78,10 +74,11 @@ vm_alloc_page_with_initializer (enum vm_type type, void *upage, bool writable,
 				break;
 		}
 
+		uninit_page->writable=writable;
+		uninit_page->is_loaded=false;
+
 		/* TODO: Insert the page into the spt. */
-		printf("vm_alloc_page_with_initializer call spt_insert_page\n");
 		spt_insert_page(spt, uninit_page);
-		printf("insert 됐니?\n");
 	}
 	return true;
 err:
@@ -98,7 +95,6 @@ spt_find_page (struct supplemental_page_table *spt, void *va) { //find_vme
 	if (hash_empty(&spt -> vm)) {
 		return NULL;
 	}
-	printf("spt find page : %ld\n", va);
 
 	page.va=pg_round_down(va);
 	e=hash_find(&spt->vm, &page.page_elem);
@@ -113,8 +109,6 @@ spt_insert_page (struct supplemental_page_table *spt,
 		struct page *page) {
 	int succ = false;
 	/* TODO: Fill this function. */
-	if(&spt->vm==NULL) printf("vm is null\n");
-	if(&page->page_elem==NULL) printf("page elem is null\n");
 	if(hash_insert(&spt->vm, &page->page_elem)!=NULL) 
 		succ=true;
 		
@@ -161,9 +155,9 @@ vm_get_frame (void) {
 	if(kva==NULL) PANIC("todo");
 	// return vm_evict_frame(); 
 
-	frame=(struct frame *)malloc(PGSIZE);
-	frame->kva=kva;
-	frame->pa=(void *)vtop(kva);
+	frame=(struct frame *)malloc(sizeof(struct frame));
+	frame->kva=kva; 
+	// frame->pa=(void *)vtop(kva);
 	frame->page=NULL;
 
 	ASSERT (frame != NULL);
@@ -186,19 +180,26 @@ bool
 vm_try_handle_fault (struct intr_frame *f, void *addr,
 		bool user, bool write, bool not_present) {
 	struct supplemental_page_table *spt = &thread_current ()->spt;
-	printf("handle fault\n");
 	struct page *page = spt_find_page(spt, addr);
+	bool handle;
 	/* TODO: Validate the fault */
 	/* TODO: Your code goes here */
 
 	/*** valid page fault ***/
-	// if(page==NULL || is_kernel_vaddr(addr)|| write==false){
-	// 	if(page!=NULL) free(page);
-	// 	return false;
-	// }
+	if(page==NULL || is_kernel_vaddr(addr)|| !not_present){
+		if(page!=NULL) free(page);
+		return false;
+	}
+
+	// if(page==NULL) printf("page is null\n");
+	// if(is_kernel_vaddr(addr)) printf("is kernel vaddr\n");
+	// if(write==false) printf("write is false\n");
 
 	/*** bogus page fault ***/
-	return vm_do_claim_page (page); 
+	handle=vm_do_claim_page(page);
+	printf(handle ? "handle success\n":"handle failed\n");
+	// return vm_do_claim_page (page); 
+	return handle;
 }
 
 /* Free the page.
@@ -214,11 +215,9 @@ bool
 vm_claim_page (void *va) {
 	struct page *page;
 	/* TODO: Fill this function */
-	printf("we have to find : %ld\n", va);
 	struct thread *curr=thread_current();
 	
 	page=spt_find_page(&curr->spt, va);
-	printf("spt find page asdf : %ld\n", page -> va);
 	if(page==NULL) return false;
 
 	return vm_do_claim_page (page);
@@ -229,7 +228,6 @@ static bool
 vm_do_claim_page (struct page *page) {
 	struct frame *frame = vm_get_frame ();
 	struct thread *curr=thread_current();
-	printf("page : %ld\n", page -> va);
 	
 	/* Set links */
 	frame->page = page;
@@ -241,7 +239,7 @@ vm_do_claim_page (struct page *page) {
 		free(frame);
 		return false;
 	}
-	printf("swap in\n");
+
 	return swap_in (page, frame->kva);
 }
 
@@ -264,7 +262,6 @@ vm_less_func(const struct hash_elem *a, const struct hash_elem *b, void *aux UNU
 /* Initialize new supplemental page table */
 void
 supplemental_page_table_init (struct supplemental_page_table *spt) { //vm_init
-	printf("hash init\n");
 	// spt = (struct supplemental_page_table *) malloc(sizeof(struct hash));
 	hash_init(&spt->vm, vm_hash_func, vm_less_func, NULL);
 }

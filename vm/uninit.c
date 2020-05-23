@@ -10,6 +10,7 @@
 
 #include "vm/vm.h"
 #include "vm/uninit.h"
+#include <stdio.h>
 
 static bool uninit_initialize (struct page *page, void *kva);
 static void uninit_destroy (struct page *page);
@@ -52,7 +53,10 @@ uninit_initialize (struct page *page, void *kva) {
 	void *aux = uninit->aux;
 
 	/* TODO: You may need to fix this function. */
-	printf("uninit initialize : %ld\n", page -> va);
+	printf("uninit initialize : %p\n", page -> va);
+	printf(uninit->page_initializer (page, uninit->type, kva) ? "uninit true\n" : "uninit false\n");
+	printf((init ? init (page, aux) : true) ? "lazy true\n" : "lazy false\n");
+
 	return uninit->page_initializer (page, uninit->type, kva) &&
 		(init ? init (page, aux) : true);
 }

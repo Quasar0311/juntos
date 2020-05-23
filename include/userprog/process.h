@@ -8,6 +8,7 @@ struct load_file{
     off_t ofs;
     size_t read_bytes;
     size_t zero_bytes;
+    struct inode *inode;
 };
 
 /*** create file descriptor for a file object ***/

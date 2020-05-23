@@ -22,6 +22,7 @@ void
 vm_anon_init (void) {
 	/* TODO: Set up the swap_disk. */
 	swap_disk = NULL;
+	printf("anon init\n");
 }
 
 /* Initialize the file mapping */
@@ -32,7 +33,7 @@ anon_initializer (struct page *page, enum vm_type type, void *kva) {
 	page->operations = &anon_ops;
 
 	struct anon_page *anon_page = &page->anon;
-
+	printf("finish anon initializer\n");
 	return true;
 }
 
