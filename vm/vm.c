@@ -59,8 +59,6 @@ vm_alloc_page_with_initializer (enum vm_type type, void *upage, bool writable,
 		 * TODO: and then create "uninit" page struct by calling uninit_new. You
 		 * TODO: should modify the field after calling the uninit_new. */
 		struct page *uninit_page=(struct page *)malloc(PGSIZE);
-		uninit_page->writable=writable;
-		uninit_page->is_loaded=false;
 
 		switch(type){
 			case VM_ANON:
@@ -76,6 +74,9 @@ vm_alloc_page_with_initializer (enum vm_type type, void *upage, bool writable,
 			case VM_PAGE_CACHE:
 				break;
 		}
+
+		uninit_page->writable=writable;
+		uninit_page->is_loaded=false;
 
 		/* TODO: Insert the page into the spt. */
 		printf("vm_alloc_page_with_initializer call spt_insert_page\n");
@@ -97,7 +98,7 @@ spt_find_page (struct supplemental_page_table *spt, void *va) { //find_vme
 	if (hash_empty(&spt -> vm)) {
 		return NULL;
 	}
-	printf("spt find page : %ld\n", va);
+	printf("spt find page : %016x\n", va);
 
 	page.va=pg_round_down(va);
 	e=hash_find(&spt->vm, &page.page_elem);
@@ -160,7 +161,7 @@ vm_get_frame (void) {
 	if(kva==NULL) PANIC("todo");
 	// return vm_evict_frame(); 
 
-	frame=(struct frame *)malloc(PGSIZE);
+	frame=(struct frame *)malloc(sizeof(struct frame));
 	frame->kva=kva;
 	frame->pa=(void *)vtop(kva);
 	frame->page=NULL;
@@ -185,7 +186,7 @@ bool
 vm_try_handle_fault (struct intr_frame *f, void *addr,
 		bool user, bool write, bool not_present) {
 	struct supplemental_page_table *spt = &thread_current ()->spt;
-	printf("handle fault\n");
+	printf("handle fault rip : %016x\n", f -> rip);
 	struct page *page = spt_find_page(spt, addr);
 	/* TODO: Validate the fault */
 	/* TODO: Your code goes here */
@@ -195,6 +196,10 @@ vm_try_handle_fault (struct intr_frame *f, void *addr,
 	// 	if(page!=NULL) free(page);
 	// 	return false;
 	// }
+	if(page==NULL || is_kernel_vaddr(addr)|| !not_present){
+		if(page!=NULL) free(page);
+		return false;
+	}
 
 	/*** bogus page fault ***/
 	return vm_do_claim_page (page); 
@@ -213,11 +218,11 @@ bool
 vm_claim_page (void *va) {
 	struct page *page;
 	/* TODO: Fill this function */
-	printf("we have to find : %ld\n", va);
+	printf("we have to find : %016x\n", va);
 	struct thread *curr=thread_current();
 	
 	page=spt_find_page(&curr->spt, va);
-	printf("spt find page asdf : %ld\n", page -> va);
+	printf("spt find page asdf : %016x\n", page -> va);
 	if(page==NULL) return false;
 
 	return vm_do_claim_page (page);
@@ -228,7 +233,7 @@ static bool
 vm_do_claim_page (struct page *page) {
 	struct frame *frame = vm_get_frame ();
 	struct thread *curr=thread_current();
-	printf("page : %ld\n", page -> va);
+	printf("page : %016x\n", page -> va);
 	
 	/* Set links */
 	frame->page = page;
