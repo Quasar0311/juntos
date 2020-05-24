@@ -47,6 +47,7 @@ uninit_new (struct page *page, void *va, vm_initializer *init,
 static bool
 uninit_initialize (struct page *page, void *kva) {
 	struct uninit_page *uninit = &page->uninit;
+	bool un, in;
 
 	/* Fetch first, page_initialize may overwrite the values */
 	vm_initializer *init = uninit->init;
@@ -54,11 +55,14 @@ uninit_initialize (struct page *page, void *kva) {
 
 	/* TODO: You may need to fix this function. */
 	printf("uninit initialize : %p\n", page -> va);
-	printf(uninit->page_initializer (page, uninit->type, kva) ? "uninit true\n" : "uninit false\n");
-	printf((init ? init (page, aux) : true) ? "lazy true\n" : "lazy false\n");
+	un=uninit->page_initializer (page, uninit->type, kva);
+	in=(init ? init (page, aux) : true);
+	printf(un ? "uninit true\n" : "uninit false\n");
+	printf(in ? "lazy true\n" : "lazy false\n");
 
-	return uninit->page_initializer (page, uninit->type, kva) &&
-		(init ? init (page, aux) : true);
+	// return uninit->page_initializer (page, uninit->type, kva) &&
+	// 	(init ? init (page, aux) : true);
+	return un && in;
 }
 
 /* Free the resources hold by uninit_page. Although most of pages are transmuted

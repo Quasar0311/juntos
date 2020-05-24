@@ -184,16 +184,15 @@ vm_try_handle_fault (struct intr_frame *f, void *addr,
 	bool handle;
 	/* TODO: Validate the fault */
 	/* TODO: Your code goes here */
+	printf("vm try handle fault addr: %p\n", addr);
+	if(page==NULL) printf("page is null\n");
+	if(is_kernel_vaddr(addr)) printf("is kernel vaddr\n");
 
 	/*** valid page fault ***/
 	if(page==NULL || is_kernel_vaddr(addr)|| !not_present){
 		if(page!=NULL) free(page);
 		return false;
 	}
-
-	// if(page==NULL) printf("page is null\n");
-	// if(is_kernel_vaddr(addr)) printf("is kernel vaddr\n");
-	// if(write==false) printf("write is false\n");
 
 	/*** bogus page fault ***/
 	handle=vm_do_claim_page(page);

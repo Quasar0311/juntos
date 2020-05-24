@@ -251,7 +251,7 @@ __do_fork (void *aux) {
 	struct intr_frame if_;
 	struct thread *parent = thread_current() -> parent;
 	struct thread *current = thread_current ();
-	struct file *new_file;	
+	struct file *new_file, *run_file;	
 
 	/* TODO: somehow pass the parent_if. (i.e. process_fork()'s if_) */
 	struct intr_frame *parent_if = aux;
@@ -280,6 +280,9 @@ __do_fork (void *aux) {
 	 * TODO:       the resources of parent.*/
 	current->next_fd=parent->next_fd;
 	current->max_fd=parent->max_fd;
+
+	run_file=file_reopen(parent->run_file);
+	current->run_file=run_file;
 
 	if(parent->max_fd==512){
 		free(current->fd_table);
@@ -724,8 +727,7 @@ load (const char *file_name, struct intr_frame *if_) {
 
 done:
 	/* We arrive here whether the load is successful or not. */
-	file_close (file); 
-	printf("load finished\n");
+	// file_close (file); 
 	return success;
 }
 
@@ -884,12 +886,15 @@ lazy_load_segment (struct page *page, void *aux) {
 	/* TODO: VA is available when calling this function. */
 	struct load_file *f=aux;
 	void *kva=page->frame->kva;
-	struct file *file=file_open(f->inode);
-	printf("lazy load segment start\n");
+	// struct file *file=file_open(f->inode);
+	printf("lazy load segment: %d\n", file_get_inode(f->file));
+
 	
 	// file_open(f->inode);
-	if(file_read_at(file, kva, (off_t)f->read_bytes, f->ofs)!=0)
-		return false;
+	if(file_read_at(f->file, kva, (off_t)f->read_bytes, f->ofs)
+		<(off_t)f->read_bytes)
+			return false;
+	printf("file read at finished\n");
 	
 	memset(kva+f->read_bytes, 0, f->zero_bytes);
 	return true;
@@ -932,7 +937,8 @@ load_segment (struct file *file, off_t ofs, uint8_t *upage,
 		load_file->ofs=ofs;
 		load_file->read_bytes=page_read_bytes;
 		load_file->zero_bytes=page_zero_bytes; 
-		load_file->inode=file_get_inode(file);
+		// load_file->inode=file_get_inode(file);
+		printf("load segment: %d\n", file_get_inode(file));
 
 		void *aux = load_file;
 		printf("call lazy load segment\n");

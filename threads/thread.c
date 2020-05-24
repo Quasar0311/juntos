@@ -408,6 +408,7 @@ thread_exit (void) {
 		sema_up(&child -> child_sema);
 	}
 	sema_up(&curr -> exit_sema);
+	if (curr -> run_file != NULL) file_allow_write(curr->run_file);
 	sema_down(&curr -> child_sema);
 	
 	process_exit ();
