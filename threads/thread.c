@@ -395,7 +395,8 @@ void
 thread_exit (void) {
 	struct thread *curr = thread_current();
 	struct list_elem *e;
-
+	// printf("exit\n");
+	
 	ASSERT (!intr_context ());
 
 #ifdef USERPROG
@@ -408,7 +409,10 @@ thread_exit (void) {
 		sema_up(&child -> child_sema);
 	}
 	sema_up(&curr -> exit_sema);
+	// printf("sema?, %d\n", curr -> tid);
+	if (curr -> run_file != NULL) file_allow_write(curr->run_file);
 	sema_down(&curr -> child_sema);
+	// printf("resume, %d\n", curr -> tid);
 	
 	process_exit ();
 #endif
