@@ -10,6 +10,7 @@
 #include "filesys/directory.h"
 #include "filesys/file.h"
 #include "filesys/filesys.h"
+#include "filesys/inode.h"
 #include "threads/flags.h"
 #include "threads/init.h"
 #include "threads/interrupt.h"
@@ -253,6 +254,7 @@ __do_fork (void *aux) {
 	struct thread *parent = thread_current() -> parent;
 	struct thread *current = thread_current ();
 	struct file *new_file;	
+	struct file *run_file;
 
 	/* TODO: somehow pass the parent_if. (i.e. process_fork()'s if_) */
 	struct intr_frame *parent_if = aux;
@@ -281,7 +283,14 @@ __do_fork (void *aux) {
 	 * TODO:       the resources of parent.*/
 	current->next_fd=parent->next_fd;
 	current->max_fd=parent->max_fd;
-	// printf("parent max fd: %d\n", parent->max_fd);
+
+	run_file=file_reopen(parent->run_file);
+	printf("parent deny write cnt: %d\n", inode_get_cnt(file_get_inode(parent->run_file)));
+	current->run_file=run_file;
+	// file_deny_write(run_file);
+	// printf("fork deny write cnt: %d\n", inode_get_cnt(file_get_inode(run_file)));
+	// current->run_file=parent->run_file;
+	// file_deny_write(current->run_file);
 
 	if(parent->max_fd==512){
 		free(current->fd_table);
@@ -465,6 +474,11 @@ process_cleanup (void) {
 		pml4_activate (NULL);
 		pml4_destroy (pml4);
 	}
+
+	printf("cleanup deny write cnt: %d\n", inode_get_cnt(file_get_inode(curr->run_file)));
+	file_allow_write(curr->run_file);
+	printf("after cleanup deny write cnt: %d\n", inode_get_cnt(file_get_inode(curr->run_file)));
+	file_close(curr->run_file);
 }
 
 /* Sets up the CPU for running user code in the nest thread.
@@ -591,7 +605,7 @@ load (const char *file_name, struct intr_frame *if_) {
 		 Then release lock. ***/
 	t -> run_file = file;
 	file_deny_write(file);
-	
+	printf("deny write cnt: %d\n", inode_get_cnt(file_get_inode(file)));
 
 	/* Read and verify executable header. */
 	if (file_read (file, &ehdr, sizeof ehdr) != sizeof ehdr
@@ -719,7 +733,7 @@ load (const char *file_name, struct intr_frame *if_) {
 
 done:
 	/* We arrive here whether the load is successful or not. */
-	file_close (file);
+	// file_close (file);
 	return success;
 }
 
