@@ -285,7 +285,7 @@ __do_fork (void *aux) {
 	current->max_fd=parent->max_fd;
 
 	run_file=file_reopen(parent->run_file);
-	printf("parent deny write cnt: %d\n", inode_get_cnt(file_get_inode(parent->run_file)));
+	// printf("parent deny write cnt: %d\n", inode_get_cnt(file_get_inode(parent->run_file)));
 	current->run_file=run_file;
 	// file_deny_write(run_file);
 	// printf("fork deny write cnt: %d\n", inode_get_cnt(file_get_inode(run_file)));
@@ -408,10 +408,11 @@ process_wait (tid_t child_tid) {
 	}
 	
 	sema_down(&child -> exit_sema);
-
+	// printf("child_sema\n");
 	for (e = list_begin(&thread_current() -> child_list); e != list_end(&thread_current() -> child_list); e = list_next(e)) {
 		child = list_entry(e, struct thread, child_elem);
 		if (child -> tid == child_tid && child -> exit_status != -2 && child -> exit_status != -1) {
+			// printf("child_sema_up, %d\n", child -> tid);
 			sema_up(&child -> child_sema);
 			list_remove(e);
 			return child -> exit_status;
@@ -430,7 +431,7 @@ process_wait (tid_t child_tid) {
 void
 process_exit (void) {
 	struct thread *curr = thread_current ();
-
+	
 	/* TODO: Your code goes here.
 	 * TODO: Implement process termination message (see
 	 * TODO: project2/process_termination.html).
@@ -443,10 +444,10 @@ process_exit (void) {
 	}
 	
 	free(curr -> fd_table);
-	lock_release(&writable_lock);
 
 	/*** release file descriptor ***/
 	process_cleanup ();
+	lock_release(&writable_lock);
 }
 
 /* Free the current process's resources. */
@@ -475,9 +476,9 @@ process_cleanup (void) {
 		pml4_destroy (pml4);
 	}
 
-	printf("cleanup deny write cnt: %d\n", inode_get_cnt(file_get_inode(curr->run_file)));
-	file_allow_write(curr->run_file);
-	printf("after cleanup deny write cnt: %d\n", inode_get_cnt(file_get_inode(curr->run_file)));
+	// printf("cleanup deny write cnt: %d\n", inode_get_cnt(file_get_inode(curr->run_file)));
+	// if (curr -> run_file != NULL) file_allow_write(curr->run_file);
+	// printf("after cleanup deny write cnt: %d\n", inode_get_cnt(file_get_inode(curr->run_file)));
 	file_close(curr->run_file);
 }
 
@@ -605,7 +606,7 @@ load (const char *file_name, struct intr_frame *if_) {
 		 Then release lock. ***/
 	t -> run_file = file;
 	file_deny_write(file);
-	printf("deny write cnt: %d\n", inode_get_cnt(file_get_inode(file)));
+	// printf("deny write cnt: %d\n", inode_get_cnt(file_get_inode(file)));
 
 	/* Read and verify executable header. */
 	if (file_read (file, &ehdr, sizeof ehdr) != sizeof ehdr
