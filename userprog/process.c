@@ -465,6 +465,9 @@ process_cleanup (void) {
 		pml4_activate (NULL);
 		pml4_destroy (pml4);
 	}
+
+	file_allow_write(curr -> run_file);
+	file_close(curr -> run_file);
 }
 
 /* Sets up the CPU for running user code in the nest thread.
@@ -719,7 +722,7 @@ load (const char *file_name, struct intr_frame *if_) {
 
 done:
 	/* We arrive here whether the load is successful or not. */
-	file_close (file);
+	// file_close (file);
 	return success;
 }
 
