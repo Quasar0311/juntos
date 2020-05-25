@@ -76,6 +76,8 @@ vm_alloc_page_with_initializer (enum vm_type type, void *upage, bool writable,
 
 		uninit_page->writable=writable;
 		uninit_page->is_loaded=false;
+		uninit_page -> init = init;
+		uninit_page -> aux = aux;
 
 		/* TODO: Insert the page into the spt. */
 		spt_insert_page(spt, uninit_page);
@@ -184,9 +186,9 @@ vm_try_handle_fault (struct intr_frame *f, void *addr,
 	bool handle;
 	/* TODO: Validate the fault */
 	/* TODO: Your code goes here */
-	printf("vm try handle fault addr: %p\n", addr);
-	if(page==NULL) printf("page is null\n");
-	if(is_kernel_vaddr(addr)) printf("is kernel vaddr\n");
+	// printf("vm try handle fault addr: %p\n", addr);
+	// if(page==NULL) printf("page is null\n");
+	// if(is_kernel_vaddr(addr)) printf("is kernel vaddr\n");
 
 	/*** valid page fault ***/
 	if(page==NULL || is_kernel_vaddr(addr)|| !not_present){
@@ -196,7 +198,7 @@ vm_try_handle_fault (struct intr_frame *f, void *addr,
 
 	/*** bogus page fault ***/
 	handle=vm_do_claim_page(page);
-	printf(handle ? "handle success\n":"handle failed\n");
+	// printf(handle ? "handle success\n":"handle failed\n");
 	// return vm_do_claim_page (page); 
 	return handle;
 }
@@ -267,13 +269,31 @@ supplemental_page_table_init (struct supplemental_page_table *spt) { //vm_init
 
 /* Copy supplemental page table from src to dst */
 bool
-supplemental_page_table_copy (struct supplemental_page_table *dst UNUSED,
-		struct supplemental_page_table *src UNUSED) {
+supplemental_page_table_copy (struct supplemental_page_table *dst,
+		struct supplemental_page_table *src) {
+	struct hash_iterator i;
+
+	hash_first(&i, &src -> vm);
+
+	while (hash_next(&i)) {
+		struct page *p = hash_entry(hash_cur(&i), struct page, page_elem);
+		if (p == NULL) return false;
+		
+		if (!vm_alloc_page_with_initializer(page_get_type(p), p -> va, p -> writable, p -> init, p -> aux)) 
+			return false;
+		if (!vm_claim_page(p -> va)) return false;
+	}
+	
+
+	return true;
 }
 
 static void
 vm_destroy_func(struct hash_elem *e, void *aux UNUSED){
 	destroy(hash_entry(e, struct page, page_elem));
+	free(hash_entry(e, struct page, page_elem));
+
+	return;
 }
 
 /* Free the resource hold by the supplemental page table */
@@ -281,5 +301,8 @@ void
 supplemental_page_table_kill (struct supplemental_page_table *spt) { //vm_destroy
 	/* TODO: Destroy all the supplemental_page_table hold by thread and
 	 * TODO: writeback all the modified contents to the storage. */
+	
 	hash_destroy(&spt->vm, vm_destroy_func);
+
+	return;
 }
