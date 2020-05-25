@@ -47,6 +47,8 @@ struct page {
 	struct hash_elem page_elem;
 	bool writable;
 	bool is_loaded;
+	vm_initializer *init;
+	void *aux;
 
 	/* Per-type data are binded into the union.
 	 * Each function automatically detects the current union */
