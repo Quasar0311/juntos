@@ -62,7 +62,6 @@ vm_alloc_page_with_initializer (enum vm_type type, void *upage, bool writable,
 
 		switch(type){
 			case VM_ANON:
-			case VM_MARKER_0:
 				uninit_new(uninit_page, upage, init, type, aux, anon_initializer);
 				break;
 
@@ -231,6 +230,7 @@ vm_do_claim_page (struct page *page) {
 	/* Set links */
 	frame->page = page;
 	page->frame = frame;
+	printf("pml4 set page va: %p, kva: %p\n", page->va, frame->kva);
 
 	/* TODO: Insert page table entry to map page's VA to frame's PA. */
 	if(!pml4_set_page(curr->pml4, page->va, frame->kva, page->writable)){

@@ -131,6 +131,7 @@ page_fault (struct intr_frame *f) {
 	   that caused the fault (that's f->rip). */
 
 	fault_addr = (void *) rcr2();
+	printf("rip: %#08llx\n", f->rip);
 
 	/* Turn interrupts back on (they were only off so that we could
 	   be assured of reading CR2 before it changed). */
@@ -159,9 +160,9 @@ page_fault (struct intr_frame *f) {
 	printf("fault addr: %p\n", fault_addr);
 
 	if (vm_try_handle_fault (f, fault_addr, user, write, not_present)){
-		// struct page *page;
-		// page=spt_find_page(&thread_current()->spt, fault_addr);
-		// printf("handle fault finished va: %p, kva: %p, fault addr: %p\n", page->va, page->frame->kva, fault_addr);
+		struct page *page;
+		page=spt_find_page(&thread_current()->spt, fault_addr);
+		printf("handle fault finished va: %p, kva: %p, fault addr: %p\n", page->va, page->frame->kva, fault_addr);
 		return;
 	}
 	else printf("vm try handle fault fault\n");

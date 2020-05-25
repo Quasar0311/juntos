@@ -889,12 +889,10 @@ lazy_load_segment (struct page *page, void *aux) {
 	// struct file *file=file_open(f->inode);
 	printf("lazy load segment: %d\n", file_get_inode(f->file));
 
-	
 	// file_open(f->inode);
 	if(file_read_at(f->file, kva, (off_t)f->read_bytes, f->ofs)
 		<(off_t)f->read_bytes)
 			return false;
-	printf("file read at finished\n");
 	
 	memset(kva+f->read_bytes, 0, f->zero_bytes);
 	return true;
@@ -951,6 +949,7 @@ load_segment (struct file *file, off_t ofs, uint8_t *upage,
 		read_bytes -= page_read_bytes;
 		zero_bytes -= page_zero_bytes;
 		upage += PGSIZE;
+		ofs += PGSIZE;
 	}
 	return true;
 }
