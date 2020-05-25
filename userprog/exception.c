@@ -154,10 +154,10 @@ page_fault (struct intr_frame *f) {
 
 #ifdef VM
 	/* For project 3 and later. */
-	printf(not_present ? "not present page\n": "writing r/o page\n");
-	printf(write ? "access was write\n": "access was read\n");
-	printf(user ? "access by user\n": "access by kernel");
-	printf("fault addr: %p\n", fault_addr);
+	// printf(not_present ? "not present page\n": "writing r/o page\n");
+	// printf(write ? "access was write\n": "access was read\n");
+	// printf(user ? "access by user\n": "access by kernel");
+	// printf("fault addr: %p\n", fault_addr);
 
 	if (vm_try_handle_fault (f, fault_addr, user, write, not_present)){
 		struct page *page;
@@ -165,7 +165,7 @@ page_fault (struct intr_frame *f) {
 		printf("handle fault finished va: %p, kva: %p, fault addr: %p\n", page->va, page->frame->kva, fault_addr);
 		return;
 	}
-	else printf("vm try handle fault fault\n");
+	// else printf("vm try handle fault fault\n");
 	
 #endif
 	

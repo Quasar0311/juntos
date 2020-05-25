@@ -440,7 +440,7 @@ process_exit (void) {
 	
 	free(curr -> fd_table);
 	
-	supplemental_page_table_kill(&curr->spt);
+	// supplemental_page_table_kill(&curr->spt);
 
 	lock_release(&writable_lock);
 
@@ -886,13 +886,15 @@ lazy_load_segment (struct page *page, void *aux) {
 	/* TODO: VA is available when calling this function. */
 	struct load_file *f=aux;
 	void *kva=page->frame->kva;
+	off_t read = 5;
 	// struct file *file=file_open(f->inode);
-	printf("lazy load segment: %d\n", file_get_inode(f->file));
-
+	// printf("lazy load segment: %d, offset : %d\n", f -> read_bytes, f -> ofs);
+	
 	// file_open(f->inode);
-	if(file_read_at(f->file, kva, (off_t)f->read_bytes, f->ofs)
+	if(read = file_read_at(f->file, kva, (off_t)f->read_bytes, f->ofs)
 		<(off_t)f->read_bytes)
 			return false;
+	// printf("file read at finished : %d\n", f -> read_bytes);
 	
 	memset(kva+f->read_bytes, 0, f->zero_bytes);
 	return true;
@@ -918,7 +920,7 @@ load_segment (struct file *file, off_t ofs, uint8_t *upage,
 	ASSERT ((read_bytes + zero_bytes) % PGSIZE == 0);
 	ASSERT (pg_ofs (upage) == 0);
 	ASSERT (ofs % PGSIZE == 0);
-	printf("load_segment\n");
+	// printf("load_segment\n");
 
 	while (read_bytes > 0 || zero_bytes > 0) {
 		/* Do calculate how to fill this page.
@@ -936,10 +938,10 @@ load_segment (struct file *file, off_t ofs, uint8_t *upage,
 		load_file->read_bytes=page_read_bytes;
 		load_file->zero_bytes=page_zero_bytes; 
 		// load_file->inode=file_get_inode(file);
-		printf("load segment: %d\n", file_get_inode(file));
+		// printf("load segment: %d, offset : %d\n", page_read_bytes, ofs);
 
 		void *aux = load_file;
-		printf("call lazy load segment\n");
+		
 		if (!vm_alloc_page_with_initializer (VM_ANON, upage,
 					writable, lazy_load_segment, aux)){
 						return false;

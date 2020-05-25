@@ -54,11 +54,11 @@ uninit_initialize (struct page *page, void *kva) {
 	void *aux = uninit->aux;
 
 	/* TODO: You may need to fix this function. */
-	printf("uninit initialize : %p\n", page -> va);
+	// printf("uninit initialize : %p\n", page -> va);
 	un=uninit->page_initializer (page, uninit->type, kva);
 	in=(init ? init (page, aux) : true);
-	printf(un ? "uninit true\n" : "uninit false\n");
-	printf(in ? "lazy true\n" : "lazy false\n");
+	// printf(un ? "uninit true\n" : "uninit false\n");
+	// printf(in ? "lazy true\n" : "lazy false\n");
 
 	// return uninit->page_initializer (page, uninit->type, kva) &&
 	// 	(init ? init (page, aux) : true);
@@ -71,7 +71,7 @@ uninit_initialize (struct page *page, void *kva) {
  * PAGE will be freed by the caller. */
 static void
 uninit_destroy (struct page *page) {
-	struct uninit_page *uninit UNUSED = &page->uninit;
+	struct uninit_page *uninit = &page->uninit;
 	/* TODO: Fill this function.
 	 * TODO: If you don't have anything to do, just return. */
 }
