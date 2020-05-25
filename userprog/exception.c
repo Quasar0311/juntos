@@ -172,7 +172,7 @@ page_fault (struct intr_frame *f) {
 	page_fault_cnt++;
 	// printf("pf : %s\n", thread_current() -> name);
 	// palloc_free_page(thread_current() -> fd_table);
-	// syscall_exit(-1);
+	syscall_exit(-1);
 
 	/* If the fault is true fault, show info and exit. */
 	printf ("Page fault at %p: %s error %s page in %s context.\n",

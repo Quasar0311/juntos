@@ -8,6 +8,7 @@
 #include "threads/vaddr.h"
 #include "threads/mmu.h"
 #include <stdio.h>
+#include <string.h>
 
 /* Initializes the virtual memory subsystem by invoking each subsystem's
  * intialize codes. */
@@ -272,16 +273,38 @@ bool
 supplemental_page_table_copy (struct supplemental_page_table *dst,
 		struct supplemental_page_table *src) {
 	struct hash_iterator i;
+	struct frame *frame;
+	struct page *page;
+	struct thread *curr = thread_current();
 
 	hash_first(&i, &src -> vm);
 
 	while (hash_next(&i)) {
 		struct page *p = hash_entry(hash_cur(&i), struct page, page_elem);
+		// printf("add : %p\n", p -> va);
+		frame = vm_get_frame();
+		memcpy(frame, p -> frame, sizeof(struct frame));
 		if (p == NULL) return false;
-		
+		// if (p -> is_loaded) {
+		// 	// vm_alloc_page(page_get_type(p), p -> va, p -> writable);
+		// 	// vm_claim_page(p -> va);
+		// 	return true;
+		// }
 		if (!vm_alloc_page_with_initializer(page_get_type(p), p -> va, p -> writable, p -> init, p -> aux)) 
 			return false;
+
+		page = spt_find_page(dst, p -> va);
+		frame -> page = page;
+		page -> frame = frame;
 		if (!vm_claim_page(p -> va)) return false;
+		// pml4_set_page(curr->pml4, p->va, p->frame->kva, p->writable);
+		if(!pml4_set_page(curr->pml4, p->va, frame->kva, p->writable)){
+			// printf("fail\n");
+			palloc_free_page(frame->kva);
+			free(frame);
+			return false;
+		}
+		
 	}
 	
 
@@ -291,7 +314,7 @@ supplemental_page_table_copy (struct supplemental_page_table *dst,
 static void
 vm_destroy_func(struct hash_elem *e, void *aux UNUSED){
 	destroy(hash_entry(e, struct page, page_elem));
-	free(hash_entry(e, struct page, page_elem));
+	// free(hash_entry(e, struct page, page_elem));
 
 	return;
 }
