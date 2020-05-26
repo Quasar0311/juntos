@@ -897,6 +897,7 @@ lazy_load_segment (struct page *page, void *aux) {
 	// printf("file read at finished : %d\n", f -> read_bytes);
 	
 	memset(kva+f->read_bytes, 0, f->zero_bytes);
+	page -> lazy_handled = true;
 	return true;
 }
 

@@ -79,7 +79,8 @@ vm_alloc_page_with_initializer (enum vm_type type, void *upage, bool writable,
 		uninit_page->is_loaded=false;
 		uninit_page -> init = init;
 		uninit_page -> aux = aux;
-
+		uninit_page -> lazy_handled = false;
+		printf("inserted to spt : %p\n", uninit_page -> va);
 		/* TODO: Insert the page into the spt. */
 		spt_insert_page(spt, uninit_page);
 	}
@@ -187,7 +188,7 @@ vm_try_handle_fault (struct intr_frame *f, void *addr,
 	bool handle;
 	/* TODO: Validate the fault */
 	/* TODO: Your code goes here */
-	// printf("vm try handle fault addr: %p\n", addr);
+	printf("vm try handle fault addr: %p\n", addr);
 	// if(page==NULL) printf("page is null\n");
 	// if(is_kernel_vaddr(addr)) printf("is kernel vaddr\n");
 
@@ -274,36 +275,27 @@ supplemental_page_table_copy (struct supplemental_page_table *dst,
 		struct supplemental_page_table *src) {
 	struct hash_iterator i;
 	struct frame *frame;
+	void *frame_addr;
 	struct page *page;
 	struct thread *curr = thread_current();
 
 	hash_first(&i, &src -> vm);
 
 	while (hash_next(&i)) {
-		struct page *p = hash_entry(hash_cur(&i), struct page, page_elem);
-		// printf("add : %p\n", p -> va);
-		frame = vm_get_frame();
-		memcpy(frame, p -> frame, sizeof(struct frame));
-		if (p == NULL) return false;
-		// if (p -> is_loaded) {
-		// 	// vm_alloc_page(page_get_type(p), p -> va, p -> writable);
-		// 	// vm_claim_page(p -> va);
-		// 	return true;
-		// }
-		if (!vm_alloc_page_with_initializer(page_get_type(p), p -> va, p -> writable, p -> init, p -> aux)) 
+		struct page *p, *newpage;
+
+		p=hash_entry(hash_cur(&i), struct page, page_elem);
+		
+		if(!vm_alloc_page_with_initializer(page_get_type(p), p->va, p->writable, p->init, p->aux))
 			return false;
 
-		page = spt_find_page(dst, p -> va);
-		frame -> page = page;
-		page -> frame = frame;
-		if (!vm_claim_page(p -> va)) return false;
-		// pml4_set_page(curr->pml4, p->va, p->frame->kva, p->writable);
-		if(!pml4_set_page(curr->pml4, p->va, frame->kva, p->writable)){
-			// printf("fail\n");
-			palloc_free_page(frame->kva);
-			free(frame);
+		if(!vm_claim_page(p->va))
 			return false;
-		}
+		printf("parent page : %p\n", p -> va);
+		newpage=spt_find_page(dst, p->va);
+		printf("mewpage : %p\n", newpage);
+		// memcpy(newpage, p, PGSIZE);
+		memcpy(newpage->frame->kva, p->frame->kva, PGSIZE);
 		
 	}
 	

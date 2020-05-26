@@ -49,6 +49,7 @@ struct page {
 	bool is_loaded;
 	vm_initializer *init;
 	void *aux;
+	bool lazy_handled;
 
 	/* Per-type data are binded into the union.
 	 * Each function automatically detects the current union */
