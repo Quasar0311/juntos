@@ -973,6 +973,7 @@ setup_stack (struct intr_frame *if_) {
 		if_->rsp=USER_STACK;
 		spt_find_page(&curr->spt, stack_bottom)->is_loaded=true;
 	}
+	// printf("setup stack: %p\n", stack_bottom);
 	
 	return success;
 }

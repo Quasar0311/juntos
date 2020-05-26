@@ -8,6 +8,7 @@
 #include "threads/vaddr.h"
 #include "threads/mmu.h"
 #include <stdio.h>
+#include <string.h>
 
 /* Initializes the virtual memory subsystem by invoking each subsystem's
  * intialize codes. */
@@ -182,12 +183,11 @@ vm_try_handle_fault (struct intr_frame *f, void *addr,
 		bool user, bool write, bool not_present) {
 	struct supplemental_page_table *spt = &thread_current ()->spt;
 	struct page *page = spt_find_page(spt, addr);
-	bool handle;
 	/* TODO: Validate the fault */
 	/* TODO: Your code goes here */
-	// printf("vm try handle fault addr: %p\n", addr);
-	// if(page==NULL) printf("page is null\n");
-	// if(is_kernel_vaddr(addr)) printf("is kernel vaddr\n");
+	printf("vm try handle fault addr: %p\n", addr);
+	if(page==NULL) printf("page is null\n");
+	if(is_kernel_vaddr(addr)) printf("is kernel vaddr\n");
 
 	/*** valid page fault ***/
 	if(page==NULL || is_kernel_vaddr(addr)|| !not_present){
@@ -196,10 +196,7 @@ vm_try_handle_fault (struct intr_frame *f, void *addr,
 	}
 
 	/*** bogus page fault ***/
-	handle=vm_do_claim_page(page);
-	// printf(handle ? "handle success\n":"handle failed\n");
-	// return vm_do_claim_page (page); 
-	return handle;
+	return vm_do_claim_page (page); 
 }
 
 /* Free the page.
@@ -232,7 +229,7 @@ vm_do_claim_page (struct page *page) {
 	/* Set links */
 	frame->page = page;
 	page->frame = frame;
-	printf("pml4 set page va: %p, kva: %p\n", page->va, frame->kva);
+	// printf("pml4 set page va: %p, kva: %p\n", page->va, frame->kva);
 
 	/* TODO: Insert page table entry to map page's VA to frame's PA. */
 	if(!pml4_set_page(curr->pml4, page->va, frame->kva, page->writable)){
@@ -276,12 +273,48 @@ supplemental_page_table_copy (struct supplemental_page_table *dst,
 	hash_first(&i, &src -> vm);
 
 	while (hash_next(&i)) {
-		struct page *p = hash_entry(hash_cur(&i), struct page, page_elem);
-		if (p == NULL) return false;
+		struct page *p, *newpage;
+
+		p=hash_entry(hash_cur(&i), struct page, page_elem);
 		
-		if (!vm_alloc_page_with_initializer(page_get_type(p), p -> va, p -> writable, p -> init, p -> aux)) 
+		if(!vm_alloc_page_with_initializer(page_get_type(p), p->va, 
+			p->writable, p->init, p->aux))
+				return false;
+
+		if(!vm_claim_page(p->va))
 			return false;
-		if (!vm_claim_page(p -> va)) return false;
+		
+		newpage=spt_find_page(dst, p->va);
+		memcpy(newpage->frame->kva, p->frame->kva, PGSIZE);
+
+		// printf("copy start va: %p, kva: %p\n", p->va, p->frame->kva);
+
+		// if (p == NULL) {
+		// 	printf("copy page is null\n");
+		// 	return false;
+		// }
+		
+		// // if(p->is_loaded){
+		// // 	printf("setup stack\n");
+		// // 	if(!vm_alloc_page_with_initializer(VM_ANON, p->va, true, NULL, NULL)){
+		// // 		printf("alloc page fail\n");
+		// // 		return false;
+		// // 	}
+		// // }
+
+		// if (!vm_alloc_page_with_initializer(page_get_type(p), p -> va, p -> writable, p -> init, p -> aux)){
+		// 	printf("copy alloc failed\n");
+		// 	return false;
+		// } 
+
+				
+		// if (!vm_claim_page(p -> va)){
+		// 	printf("copy claim failed\n");
+		// 	return false;
+		// }
+
+		// page=spt_find_page(dst, p->va);
+		printf("copy finished va: %p, kva: %p\n", newpage->va, newpage->frame->kva);
 	}
 	
 
@@ -301,7 +334,6 @@ void
 supplemental_page_table_kill (struct supplemental_page_table *spt) { //vm_destroy
 	/* TODO: Destroy all the supplemental_page_table hold by thread and
 	 * TODO: writeback all the modified contents to the storage. */
-	
 	hash_destroy(&spt->vm, vm_destroy_func);
 
 	return;

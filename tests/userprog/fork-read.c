@@ -37,6 +37,8 @@ test_main (void)
     close(handle);
   } else {
     msg ("child run");
+    msg ("size of sample in child: %ld", strlen(sample));
+    msg ("Tryprinting sample in child: %s\n", sample);  
 
     byte_cnt = read (handle, buffer + 20, sizeof sample - 21);
     if (byte_cnt != sizeof sample - 21)
