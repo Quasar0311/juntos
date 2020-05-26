@@ -52,7 +52,6 @@ vm_alloc_page_with_initializer (enum vm_type type, void *upage, bool writable,
 	ASSERT (VM_TYPE(type) != VM_UNINIT)
 
 	struct supplemental_page_table *spt = &thread_current ()->spt;
-	struct hash *h=&spt->vm;
 
 	/* Check wheter the upage is already occupied or not. */
 	if (spt_find_page (spt, upage) == NULL) {
@@ -63,7 +62,6 @@ vm_alloc_page_with_initializer (enum vm_type type, void *upage, bool writable,
 
 		switch(type){
 			case VM_ANON:
-			case VM_MARKER_0:
 				uninit_new(uninit_page, upage, init, type, aux, anon_initializer);
 				break;
 
@@ -79,10 +77,10 @@ vm_alloc_page_with_initializer (enum vm_type type, void *upage, bool writable,
 		uninit_page->is_loaded=false;
 		uninit_page -> init = init;
 		uninit_page -> aux = aux;
-		uninit_page -> lazy_handled = false;
-		printf("inserted to spt : %p\n", uninit_page -> va);
+		// printf("inserted to spt: %p\n", upage);
 		/* TODO: Insert the page into the spt. */
 		spt_insert_page(spt, uninit_page);
+		// printf("insert finish\n");
 	}
 	return true;
 err:
@@ -185,7 +183,6 @@ vm_try_handle_fault (struct intr_frame *f, void *addr,
 		bool user, bool write, bool not_present) {
 	struct supplemental_page_table *spt = &thread_current ()->spt;
 	struct page *page = spt_find_page(spt, addr);
-	bool handle;
 	/* TODO: Validate the fault */
 	/* TODO: Your code goes here */
 	printf("vm try handle fault addr: %p\n", addr);
@@ -199,10 +196,7 @@ vm_try_handle_fault (struct intr_frame *f, void *addr,
 	}
 
 	/*** bogus page fault ***/
-	handle=vm_do_claim_page(page);
-	// printf(handle ? "handle success\n":"handle failed\n");
-	// return vm_do_claim_page (page); 
-	return handle;
+	return vm_do_claim_page (page); 
 }
 
 /* Free the page.
@@ -219,9 +213,11 @@ vm_claim_page (void *va) {
 	struct page *page;
 	/* TODO: Fill this function */
 	struct thread *curr=thread_current();
+	// printf("vm claim page\n");
 	
 	page=spt_find_page(&curr->spt, va);
 	if(page==NULL) return false;
+	// printf("vm claim page 2\n");
 
 	return vm_do_claim_page (page);
 }
@@ -231,10 +227,12 @@ static bool
 vm_do_claim_page (struct page *page) {
 	struct frame *frame = vm_get_frame ();
 	struct thread *curr=thread_current();
+	// printf("vm do claim page\n");
 	
 	/* Set links */
 	frame->page = page;
 	page->frame = frame;
+	// printf("pml4 set page va: %p, kva: %p\n", page->va, frame->kva);
 
 	/* TODO: Insert page table entry to map page's VA to frame's PA. */
 	if(!pml4_set_page(curr->pml4, page->va, frame->kva, page->writable)){
@@ -242,6 +240,7 @@ vm_do_claim_page (struct page *page) {
 		free(frame);
 		return false;
 	}
+	// printf("vm do claim page 2\n");
 
 	return swap_in (page, frame->kva);
 }
@@ -286,20 +285,21 @@ supplemental_page_table_copy (struct supplemental_page_table *dst,
 
 		p=hash_entry(hash_cur(&i), struct page, page_elem);
 		
-		if(!vm_alloc_page_with_initializer(page_get_type(p), p->va, p->writable, p->init, p->aux))
-			return false;
+		if(!vm_alloc_page_with_initializer(page_get_type(p), p->va, 
+			p->writable, p->init, p->aux))
+				return false;
 
 		if(!vm_claim_page(p->va))
 			return false;
-		printf("parent page : %p\n", p -> va);
+
+		// printf("spt find page begin\n");
 		newpage=spt_find_page(dst, p->va);
-		printf("mewpage : %p\n", newpage);
-		// memcpy(newpage, p, PGSIZE);
-		memcpy(newpage->frame->kva, p->frame->kva, PGSIZE);
-		
+		// printf("memcpy begin: %p\n", p->frame->kva);
+		if(p->frame!=NULL)
+			memcpy(newpage->frame->kva, p->frame->kva, PGSIZE);
+		// printf("memcpy finish\n");
 	}
 	
-
 	return true;
 }
 
@@ -316,7 +316,6 @@ void
 supplemental_page_table_kill (struct supplemental_page_table *spt) { //vm_destroy
 	/* TODO: Destroy all the supplemental_page_table hold by thread and
 	 * TODO: writeback all the modified contents to the storage. */
-	
 	hash_destroy(&spt->vm, vm_destroy_func);
 
 	return;

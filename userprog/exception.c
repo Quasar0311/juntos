@@ -131,6 +131,7 @@ page_fault (struct intr_frame *f) {
 	   that caused the fault (that's f->rip). */
 
 	fault_addr = (void *) rcr2();
+	// printf("rip: %#08llx\n", f->rip);
 
 	/* Turn interrupts back on (they were only off so that we could
 	   be assured of reading CR2 before it changed). */
@@ -155,7 +156,7 @@ page_fault (struct intr_frame *f) {
 	/* For project 3 and later. */
 	// printf(not_present ? "not present page\n": "writing r/o page\n");
 	// printf(write ? "access was write\n": "access was read\n");
-	// printf(user ? "access by user\n": "access by kernel");
+	// printf(user ? "access by user\n": "access by kernel\n");
 	// printf("fault addr: %p\n", fault_addr);
 
 	if (vm_try_handle_fault (f, fault_addr, user, write, not_present)){
@@ -172,7 +173,7 @@ page_fault (struct intr_frame *f) {
 	page_fault_cnt++;
 	// printf("pf : %s\n", thread_current() -> name);
 	// palloc_free_page(thread_current() -> fd_table);
-	// syscall_exit(-1);
+	syscall_exit(-1);
 
 	/* If the fault is true fault, show info and exit. */
 	printf ("Page fault at %p: %s error %s page in %s context.\n",
