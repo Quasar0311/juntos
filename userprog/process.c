@@ -355,11 +355,12 @@ process_exec (void *f_name) { //start_process
 	/* And then load the binary */
 	if (curr -> tid > 3) lock_acquire(&writable_lock);
 	
+	supplemental_page_table_init(&curr->spt);
 	success = load (file_name, &_if);
 	
 	/* If load failed, quit. */
 	if (!success){
-		printf("load failed\n");
+		// printf("load failed\n");
 		return -1;
 	}
 	
@@ -977,9 +978,9 @@ setup_stack (struct intr_frame *if_) {
 		if_->rsp=USER_STACK;
 		spt_find_page(&curr->spt, stack_bottom)->is_loaded=true;
 	}
-	printf("setup stack: %p, success: %d\n", stack_bottom, success);
-	printf(success ? "setup stack success\n" : "setup stack failed\n");
-	if(!success) printf("setup stack really failed\n");
+	// printf("setup stack: %p, success: %d\n", stack_bottom, success);
+	// printf(success ? "setup stack success\n" : "setup stack failed\n");
+	// if(!success) printf("setup stack really failed\n");
 	// if(success) printf("setup stack is 88\n");
 	
 	return success;

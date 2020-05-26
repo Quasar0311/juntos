@@ -290,7 +290,7 @@ supplemental_page_table_copy (struct supplemental_page_table *dst,
 
 		// printf("spt find page begin\n");
 		newpage=spt_find_page(dst, p->va);
-		// printf("memcpy begin: %p\n", p->frame->kva);
+		// printf("memcpy begin\n");	
 		if(p->frame!=NULL)
 			memcpy(newpage->frame->kva, p->frame->kva, PGSIZE);
 		// printf("memcpy finish\n");
