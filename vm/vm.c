@@ -52,7 +52,6 @@ vm_alloc_page_with_initializer (enum vm_type type, void *upage, bool writable,
 	ASSERT (VM_TYPE(type) != VM_UNINIT)
 
 	struct supplemental_page_table *spt = &thread_current ()->spt;
-	struct hash *h=&spt->vm;
 
 	/* Check wheter the upage is already occupied or not. */
 	if (spt_find_page (spt, upage) == NULL) {
@@ -78,9 +77,10 @@ vm_alloc_page_with_initializer (enum vm_type type, void *upage, bool writable,
 		uninit_page->is_loaded=false;
 		uninit_page -> init = init;
 		uninit_page -> aux = aux;
-
+		// printf("inserted to spt: %p\n", upage);
 		/* TODO: Insert the page into the spt. */
 		spt_insert_page(spt, uninit_page);
+		// printf("insert finish\n");
 	}
 	return true;
 err:
@@ -185,9 +185,9 @@ vm_try_handle_fault (struct intr_frame *f, void *addr,
 	struct page *page = spt_find_page(spt, addr);
 	/* TODO: Validate the fault */
 	/* TODO: Your code goes here */
-	printf("vm try handle fault addr: %p\n", addr);
-	if(page==NULL) printf("page is null\n");
-	if(is_kernel_vaddr(addr)) printf("is kernel vaddr\n");
+	// printf("vm try handle fault addr: %p\n", addr);
+	// if(page==NULL) printf("page is null\n");
+	// if(is_kernel_vaddr(addr)) printf("is kernel vaddr\n");
 
 	/*** valid page fault ***/
 	if(page==NULL || is_kernel_vaddr(addr)|| !not_present){
@@ -213,9 +213,11 @@ vm_claim_page (void *va) {
 	struct page *page;
 	/* TODO: Fill this function */
 	struct thread *curr=thread_current();
+	// printf("vm claim page\n");
 	
 	page=spt_find_page(&curr->spt, va);
 	if(page==NULL) return false;
+	// printf("vm claim page 2\n");
 
 	return vm_do_claim_page (page);
 }
@@ -225,6 +227,7 @@ static bool
 vm_do_claim_page (struct page *page) {
 	struct frame *frame = vm_get_frame ();
 	struct thread *curr=thread_current();
+	// printf("vm do claim page\n");
 	
 	/* Set links */
 	frame->page = page;
@@ -237,6 +240,7 @@ vm_do_claim_page (struct page *page) {
 		free(frame);
 		return false;
 	}
+	// printf("vm do claim page 2\n");
 
 	return swap_in (page, frame->kva);
 }
@@ -283,41 +287,15 @@ supplemental_page_table_copy (struct supplemental_page_table *dst,
 
 		if(!vm_claim_page(p->va))
 			return false;
-		
+
+		// printf("spt find page begin\n");
 		newpage=spt_find_page(dst, p->va);
-		memcpy(newpage->frame->kva, p->frame->kva, PGSIZE);
-
-		// printf("copy start va: %p, kva: %p\n", p->va, p->frame->kva);
-
-		// if (p == NULL) {
-		// 	printf("copy page is null\n");
-		// 	return false;
-		// }
-		
-		// // if(p->is_loaded){
-		// // 	printf("setup stack\n");
-		// // 	if(!vm_alloc_page_with_initializer(VM_ANON, p->va, true, NULL, NULL)){
-		// // 		printf("alloc page fail\n");
-		// // 		return false;
-		// // 	}
-		// // }
-
-		// if (!vm_alloc_page_with_initializer(page_get_type(p), p -> va, p -> writable, p -> init, p -> aux)){
-		// 	printf("copy alloc failed\n");
-		// 	return false;
-		// } 
-
-				
-		// if (!vm_claim_page(p -> va)){
-		// 	printf("copy claim failed\n");
-		// 	return false;
-		// }
-
-		// page=spt_find_page(dst, p->va);
-		printf("copy finished va: %p, kva: %p\n", newpage->va, newpage->frame->kva);
+		// printf("memcpy begin: %p\n", p->frame->kva);
+		if(p->frame!=NULL)
+			memcpy(newpage->frame->kva, p->frame->kva, PGSIZE);
+		// printf("memcpy finish\n");
 	}
 	
-
 	return true;
 }
 

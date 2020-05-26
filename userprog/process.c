@@ -657,8 +657,10 @@ load (const char *file_name, struct intr_frame *if_) {
 						zero_bytes = ROUND_UP (page_offset + phdr.p_memsz, PGSIZE);
 					}
 					if (!load_segment (file, file_page, (void *) mem_page,
-								read_bytes, zero_bytes, writable))
-						goto done;
+								read_bytes, zero_bytes, writable)){
+									printf("load segment failed\n");
+									goto done;
+								}
 				}
 				else
 					goto done;
@@ -667,8 +669,10 @@ load (const char *file_name, struct intr_frame *if_) {
 	}
 
 	/* Set up stack. */
-	if (!setup_stack (if_))
+	if (!setup_stack (if_)){
+		printf("setup stack failed\n");
 		goto done;
+	}
 
 	/* Start address. */
 	if_->rip = ehdr.e_entry;
@@ -973,7 +977,10 @@ setup_stack (struct intr_frame *if_) {
 		if_->rsp=USER_STACK;
 		spt_find_page(&curr->spt, stack_bottom)->is_loaded=true;
 	}
-	// printf("setup stack: %p\n", stack_bottom);
+	printf("setup stack: %p, success: %d\n", stack_bottom, success);
+	printf(success ? "setup stack success\n" : "setup stack failed\n");
+	if(!success) printf("setup stack really failed\n");
+	// if(success) printf("setup stack is 88\n");
 	
 	return success;
 }
