@@ -667,13 +667,13 @@ load (const char *file_name, struct intr_frame *if_) {
 				break;
 		}
 	}
-
+	printf("load1\n");
 	/* Set up stack. */
 	if (!setup_stack (if_)){
 		printf("setup stack failed\n");
 		goto done;
 	}
-
+	printf("load2\n");
 	/* Start address. */
 	if_->rip = ehdr.e_entry;
 	
@@ -728,7 +728,7 @@ load (const char *file_name, struct intr_frame *if_) {
 	free(argv);
 
 	success = true;
-
+	printf("load3\n");
 done:
 	/* We arrive here whether the load is successful or not. */
 	// file_close (file); 
@@ -925,7 +925,7 @@ load_segment (struct file *file, off_t ofs, uint8_t *upage,
 	ASSERT ((read_bytes + zero_bytes) % PGSIZE == 0);
 	ASSERT (pg_ofs (upage) == 0);
 	ASSERT (ofs % PGSIZE == 0);
-	// printf("load_segment\n");
+	printf("load_segment\n");
 
 	while (read_bytes > 0 || zero_bytes > 0) {
 		/* Do calculate how to fill this page.
@@ -933,7 +933,7 @@ load_segment (struct file *file, off_t ofs, uint8_t *upage,
 		 * and zero the final PAGE_ZERO_BYTES bytes. */
 		size_t page_read_bytes = read_bytes < PGSIZE ? read_bytes : PGSIZE;
 		size_t page_zero_bytes = PGSIZE - page_read_bytes;
-
+		printf("l_s loop, %p\n", upage);
 		/* TODO: Set up aux to pass information to the lazy_load_segment. */
 		struct load_file *load_file=
 			(struct load_file *) malloc(sizeof(struct load_file));
@@ -978,9 +978,9 @@ setup_stack (struct intr_frame *if_) {
 		if_->rsp=USER_STACK;
 		spt_find_page(&curr->spt, stack_bottom)->is_loaded=true;
 	}
-	printf("setup stack: %p, success: %d\n", stack_bottom, success);
-	printf(success ? "setup stack success\n" : "setup stack failed\n");
-	if(!success) printf("setup stack really failed\n");
+	// printf("setup stack: %p, success: %d\n", stack_bottom, success);
+	// printf(success ? "setup stack success\n" : "setup stack failed\n");
+	// if(!success) printf("setup stack really failed\n");
 	// if(success) printf("setup stack is 88\n");
 	
 	return success;

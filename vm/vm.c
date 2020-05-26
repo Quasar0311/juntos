@@ -59,7 +59,7 @@ vm_alloc_page_with_initializer (enum vm_type type, void *upage, bool writable,
 		 * TODO: and then create "uninit" page struct by calling uninit_new. You
 		 * TODO: should modify the field after calling the uninit_new. */
 		struct page *uninit_page=(struct page *)malloc(PGSIZE);
-
+		
 		switch(type){
 			case VM_ANON:
 				uninit_new(uninit_page, upage, init, type, aux, anon_initializer);
@@ -77,7 +77,7 @@ vm_alloc_page_with_initializer (enum vm_type type, void *upage, bool writable,
 		uninit_page->is_loaded=false;
 		uninit_page -> init = init;
 		uninit_page -> aux = aux;
-		// printf("inserted to spt: %p\n", upage);
+		
 		/* TODO: Insert the page into the spt. */
 		spt_insert_page(spt, uninit_page);
 		// printf("insert finish\n");
@@ -185,7 +185,7 @@ vm_try_handle_fault (struct intr_frame *f, void *addr,
 	struct page *page = spt_find_page(spt, addr);
 	/* TODO: Validate the fault */
 	/* TODO: Your code goes here */
-	printf("vm try handle fault addr: %p\n", addr);
+	// printf("vm try handle fault addr: %p\n", addr);
 	// if(page==NULL) printf("page is null\n");
 	// if(is_kernel_vaddr(addr)) printf("is kernel vaddr\n");
 
