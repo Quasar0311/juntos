@@ -191,12 +191,21 @@ vm_try_handle_fault (struct intr_frame *f, void *addr,
 		bool user, bool write, bool not_present) {
 	struct supplemental_page_table *spt = &thread_current ()->spt;
 	struct page *page = spt_find_page(spt, addr);
-	void *rsp=(void *)thread_current()->tf.rsp;
+	void *rsp=(void *)f->rsp;
 	/* TODO: Validate the fault */
 	/* TODO: Your code goes here */
-	// printf("vm try handle fault addr: %p\n", addr);
+	// printf("vm try handle fault addr: %p, rsp : %p\n", addr, rsp);
 	// if(page==NULL) printf("page is null\n");
 	// if(is_kernel_vaddr(addr)) printf("is kernel vaddr\n");
+	// if(user) rsp=(void *)f->rsp;
+	// if(!user) rsp=(void *)thread_current()->tf.rsp;
+	
+	if (page == NULL) {
+		if(addr >= rsp - 8 && addr+PGSIZE<(void *)USER_STACK+1024*1024){
+			// printf("here\n");
+			return vm_stack_growth(addr);
+		}
+	}
 
 	/*** valid page fault ***/
 	if(page==NULL || is_kernel_vaddr(addr)|| !not_present){
@@ -204,9 +213,7 @@ vm_try_handle_fault (struct intr_frame *f, void *addr,
 		return false;
 	}
 
-	if(rsp<addr && addr<=rsp-32 && addr+PGSIZE<(void *)USER_STACK+1024*1024){
-		return vm_stack_growth(addr);
-	}
+	
 
 	/*** bogus page fault ***/
 	return vm_do_claim_page (page); 
