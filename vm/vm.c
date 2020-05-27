@@ -168,8 +168,16 @@ vm_get_frame (void) {
 }
 
 /* Growing the stack. */
-static void
-vm_stack_growth (void *addr UNUSED) {
+static bool
+vm_stack_growth (void *addr) {
+	void *pg_addr=pg_round_down(addr);
+
+	if(!vm_alloc_page_with_initializer(VM_ANON, pg_round_down(addr), true, NULL, NULL))
+		return false;
+	if(!vm_claim_page(pg_addr))
+		return false;
+
+	return true;
 }
 
 /* Handle the fault on write_protected page */
@@ -183,6 +191,7 @@ vm_try_handle_fault (struct intr_frame *f, void *addr,
 		bool user, bool write, bool not_present) {
 	struct supplemental_page_table *spt = &thread_current ()->spt;
 	struct page *page = spt_find_page(spt, addr);
+	void *rsp=(void *)thread_current()->tf.rsp;
 	/* TODO: Validate the fault */
 	/* TODO: Your code goes here */
 	// printf("vm try handle fault addr: %p\n", addr);
@@ -193,6 +202,10 @@ vm_try_handle_fault (struct intr_frame *f, void *addr,
 	if(page==NULL || is_kernel_vaddr(addr)|| !not_present){
 		if(page!=NULL) free(page);
 		return false;
+	}
+
+	if(rsp<addr && addr<=rsp-32 && addr+PGSIZE<(void *)USER_STACK+1024*1024){
+		return vm_stack_growth(addr);
 	}
 
 	/*** bogus page fault ***/
