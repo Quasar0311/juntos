@@ -59,7 +59,7 @@ vm_alloc_page_with_initializer (enum vm_type type, void *upage, bool writable,
 		 * TODO: and then create "uninit" page struct by calling uninit_new. You
 		 * TODO: should modify the field after calling the uninit_new. */
 		struct page *uninit_page=(struct page *)malloc(PGSIZE);
-
+		
 		switch(type){
 			case VM_ANON:
 				uninit_new(uninit_page, upage, init, type, aux, anon_initializer);
@@ -77,7 +77,7 @@ vm_alloc_page_with_initializer (enum vm_type type, void *upage, bool writable,
 		uninit_page->is_loaded=false;
 		uninit_page -> init = init;
 		uninit_page -> aux = aux;
-		// printf("inserted to spt: %p\n", upage);
+		
 		/* TODO: Insert the page into the spt. */
 		spt_insert_page(spt, uninit_page);
 		// printf("insert finish\n");
@@ -273,6 +273,10 @@ bool
 supplemental_page_table_copy (struct supplemental_page_table *dst,
 		struct supplemental_page_table *src) {
 	struct hash_iterator i;
+	struct frame *frame;
+	void *frame_addr;
+	struct page *page;
+	struct thread *curr = thread_current();
 
 	hash_first(&i, &src -> vm);
 
@@ -290,7 +294,7 @@ supplemental_page_table_copy (struct supplemental_page_table *dst,
 
 		// printf("spt find page begin\n");
 		newpage=spt_find_page(dst, p->va);
-		// printf("memcpy begin\n");	
+		// printf("memcpy begin: %p\n", p->frame->kva);
 		if(p->frame!=NULL)
 			memcpy(newpage->frame->kva, p->frame->kva, PGSIZE);
 		// printf("memcpy finish\n");
@@ -302,7 +306,7 @@ supplemental_page_table_copy (struct supplemental_page_table *dst,
 static void
 vm_destroy_func(struct hash_elem *e, void *aux UNUSED){
 	destroy(hash_entry(e, struct page, page_elem));
-	free(hash_entry(e, struct page, page_elem));
+	// free(hash_entry(e, struct page, page_elem));
 
 	return;
 }
