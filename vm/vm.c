@@ -59,7 +59,7 @@ vm_alloc_page_with_initializer (enum vm_type type, void *upage, bool writable,
 		 * TODO: and then create "uninit" page struct by calling uninit_new. You
 		 * TODO: should modify the field after calling the uninit_new. */
 		struct page *uninit_page=(struct page *)malloc(PGSIZE);
-
+		
 		switch(type){
 			case VM_ANON:
 				uninit_new(uninit_page, upage, init, type, aux, anon_initializer);
@@ -77,7 +77,7 @@ vm_alloc_page_with_initializer (enum vm_type type, void *upage, bool writable,
 		uninit_page->is_loaded=false;
 		uninit_page -> init = init;
 		uninit_page -> aux = aux;
-		// printf("inserted to spt: %p\n", upage);
+		
 		/* TODO: Insert the page into the spt. */
 		spt_insert_page(spt, uninit_page);
 		// printf("insert finish\n");
@@ -192,38 +192,29 @@ vm_try_handle_fault (struct intr_frame *f, void *addr,
 	struct supplemental_page_table *spt = &thread_current ()->spt;
 	struct page *page = spt_find_page(spt, addr);
 	void *rsp=(void *)f->rsp;
-	bool stack_growth;
 	/* TODO: Validate the fault */
 	/* TODO: Your code goes here */
-	// printf("vm try handle fault addr: %p\n", addr);
+	// printf("vm try handle fault addr: %p, rsp : %p\n", addr, rsp);
 	// if(page==NULL) printf("page is null\n");
 	// if(is_kernel_vaddr(addr)) printf("is kernel vaddr\n");
-
-	/*** valid page fault ***/
-	// if(is_kernel_vaddr(addr)|| !not_present){
-	// 	if(page!=NULL) free(page);
-	// 	return false;
-	// }
-
-	// if(user) rsp=f->rsp;
-	// if(!user) rsp=thread_current()->tf.rsp;
-
-	// printf("rsp: %p, addr: %p user: %p\n", rsp, addr, (void *)USER_STACK);
-	// if(addr<rsp-8) printf("1 ");
-	// // if(addr<=rsp-32) printf("2 ");
-	// if(addr+PGSIZE<(void *)0xc0000000+1024*1024) printf("3 ");
-	// printf("4\n");
-	if(page==NULL){
-		if(addr<=rsp-8 && addr+PGSIZE<(void *)USER_STACK+1024*1024){
-		// printf("vm stack growth\n");
-		// stack_growth=vm_stack_growth(addr);
-		// rsp=pg_round_down(addr);
-		// printf("rsp: %p, pg: %p\n", rsp, pg_round_down(addr));
-		// printf(stack_growth ? "growth success\n" : "growth failed\n");
-		return vm_stack_growth(addr);
+	// if(user) rsp=(void *)f->rsp;
+	// if(!user) rsp=(void *)thread_current()->tf.rsp;
+	
+	if (page == NULL) {
+		if(addr >= rsp - 8 && addr+PGSIZE<(void *)USER_STACK+1024*1024){
+			// printf("here\n");
+			return vm_stack_growth(addr);
 		}
 	}
+
+	/*** valid page fault ***/
+	if(page==NULL || is_kernel_vaddr(addr)|| !not_present){
+		if(page!=NULL) free(page);
+		return false;
+	}
+
 	
+
 	/*** bogus page fault ***/
 	return vm_do_claim_page (page); 
 }
@@ -302,6 +293,10 @@ bool
 supplemental_page_table_copy (struct supplemental_page_table *dst,
 		struct supplemental_page_table *src) {
 	struct hash_iterator i;
+	struct frame *frame;
+	void *frame_addr;
+	struct page *page;
+	struct thread *curr = thread_current();
 
 	hash_first(&i, &src -> vm);
 
@@ -319,7 +314,7 @@ supplemental_page_table_copy (struct supplemental_page_table *dst,
 
 		// printf("spt find page begin\n");
 		newpage=spt_find_page(dst, p->va);
-		// printf("memcpy begin\n");	
+		// printf("memcpy begin: %p\n", p->frame->kva);
 		if(p->frame!=NULL)
 			memcpy(newpage->frame->kva, p->frame->kva, PGSIZE);
 		// printf("memcpy finish\n");
@@ -331,7 +326,7 @@ supplemental_page_table_copy (struct supplemental_page_table *dst,
 static void
 vm_destroy_func(struct hash_elem *e, void *aux UNUSED){
 	destroy(hash_entry(e, struct page, page_elem));
-	free(hash_entry(e, struct page, page_elem));
+	// free(hash_entry(e, struct page, page_elem));
 
 	return;
 }
