@@ -118,6 +118,8 @@ syscall_handler (struct intr_frame *f) {
 
 		/*** SYS_OPEN ***/
 		case 7:
+			thread_current() -> tf.rsp = f -> rsp;
+			
 			check_address(f -> R.rdi);
 			f -> R.rax = syscall_open((char *)f->R.rdi);
 			break;
@@ -130,11 +132,16 @@ syscall_handler (struct intr_frame *f) {
 		/*** SYS_READ ***/
 		case 9:
 			check_address(f -> R.rsi);
+			// printf("rsi : %p\n", f -> R.rsi);
+			if (f -> R.rsi < (void *) 0x600000) {
+				syscall_exit(-1);
+			}
 			f -> R.rax = syscall_read((int)f->R.rdi, (void *)f->R.rsi, (unsigned)f->R.rdx);
 			break;
 		
 		/*** SYS_WRITE ***/
 		case 10:
+			// thread_current() -> tf.rsp = f -> rsp;
 			check_address(f -> R.rsi);
 			f -> R.rax = syscall_write((int) f -> R.rdi, (void *) f -> R.rsi, (unsigned) f -> R.rdx);
 			break; 
@@ -151,6 +158,8 @@ syscall_handler (struct intr_frame *f) {
 		
 		/*** SYS_CLOSE ***/
 		case 13:
+			thread_current() -> tf.rsp = f -> rsp;
+			
 			syscall_close((int)f->R.rdi);
 			break;
 		
