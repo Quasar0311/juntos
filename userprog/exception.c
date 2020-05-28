@@ -158,6 +158,7 @@ page_fault (struct intr_frame *f) {
 	// printf(write ? "access was write\n": "access was read\n");
 	// printf(user ? "access by user\n": "access by kernel\n");
 	// printf("fault addr: %p\n", fault_addr);
+	// if(!user) thread_current()->tf.rsp=f->rsp;
 
 	if (vm_try_handle_fault (f, fault_addr, user, write, not_present)){
 		// struct page *page;

@@ -191,7 +191,8 @@ vm_try_handle_fault (struct intr_frame *f, void *addr,
 		bool user, bool write, bool not_present) {
 	struct supplemental_page_table *spt = &thread_current ()->spt;
 	struct page *page = spt_find_page(spt, addr);
-	void *rsp=(void *)thread_current()->tf.rsp;
+	void *rsp=(void *)f->rsp;
+	bool stack_growth;
 	/* TODO: Validate the fault */
 	/* TODO: Your code goes here */
 	// printf("vm try handle fault addr: %p\n", addr);
@@ -199,15 +200,30 @@ vm_try_handle_fault (struct intr_frame *f, void *addr,
 	// if(is_kernel_vaddr(addr)) printf("is kernel vaddr\n");
 
 	/*** valid page fault ***/
-	if(page==NULL || is_kernel_vaddr(addr)|| !not_present){
-		if(page!=NULL) free(page);
-		return false;
-	}
+	// if(is_kernel_vaddr(addr)|| !not_present){
+	// 	if(page!=NULL) free(page);
+	// 	return false;
+	// }
 
-	if(rsp<addr && addr<=rsp-32 && addr+PGSIZE<(void *)USER_STACK+1024*1024){
+	// if(user) rsp=f->rsp;
+	// if(!user) rsp=thread_current()->tf.rsp;
+
+	// printf("rsp: %p, addr: %p user: %p\n", rsp, addr, (void *)USER_STACK);
+	// if(addr<rsp-8) printf("1 ");
+	// // if(addr<=rsp-32) printf("2 ");
+	// if(addr+PGSIZE<(void *)0xc0000000+1024*1024) printf("3 ");
+	// printf("4\n");
+	if(page==NULL){
+		if(addr<=rsp-8 && addr+PGSIZE<(void *)USER_STACK+1024*1024){
+		// printf("vm stack growth\n");
+		// stack_growth=vm_stack_growth(addr);
+		// rsp=pg_round_down(addr);
+		// printf("rsp: %p, pg: %p\n", rsp, pg_round_down(addr));
+		// printf(stack_growth ? "growth success\n" : "growth failed\n");
 		return vm_stack_growth(addr);
+		}
 	}
-
+	
 	/*** bogus page fault ***/
 	return vm_do_claim_page (page); 
 }
