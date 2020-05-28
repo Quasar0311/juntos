@@ -302,6 +302,9 @@ thread_create (const char *name, int priority,
 
 	t->pid=t->tid;
 
+	/*** vm ***/
+	list_init(&t->mmap_list);
+
 	/* Add to run queue. */
 	thread_unblock (t);
 
