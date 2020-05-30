@@ -205,7 +205,7 @@ vm_try_handle_fault (struct intr_frame *f, void *addr,
 		}
 	}
 
-	/*** valid page fault ***/
+	// /*** valid page fault ***/
 	if(page==NULL || is_kernel_vaddr(addr)|| !not_present){
 		if(page!=NULL) free(page);
 		return false;
