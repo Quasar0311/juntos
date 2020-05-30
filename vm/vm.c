@@ -52,7 +52,7 @@ vm_alloc_page_with_initializer (enum vm_type type, void *upage, bool writable,
 	ASSERT (VM_TYPE(type) != VM_UNINIT)
 
 	struct supplemental_page_table *spt = &thread_current ()->spt;
-
+	
 	/* Check wheter the upage is already occupied or not. */
 	if (spt_find_page (spt, upage) == NULL) {
 		/* TODO: Create the page, fetch the initialier according to the VM type,
@@ -202,13 +202,9 @@ vm_try_handle_fault (struct intr_frame *f, void *addr,
 	// printf("thread rsp : %p\n", thread_current() -> tf.rsp);
 	// if(page==NULL) printf("page is null\n");
 	// if(is_kernel_vaddr(addr)) printf("is kernel vaddr\n");
-	// if(user) rsp=(void *)f->rsp;
-	// if(!user) rsp=(void *)thread_current()->tf.rsp;
 	
 	if (page == NULL) {
 		if(addr >= rsp - 8 && addr+PGSIZE<(void *)USER_STACK+1024*1024){
-			// printf("here\n");
-			// thread_current() -> user_to_kernel = false;
 			return vm_stack_growth(addr);
 		}
 	}
