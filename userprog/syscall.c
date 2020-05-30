@@ -170,14 +170,14 @@ syscall_handler (struct intr_frame *f) {
 			break;
 
 		/*** SYS_MMAP ***/
-		case 22:
+		case 14:
 			check_address(f->R.rdi);
 			f->R.rax=syscall_mmap((void *)f->R.rdi, (size_t)f->R.rsi, (int)f->R.rdx, 
 				(int)f->R.r10, (off_t)f->R.r8);
 			break;
 		
 		/*** SYS_MUNMAP ***/
-		case 23:
+		case 15:
 			check_address(f->R.rdi);
 			syscall_munmap((void *)f->R.rdi);
 			break;
