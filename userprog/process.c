@@ -440,8 +440,6 @@ process_exit (void) {
 	}
 	
 	free(curr -> fd_table);
-	
-	// supplemental_page_table_kill(&curr->spt);
 
 	lock_release(&writable_lock);
 

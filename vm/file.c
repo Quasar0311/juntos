@@ -3,6 +3,7 @@
 #include "vm/vm.h"
 #include "threads/malloc.h"
 #include "threads/vaddr.h"
+#include "threads/mmu.h"
 
 static bool file_map_swap_in (struct page *page, void *kva);
 static bool file_map_swap_out (struct page *page);
@@ -47,12 +48,21 @@ file_map_swap_out (struct page *page) {
 /* Destory the file mapped page. PAGE will be freed by the caller. */
 static void
 file_map_destroy (struct page *page) {
-	struct file_page *file_page UNUSED = &page->file;
+	struct file_page *file_page = &page->file;
+	struct thread *curr=thread_current();
+
+	if(pml4_is_dirty(curr->pml4, page->va)){
+		file_write_at(file_page->f, page->va, 
+			(off_t)file_page->read_bytes, file_page->ofs);
+		
+		// read_bytes-=page_read_bytes;
+		// ofs+=PGSIZE;
+	}
 }
 
 static bool
 lazy_file_segment(struct page *page, void *aux){
-	struct file_page *f=aux;
+	struct mmap_file *f=aux;
 	void *addr=page->va;
 
 	if(file_read_at(f->file, addr, (off_t)f->read_bytes, f->ofs)
@@ -67,36 +77,48 @@ void *
 do_mmap (void *addr, size_t length, int writable,
 		struct file *file, off_t offset) {
 	void *va=addr;
+	struct mmap_file *mmap_file;
+	struct thread *curr=thread_current();
+	struct page *page;
+	// off_t ofs=offset;
+	// size_t read_bytes=length;
 
 	if(addr==0 || length==0) return NULL;
 
-	struct file_page *file_page=
-			(struct file_page *) malloc(sizeof(struct file_page));
-	struct thread *curr=thread_current();
-	
-	file_page->file=file;
-	list_push_back(&curr->mmap_list, &file_page->file_elem);
+	mmap_file=(struct mmap_file *) malloc(sizeof(struct mmap_file));
+
+	list_init(&mmap_file->page_list);
+	mmap_file->file=file_reopen(file);
+	mmap_file->va=addr;
+
+	list_push_back(&curr->mmap_list, &mmap_file->file_elem);
 
 	while(length>0){
 		size_t page_read_bytes = length < PGSIZE ? length : PGSIZE;
 	
-		file_page->ofs=offset;
-		file_page->read_bytes=page_read_bytes; 
+		mmap_file->ofs=offset;
+		mmap_file->read_bytes=page_read_bytes; 
 
-		void *aux=file_page;
+		void *aux=mmap_file;
 
 		if(!vm_alloc_page_with_initializer(VM_FILE, addr, writable, 
 			lazy_file_segment, aux)){
 				return NULL;
 			}
 		
-		struct page *page=spt_find_page(&curr->spt, addr);
-		list_push_back(&file_page->page_list, &page->mmap_elem);
+		page=spt_find_page(&curr->spt, addr);
+		list_push_back(&mmap_file->page_list, &page->mmap_elem);
+
+		page->file.f=mmap_file->file;
+		page->file.ofs=mmap_file->ofs;
+		page->file.read_bytes=mmap_file->read_bytes;
 
 		length-=page_read_bytes;
 		addr+=PGSIZE;
 		offset+=PGSIZE;
 	}
+	// mmap_file->ofs=ofs;
+	// mmap_file->read_bytes=read_bytes;
 
 	return va;
 }
@@ -104,5 +126,32 @@ do_mmap (void *addr, size_t length, int writable,
 /* Do the munmap */
 void
 do_munmap (void *addr) {
+	struct thread *curr=thread_current();
+	struct list_elem *e=list_begin(&curr->mmap_list);
+	struct mmap_file *fp;
 
+	while(e!=list_end(&curr->mmap_list)){
+		fp=list_entry(e, struct mmap_file, file_elem);
+
+		if(fp->va==addr){
+			struct list_elem *m=list_begin(&fp->page_list);
+
+			while(m!=list_end(&fp->page_list)){
+				// off_t ofs=fp->ofs;
+				// size_t read_bytes=fp->read_bytes;
+				// size_t page_read_bytes = read_bytes < PGSIZE ? read_bytes : PGSIZE;
+				struct page *p=list_entry(m, struct page, mmap_elem);
+
+				file_map_destroy(p);
+
+				pml4_clear_page(curr->pml4, p->va);
+				vm_dealloc_page(list_entry(m, struct page, mmap_elem));
+
+				m=list_next(m);
+			}
+		}
+		file_close(fp->file);
+
+		e=list_next(e);
+	}
 }
