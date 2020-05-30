@@ -205,11 +205,11 @@ vm_try_handle_fault (struct intr_frame *f, void *addr,
 		}
 	}
 
-	// /*** valid page fault ***/
-	// if(page==NULL || is_kernel_vaddr(addr)|| !not_present){
-	// 	if(page!=NULL) free(page);
-	// 	return false;
-	// }
+	/*** valid page fault ***/
+	if(page==NULL || is_kernel_vaddr(addr)|| !not_present){
+		if(page!=NULL) free(page);
+		return false;
+	}
 
 	/*** bogus page fault ***/
 	return vm_do_claim_page (page); 
