@@ -49,6 +49,7 @@ struct page {
 	bool is_loaded;
 	vm_initializer *init;
 	void *aux;
+	struct list_elem mmap_elem;
 
 	/* Per-type data are binded into the union.
 	 * Each function automatically detects the current union */
