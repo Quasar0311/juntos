@@ -170,14 +170,15 @@ syscall_handler (struct intr_frame *f) {
 			break;
 
 		/*** SYS_MMAP ***/
-		case 22:
+		case SYS_MMAP:
+			printf("sys mmap\n");
 			check_address(f->R.rdi);
 			f->R.rax=syscall_mmap((void *)f->R.rdi, (size_t)f->R.rsi, (int)f->R.rdx, 
 				(int)f->R.r10, (off_t)f->R.r8);
 			break;
 		
 		/*** SYS_MUNMAP ***/
-		case 23:
+		case SYS_MUNMAP:
 			check_address(f->R.rdi);
 			syscall_munmap((void *)f->R.rdi);
 			break;
@@ -430,6 +431,7 @@ syscall_dup2(int oldfd, int newfd){
 void *
 syscall_mmap (void *addr, size_t length, int writable, int fd, off_t offset){
 	if(fd==0 || fd==1) return NULL;
+	printf("syscall mmap\n");
 
 	return do_mmap(addr, length, writable, process_get_file(fd), offset);
 }
