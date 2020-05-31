@@ -66,7 +66,7 @@ vm_alloc_page_with_initializer (enum vm_type type, void *upage, bool writable,
 				break;
 
 			case VM_FILE:
-				printf("case vm file\n");
+				// printf("case vm file\n");
 				uninit_new(uninit_page, upage, init, type, aux, file_map_initializer);
 				break;
 

@@ -78,6 +78,7 @@ syscall_handler (struct intr_frame *f) {
 	/*** implement syscall_handgler using 
 	system call number stored in the user stack ***/
 	int *number=(int *)&f->R.rax;
+	struct thread *curr=thread_current();
 	
 	switch(*number){
 		/*** SYS_HALT ***/
@@ -133,8 +134,10 @@ syscall_handler (struct intr_frame *f) {
 		/*** SYS_READ ***/
 		case 9:
 			check_address(f -> R.rsi);
+			curr -> tf.rsp = f -> rsp;
 			// printf("rsi : %p\n", f -> R.rsi);
 			if (f -> R.rsi < (void *) 0x600000) {
+			// if(spt_find_page(&curr->spt, (void *)f->R.rsi)->writable){
 				syscall_exit(-1);
 			}
 			f -> R.rax = syscall_read((int)f->R.rdi, (void *)f->R.rsi, (unsigned)f->R.rdx);
@@ -171,7 +174,7 @@ syscall_handler (struct intr_frame *f) {
 
 		/*** SYS_MMAP ***/
 		case SYS_MMAP:
-			printf("sys mmap\n");
+			// printf("sys mmap\n");
 			check_address(f->R.rdi);
 			f->R.rax=syscall_mmap((void *)f->R.rdi, (size_t)f->R.rsi, (int)f->R.rdx, 
 				(int)f->R.r10, (off_t)f->R.r8);
@@ -431,7 +434,7 @@ syscall_dup2(int oldfd, int newfd){
 void *
 syscall_mmap (void *addr, size_t length, int writable, int fd, off_t offset){
 	if(fd==0 || fd==1) return NULL;
-	printf("syscall mmap addr: %p\n", addr);
+	// printf("syscall mmap addr: %p\n", addr);
 
 	return do_mmap(addr, length, writable, process_get_file(fd), offset);
 }
