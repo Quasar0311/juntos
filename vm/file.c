@@ -4,6 +4,7 @@
 #include "threads/malloc.h"
 #include "threads/vaddr.h"
 #include "threads/mmu.h"
+#include <stdio.h>
 
 static bool file_map_swap_in (struct page *page, void *kva);
 static bool file_map_swap_out (struct page *page);
@@ -37,12 +38,14 @@ file_map_initializer (struct page *page, enum vm_type type, void *kva) {
 static bool
 file_map_swap_in (struct page *page, void *kva) {
 	struct file_page *file_page UNUSED = &page->file;
+	return true;
 }
 
 /* Swap out the page by writeback contents to the file. */
 static bool
 file_map_swap_out (struct page *page) {
 	struct file_page *file_page UNUSED = &page->file;
+	return true;
 }
 
 /* Destory the file mapped page. PAGE will be freed by the caller. */
@@ -64,7 +67,7 @@ static bool
 lazy_file_segment(struct page *page, void *aux){
 	struct mmap_file *f=aux;
 	void *addr=page->va;
-
+	printf("lazy file segment\n");
 	if(file_read_at(f->file, addr, (off_t)f->read_bytes, f->ofs)
 		<(off_t)f->read_bytes)
 			return false;
@@ -76,13 +79,13 @@ lazy_file_segment(struct page *page, void *aux){
 void *
 do_mmap (void *addr, size_t length, int writable,
 		struct file *file, off_t offset) {
-	void *va=addr;
+	// void *va=addr;
 	struct mmap_file *mmap_file;
 	struct thread *curr=thread_current();
 	struct page *page;
 	// off_t ofs=offset;
 	// size_t read_bytes=length;
-
+	printf("do mmap\n");
 	if(addr==0 || length==0) return NULL;
 
 	mmap_file=(struct mmap_file *) malloc(sizeof(struct mmap_file));
@@ -103,6 +106,7 @@ do_mmap (void *addr, size_t length, int writable,
 
 		if(!vm_alloc_page_with_initializer(VM_FILE, addr, writable, 
 			lazy_file_segment, aux)){
+				printf("alloc null\n");
 				return NULL;
 			}
 		
@@ -112,15 +116,15 @@ do_mmap (void *addr, size_t length, int writable,
 		page->file.f=mmap_file->file;
 		page->file.ofs=mmap_file->ofs;
 		page->file.read_bytes=mmap_file->read_bytes;
-
+		printf("length: %ld, page_read_bytes: %ld, addr: %p, offset: %d\n", length, page_read_bytes, addr, offset);
 		length-=page_read_bytes;
 		addr+=PGSIZE;
 		offset+=PGSIZE;
 	}
 	// mmap_file->ofs=ofs;
 	// mmap_file->read_bytes=read_bytes;
-
-	return va;
+	printf("finish mmap va: %p\n", mmap_file->va);
+	return mmap_file->va;
 }
 
 /* Do the munmap */
