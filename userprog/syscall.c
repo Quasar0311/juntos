@@ -134,6 +134,7 @@ syscall_handler (struct intr_frame *f) {
 		case 9:
 			check_address(f -> R.rsi);
 			// printf("rsi : %p\n", f -> R.rsi);
+			// thread_current() -> tf.rsp = f -> rsp;
 			if (f -> R.rsi < (void *) 0x600000) {
 				syscall_exit(-1);
 			}

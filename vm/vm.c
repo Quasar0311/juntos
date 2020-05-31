@@ -66,7 +66,7 @@ vm_alloc_page_with_initializer (enum vm_type type, void *upage, bool writable,
 				break;
 
 			case VM_FILE:
-				printf("case vm file\n");
+				printf("case vm file : %p\n", init);
 				uninit_new(uninit_page, upage, init, type, aux, file_map_initializer);
 				break;
 
@@ -81,7 +81,7 @@ vm_alloc_page_with_initializer (enum vm_type type, void *upage, bool writable,
 		
 		/* TODO: Insert the page into the spt. */
 		spt_insert_page(spt, uninit_page);
-		printf("insert finish\n");
+		// printf("insert finish\n");
 	}
 	return true;
 err:
@@ -195,11 +195,12 @@ vm_try_handle_fault (struct intr_frame *f, void *addr,
 	void *rsp=(void *)f->rsp;
 	/* TODO: Validate the fault */
 	/* TODO: Your code goes here */
+	if(user) rsp=(void *)f->rsp;
+	if(!user) rsp=(void *)thread_current()->tf.rsp;
 	printf("vm try handle fault addr: %p, rsp : %p\n", addr, rsp);
 	if(page==NULL) printf("page is null\n");
 	if(is_kernel_vaddr(addr)) printf("is kernel vaddr\n");
-	// if(user) rsp=(void *)f->rsp;
-	// if(!user) rsp=(void *)thread_current()->tf.rsp;
+	// if (page) printf("init at fault : %p\n", page->uninit.init);
 	
 	if (page == NULL) {
 		if(addr >= rsp - 8 && addr+PGSIZE<(void *)USER_STACK+1024*1024){
@@ -213,6 +214,7 @@ vm_try_handle_fault (struct intr_frame *f, void *addr,
 		if(page!=NULL) free(page);
 		return false;
 	}
+	printf("page type : %d\n", page_get_type(page));
 
 	/*** bogus page fault ***/
 	return vm_do_claim_page (page); 
@@ -251,7 +253,7 @@ vm_do_claim_page (struct page *page) {
 	/* Set links */
 	frame->page = page;
 	page->frame = frame;
-	printf("pml4 set page va: %p, kva: %p\n", page->va, frame->kva);
+	// printf("pml4 set page va: %p, kva: %p\n", page->va, frame->kva);
 
 	/* TODO: Insert page table entry to map page's VA to frame's PA. */
 	if(!pml4_set_page(curr->pml4, page->va, frame->kva, page->writable)){

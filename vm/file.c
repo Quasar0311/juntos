@@ -67,11 +67,16 @@ static bool
 lazy_file_segment(struct page *page, void *aux){
 	struct mmap_file *f=aux;
 	void *addr=page->va;
-	printf("lazy file segment\n");
-	if(file_read_at(f->file, addr, (off_t)f->read_bytes, f->ofs)
-		<(off_t)f->read_bytes)
+	off_t off;
+	printf("lazy file seg\n");
+	printf("lazy file : %p\n", f -> file);
+	if(off = file_read_at(f->file, addr, (off_t)f->read_bytes, f->ofs)
+		<(off_t)f->read_bytes) {
+			printf("off : %d, read_byte : %d\n", off, f -> read_bytes);
 			return false;
-	
+		}
+
+	printf("hi\n");
 	return true;
 }
 
@@ -86,6 +91,7 @@ do_mmap (void *addr, size_t length, int writable,
 	// off_t ofs=offset;
 	// size_t read_bytes=length;
 	printf("do mmap\n");
+	printf("lazy : %p\n", lazy_file_segment);
 	if(addr==0 || length==0) return NULL;
 
 	mmap_file=(struct mmap_file *) malloc(sizeof(struct mmap_file));
@@ -111,6 +117,7 @@ do_mmap (void *addr, size_t length, int writable,
 			}
 		
 		page=spt_find_page(&curr->spt, addr);
+		
 		list_push_back(&mmap_file->page_list, &page->mmap_elem);
 
 		page->file.f=mmap_file->file;
