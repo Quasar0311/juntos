@@ -68,13 +68,15 @@ lazy_file_segment(struct page *page, void *aux){
 	struct mmap_file *f=aux;
 	void *addr=page->va;
 	off_t off;
-	printf("lazy file seg\n");
+	printf("lazy file seg: %p, %p\n", addr, page -> frame -> kva);
 	printf("lazy file : %p\n", f -> file);
-	if(off = file_read_at(f->file, addr, (off_t)f->read_bytes, f->ofs)
-		<(off_t)f->read_bytes) {
-			printf("off : %d, read_byte : %d\n", off, f -> read_bytes);
-			return false;
-		}
+	off = file_read_at(f->file, addr, (off_t)f->read_bytes, f->ofs);
+	// if(file_read_at(f->file, addr, (off_t)f->read_bytes, f->ofs)
+	// 	<(off_t)f->read_bytes) {
+	// 		printf("off : %d, read_byte : %d\n", off, f -> read_bytes);
+	// 		return false;
+	// 	}
+	printf("off : %d\n", off);
 
 	printf("hi\n");
 	return true;
@@ -90,7 +92,7 @@ do_mmap (void *addr, size_t length, int writable,
 	struct page *page;
 	// off_t ofs=offset;
 	// size_t read_bytes=length;
-	printf("do mmap\n");
+	// printf("do mmap wri : %d\n", writable);
 	printf("lazy : %p\n", lazy_file_segment);
 	if(addr==0 || length==0) return NULL;
 
@@ -99,7 +101,7 @@ do_mmap (void *addr, size_t length, int writable,
 	list_init(&mmap_file->page_list);
 	mmap_file->file=file_reopen(file);
 	mmap_file->va=addr;
-
+	// printf("mmap file : %p\n", mmap_file -> file);
 	list_push_back(&curr->mmap_list, &mmap_file->file_elem);
 
 	while(length>0){
