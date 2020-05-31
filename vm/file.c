@@ -28,6 +28,7 @@ bool
 file_map_initializer (struct page *page, enum vm_type type, void *kva) {
 	/* Set up the handler */
 	page->operations = &file_ops;
+	printf("file map initializer\n");
 
 	struct file_page *file_page = &page->file;
 
@@ -63,7 +64,7 @@ file_map_destroy (struct page *page) {
 	}
 }
 
-static bool
+bool
 lazy_file_segment(struct page *page, void *aux){
 	struct mmap_file *f=aux;
 	void *addr=page->va;

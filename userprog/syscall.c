@@ -431,7 +431,7 @@ syscall_dup2(int oldfd, int newfd){
 void *
 syscall_mmap (void *addr, size_t length, int writable, int fd, off_t offset){
 	if(fd==0 || fd==1) return NULL;
-	printf("syscall mmap\n");
+	printf("syscall mmap addr: %p\n", addr);
 
 	return do_mmap(addr, length, writable, process_get_file(fd), offset);
 }

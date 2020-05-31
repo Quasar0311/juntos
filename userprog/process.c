@@ -890,7 +890,7 @@ lazy_load_segment (struct page *page, void *aux) {
 	struct load_file *f=aux;
 	void *kva=page->frame->kva;
 	// struct file *file=file_open(f->inode);
-	// printf("lazy load segment: %d, offset : %d\n", f -> read_bytes, f -> ofs);
+	printf("lazy load segment: %ld, offset : %d\n", f -> read_bytes, f -> ofs);
 	
 	// file_open(f->inode);
 	if(file_read_at(f->file, kva, (off_t)f->read_bytes, f->ofs)
