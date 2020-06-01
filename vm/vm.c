@@ -66,7 +66,7 @@ vm_alloc_page_with_initializer (enum vm_type type, void *upage, bool writable,
 				break;
 
 			case VM_FILE:
-				printf("case vm file : %p\n", init);
+				// printf("case vm file\n");
 				uninit_new(uninit_page, upage, init, type, aux, file_map_initializer);
 				break;
 
@@ -195,16 +195,15 @@ vm_try_handle_fault (struct intr_frame *f, void *addr,
 	void *rsp=(void *)f->rsp;
 	/* TODO: Validate the fault */
 	/* TODO: Your code goes here */
-	if(user) rsp=(void *)f->rsp;
+	// printf("vm try handle fault addr: %p, rsp : %p\n", addr, rsp);
+	// if(page==NULL) printf("page is null\n");
+	// if(is_kernel_vaddr(addr)) printf("is kernel vaddr\n");
+	// if(user) rsp=(void *)f->rsp;
 	if(!user) rsp=(void *)thread_current()->tf.rsp;
-	printf("vm try handle fault addr: %p, rsp : %p\n", addr, rsp);
-	if(page==NULL) printf("page is null\n");
-	if(is_kernel_vaddr(addr)) printf("is kernel vaddr\n");
-	// if (page) printf("init at fault : %p\n", page->uninit.init);
 	
 	if (page == NULL) {
 		if(addr >= rsp - 8 && addr+PGSIZE<(void *)USER_STACK+1024*1024){
-			printf("here\n");
+			// printf("here\n");
 			return vm_stack_growth(addr);
 		}
 	}

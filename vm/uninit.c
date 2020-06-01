@@ -47,20 +47,20 @@ uninit_new (struct page *page, void *va, vm_initializer *init,
 static bool
 uninit_initialize (struct page *page, void *kva) {
 	struct uninit_page *uninit = &page->uninit;
+	// bool un, in;
 
 	/* Fetch first, page_initialize may overwrite the values */
 	vm_initializer *init = uninit->init;
 	void *aux = uninit->aux;
-	bool un, in;
+
 	init = page -> init;
 	aux = page -> aux;
-	printf("uninit initialize : %p\n", init);
-	printf("uninit va : %p\n", page -> va);
-	un=uninit->page_initializer (page, uninit->type, kva);
-	printf(un ? "uninit true\n" : "uninit false\n");
-	in=(init ? init (page, aux) : true);
-	
-	printf(in ? "lazy true\n" : "lazy false\n");
+
+	// printf("uninit initialize : %p\n", page -> va);
+	// un=uninit->page_initializer (page, uninit->type, kva);
+	// printf(un ? "uninit true\n" : "uninit false\n");
+	// in=(init ? init (page, aux) : true);
+	// printf(in ? "lazy true\n" : "lazy false\n");
 	
 	/* TODO: You may need to fix this function. */
 	// return uninit->page_initializer (page, uninit->type, kva) &&
