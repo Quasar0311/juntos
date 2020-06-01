@@ -198,7 +198,7 @@ vm_try_handle_fault (struct intr_frame *f, void *addr,
 	// printf("vm try handle fault addr: %p, rsp : %p\n", addr, rsp);
 	// if(page==NULL) printf("page is null\n");
 	// if(is_kernel_vaddr(addr)) printf("is kernel vaddr\n");
-	// if(user) rsp=(void *)f->rsp;
+	// if(user) rsp=(voi9d *)f->rsp;
 	if(!user) rsp=(void *)thread_current()->tf.rsp;
 	
 	if (page == NULL) {
