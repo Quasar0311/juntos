@@ -147,7 +147,7 @@ struct thread {
 
 	struct list mmap_list;
 
-	struct lock *load_lock;
+	struct lock load_lock;
 
 #endif
 

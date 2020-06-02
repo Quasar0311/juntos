@@ -7,6 +7,7 @@
 #include <string.h>
 #include "userprog/gdt.h"
 #include "userprog/tss.h"
+#include "userprog/syscall.h"
 #include "filesys/directory.h"
 #include "filesys/file.h"
 #include "filesys/filesys.h"
@@ -29,6 +30,8 @@ static void initd (void *f_name);
 static void __do_fork (void *);
 
 struct lock writable_lock;
+
+struct lock lazy_lock;
 
 int 
 process_add_file(struct file *f){
@@ -142,6 +145,7 @@ process_create_initd (const char *file_name) { //process_execute
 	char *token, *save_ptr;
 
 	lock_init(&writable_lock);
+	lock_init(&lazy_lock);
 	for (token = strtok_r(file_title, " ", &save_ptr); token != NULL;
 	token = strtok_r(NULL, " ", &save_ptr)) {
 		strlcpy(file_title, token, strlen(token) + 1);
@@ -441,10 +445,12 @@ process_exit (void) {
 	
 	free(curr -> fd_table);
 
-	lock_release(&writable_lock);
+	
 
 	/*** release file descriptor ***/
 	process_cleanup ();
+	lock_release(&writable_lock);
+	
 }
 
 /* Free the current process's resources. */
@@ -892,16 +898,21 @@ lazy_load_segment (struct page *page, void *aux) {
 	struct thread *curr=thread_current();
 	// printf("lazy load segment: %ld, offset : %d\n", f -> read_bytes, f -> ofs);
 	
-	// lock_acquire(&curr->load_lock);
+	// lock_acquire(&lazy_lock);
+	// lock_acquire(&curr -> parent -> load_lock);
+	// printf("here : %s\n", curr -> parent -> name);
 	if(file_read_at(f->file, kva, (off_t)f->read_bytes, f->ofs)
 		<(off_t)f->read_bytes){
 			// lock_release(&curr->load_lock);
 			return false;
-		}
-	// lock_release(&curr->load_lock);
+	}
+	// printf("current lock holding : %d\n", curr -> tid);
+	// lock_release(&lazy_lock);
+	// lock_release(&curr -> parent -> load_lock);
 	// printf("file read at finished : %d\n", f -> read_bytes);
 	
 	memset(kva+f->read_bytes, 0, f->zero_bytes);
+	// syscall_lock_release();
 	return true;
 }
 

@@ -1,6 +1,7 @@
 /* file.c: Implementation of memory mapped file object (mmaped object). */
 
 #include "vm/vm.h"
+#include "userprog/syscall.h"
 #include "threads/malloc.h"
 #include "threads/vaddr.h"
 #include "threads/mmu.h"
@@ -10,6 +11,8 @@
 static bool file_map_swap_in (struct page *page, void *kva);
 static bool file_map_swap_out (struct page *page);
 static void file_map_destroy (struct page *page);
+
+struct lock file_lock;
 
 /* DO NOT MODIFY this struct */
 static const struct page_operations file_ops = {
@@ -22,6 +25,7 @@ static const struct page_operations file_ops = {
 /* The initializer of file vm */
 void
 vm_file_init (void) {
+	lock_init(&file_lock);
 }
 
 /* Initialize the file mapped page */
@@ -63,9 +67,8 @@ file_map_destroy (struct page *page) {
 		write=file_write_at(file_page->f, page->va, 
 			(off_t)file_page->read_bytes, file_page->ofs);
 		// printf("file write at: %d\n", write);
-		// read_bytes-=page_read_bytes;
-		// ofs+=PGSIZE;
 	}
+	file_close(file_page->f);
 	// printf("file map destroy finish\n");
 }
 
@@ -75,7 +78,7 @@ lazy_file_segment(struct page *page, void *aux){
 	void *addr=page->va;
 	// void *addr=page->frame->kva;
 	off_t read;
-	// printf("offset: %d\n", f->ofs);
+	// printf("offset: %d\n", page->file.ofs);
 	/*** file into addr ***/
 	read=file_read_at(f->file, addr, (off_t)f->read_bytes, page->file.ofs);
 	// if(file_read_at(f->file, addr, (off_t)f->read_bytes, f->ofs)
@@ -89,13 +92,14 @@ lazy_file_segment(struct page *page, void *aux){
 		memset(addr+read, 0, f->read_bytes-read);
 		// printf("lazy file segment finish\n");
 	}
+	// printf("page writable : %d\n", page -> writable);
 	// void *addr=page->frame->kva;
 	// printf("lazy file segment file: %p\n", f->file);
 	// if(file_read_at(f->file, addr, (off_t)f->read_bytes, f->ofs)
 	// 	<(off_t)f->read_bytes)
 	// 		return false;
 	// printf("lazy file segment: %d\n", *(int *)addr);
-	
+	// page -> mapped = true;
 	return true;
 }
 
@@ -114,7 +118,7 @@ do_mmap (void *addr, size_t length, int writable,
 	mmap_file=(struct mmap_file *) malloc(sizeof(struct mmap_file));
 
 	list_init(&mmap_file->page_list);
-	mmap_file->file=file_reopen(file);
+	
 	mmap_file->va=addr;
 
 	list_push_back(&curr->mmap_list, &mmap_file->file_elem);
@@ -122,7 +126,7 @@ do_mmap (void *addr, size_t length, int writable,
 
 	while(length>0){
 		size_t page_read_bytes = length < PGSIZE ? length : PGSIZE;
-	
+		mmap_file->file=file_reopen(file);
 		mmap_file->ofs=offset;
 		mmap_file->read_bytes=page_read_bytes; 
 
@@ -175,9 +179,9 @@ do_munmap (void *addr) {
 				// size_t read_bytes=fp->read_bytes;
 				// size_t page_read_bytes = read_bytes < PGSIZE ? read_bytes : PGSIZE;
 				struct page *p=list_entry(m, struct page, mmap_elem);
-				// printf("while file map destroy\n");
+				// printf("while file map destroy : %d\n", p -> file.ofs);
 				m=list_next(m);
-
+				p -> mapped = true;
 				file_map_destroy(p);
 
 				pml4_clear_page(curr->pml4, p->va);
@@ -186,14 +190,19 @@ do_munmap (void *addr) {
 			// struct page *p=list_entry(m, struct page, mmap_elem);
 			// // printf("while file map destroy\n");
 			// file_map_destroy(p);
-
+			e=list_next(e);
+			free(fp);
 			// pml4_clear_page(curr->pml4, p->va);
 			// vm_dealloc_page(list_entry(m, struct page, mmap_elem));
 		}
+		else {
+			e = list_next(e);
+		}
 		// printf("file close\n");
-		file_close(fp->file);
 		// printf("list next\n");
-		e=list_next(e);
+		
+		
 	}
+
 	// printf("munmap finished\n");
 }
