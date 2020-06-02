@@ -7,6 +7,7 @@
 #include <string.h>
 #include "userprog/gdt.h"
 #include "userprog/tss.h"
+#include "userprog/syscall.h"
 #include "filesys/directory.h"
 #include "filesys/file.h"
 #include "filesys/filesys.h"
@@ -893,11 +894,12 @@ lazy_load_segment (struct page *page, void *aux) {
 	// printf("lazy load segment: %ld, offset : %d\n", f -> read_bytes, f -> ofs);
 	
 	// file_open(f->inode);
+	syscall_lock_acquire();
 	if(file_read_at(f->file, kva, (off_t)f->read_bytes, f->ofs)
 		<(off_t)f->read_bytes)
 			return false;
 	// printf("file read at finished : %d\n", f -> read_bytes);
-	
+	syscall_lock_release();
 	memset(kva+f->read_bytes, 0, f->zero_bytes);
 	return true;
 }

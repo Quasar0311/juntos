@@ -213,7 +213,7 @@ vm_try_handle_fault (struct intr_frame *f, void *addr,
 		if(page!=NULL) free(page);
 		return false;
 	}
-	printf("page type : %d\n", page_get_type(page));
+	// printf("page type : %d\n", page_get_type(page));
 
 	/*** bogus page fault ***/
 	return vm_do_claim_page (page); 

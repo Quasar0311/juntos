@@ -53,19 +53,19 @@ uninit_initialize (struct page *page, void *kva) {
 	vm_initializer *init = uninit->init;
 	void *aux = uninit->aux;
 
-	init = page -> init;
-	aux = page -> aux;
+	// init = page -> init;
+	// aux = page -> aux;
 
 	// printf("uninit initialize : %p\n", page -> va);
 	// un=uninit->page_initializer (page, uninit->type, kva);
 	// printf(un ? "uninit true\n" : "uninit false\n");
 	// in=(init ? init (page, aux) : true);
 	// printf(in ? "lazy true\n" : "lazy false\n");
-	
+
 	/* TODO: You may need to fix this function. */
-	// return uninit->page_initializer (page, uninit->type, kva) &&
-	// 	(init ? init (page, aux) : true);
-	return un && in;
+	return uninit->page_initializer (page, uninit->type, kva) &&
+		(init ? init (page, aux) : true);
+	// return un && in;
 }
 
 /* Free the resources hold by uninit_page. Although most of pages are transmuted
