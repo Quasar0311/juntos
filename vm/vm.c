@@ -78,6 +78,7 @@ vm_alloc_page_with_initializer (enum vm_type type, void *upage, bool writable,
 		uninit_page->is_loaded=false;
 		uninit_page -> init = init;
 		uninit_page -> aux = aux;
+		uninit_page -> mapped = false;
 		
 		/* TODO: Insert the page into the spt. */
 		spt_insert_page(spt, uninit_page);
@@ -198,7 +199,7 @@ vm_try_handle_fault (struct intr_frame *f, void *addr,
 	// printf("vm try handle fault addr: %p, rsp : %p\n", addr, rsp);
 	// if(page==NULL) printf("page is null\n");
 	// if(is_kernel_vaddr(addr)) printf("is kernel vaddr\n");
-	// if(user) rsp=(void *)f->rsp;
+	if(user) rsp=(void *)f->rsp;
 	if(!user) rsp=(void *)thread_current()->tf.rsp;
 	
 	if (page == NULL) {
@@ -211,6 +212,10 @@ vm_try_handle_fault (struct intr_frame *f, void *addr,
 	/*** valid page fault ***/
 	if(page==NULL || is_kernel_vaddr(addr)|| !not_present){
 		if(page!=NULL) free(page);
+		return false;
+	}
+
+	if (page -> mapped) {
 		return false;
 	}
 
@@ -298,7 +303,7 @@ supplemental_page_table_copy (struct supplemental_page_table *dst,
 	struct thread *curr = thread_current();
 
 	hash_first(&i, &src -> vm);
-
+	// printf("copy\n");
 	while (hash_next(&i)) {
 		struct page *p, *newpage;
 

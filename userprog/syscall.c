@@ -443,3 +443,13 @@ void
 syscall_munmap (void *addr){
 	return do_munmap(addr);
 }
+
+void syscall_lock_acquire (void) {
+	lock_acquire(&filesys_lock);
+	return;
+}
+
+void syscall_lock_release (void) {
+	lock_release(&filesys_lock);
+	return;
+}

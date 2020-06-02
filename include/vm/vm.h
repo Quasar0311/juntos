@@ -47,6 +47,7 @@ struct page {
 	struct hash_elem page_elem;
 	bool writable;
 	bool is_loaded;
+	bool mapped;
 	vm_initializer *init;
 	void *aux;
 	struct list_elem mmap_elem;
