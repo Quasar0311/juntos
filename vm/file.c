@@ -80,7 +80,9 @@ lazy_file_segment(struct page *page, void *aux){
 	off_t read;
 	// printf("offset: %d\n", page->file.ofs);
 	/*** file into addr ***/
+	// syscall_lock_acquire();
 	read=file_read_at(f->file, addr, (off_t)f->read_bytes, page->file.ofs);
+	// syscall_lock_release();
 	// if(file_read_at(f->file, addr, (off_t)f->read_bytes, f->ofs)
 	// 	<(off_t)f->read_bytes){
 	// printf("file read at read bytes: %ld, ofs: %d\n", f->read_bytes, page->file.ofs);
@@ -132,6 +134,10 @@ do_mmap (void *addr, size_t length, int writable,
 
 		void *aux=mmap_file;
 
+		if (spt_find_page(&curr -> spt, addr) != NULL) {
+			if (spt_find_page(&curr -> spt, addr) -> mapped) return NULL;
+		}
+
 		if(!vm_alloc_page_with_initializer(VM_FILE, addr, writable, 
 			lazy_file_segment, aux)){
 				// printf("alloc null\n");
@@ -140,7 +146,7 @@ do_mmap (void *addr, size_t length, int writable,
 		
 		page=spt_find_page(&curr->spt, addr);
 		list_push_back(&mmap_file->page_list, &page->mmap_elem);
-
+		page -> mapped = true;
 		page->file.f=mmap_file->file;
 		page->file.ofs=mmap_file->ofs;
 		// printf("mmap page offset: %d\n", mmap_file->ofs);
@@ -179,29 +185,23 @@ do_munmap (void *addr) {
 				// size_t read_bytes=fp->read_bytes;
 				// size_t page_read_bytes = read_bytes < PGSIZE ? read_bytes : PGSIZE;
 				struct page *p=list_entry(m, struct page, mmap_elem);
-				// printf("while file map destroy : %d\n", p -> file.ofs);
-				m=list_next(m);
-				p -> mapped = true;
-				file_map_destroy(p);
+				if (p -> mapped) {
+					m=list_next(m);
+					p -> unmapped = true;
+					p -> mapped = false;
+					file_map_destroy(p);
 
-				pml4_clear_page(curr->pml4, p->va);
+					pml4_clear_page(curr->pml4, p->va);
+				}
+				// printf("while file map destroy : %d\n", p -> file.ofs);
 				// vm_dealloc_page(p);
 			}
-			// struct page *p=list_entry(m, struct page, mmap_elem);
-			// // printf("while file map destroy\n");
-			// file_map_destroy(p);
 			e=list_next(e);
 			free(fp);
-			// pml4_clear_page(curr->pml4, p->va);
-			// vm_dealloc_page(list_entry(m, struct page, mmap_elem));
 		}
 		else {
 			e = list_next(e);
 		}
-		// printf("file close\n");
-		// printf("list next\n");
-		
-		
 	}
 
 	// printf("munmap finished\n");

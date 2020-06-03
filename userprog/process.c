@@ -22,6 +22,7 @@
 #include "intrinsic.h"
 #ifdef VM
 #include "vm/vm.h"
+#include "vm/file.h"
 #endif
 
 static void process_cleanup (void);
@@ -431,7 +432,7 @@ process_wait (tid_t child_tid) {
 void
 process_exit (void) {
 	struct thread *curr = thread_current ();
-
+	
 	/* TODO: Your code goes here.
 	 * TODO: Implement process termination message (see
 	 * TODO: project2/process_termination.html).
@@ -444,9 +445,7 @@ process_exit (void) {
 	}
 	
 	free(curr -> fd_table);
-
-	
-
+	// printf("asdf\n");
 	/*** release file descriptor ***/
 	process_cleanup ();
 	lock_release(&writable_lock);
@@ -457,8 +456,19 @@ process_exit (void) {
 static void
 process_cleanup (void) {
 	struct thread *curr = thread_current ();
+	struct list mmap_list = curr -> mmap_list;
 
+	struct list_elem *e=list_begin(&curr->mmap_list);
+	struct mmap_file *fp;
 #ifdef VM
+	
+	while(e!=list_end(&curr->mmap_list)){
+		fp=list_entry(e, struct mmap_file, file_elem);
+		do_munmap(fp -> va);
+
+		e=list_next(e);
+	}
+	
 	supplemental_page_table_kill (&curr->spt);
 #endif
 
