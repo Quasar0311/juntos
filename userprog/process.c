@@ -464,17 +464,19 @@ static void
 process_cleanup (void) {
 	struct thread *curr = thread_current ();
 	struct list mmap_list = curr -> mmap_list;
-	struct supplemental_page_table *spt = &curr -> spt;
+	// struct supplemental_page_table *spt = &curr -> spt;
 	struct list_elem *e=list_begin(&curr->mmap_list);
 	struct mmap_file *fp;
 #ifdef VM
-	// printf("cleanup\n");
-	// while(e!=list_end(&curr->mmap_list)){
-	// 	fp=list_entry(e, struct mmap_file, file_elem);
-	// 	syscall_munmap(fp -> va);
-
-	// 	e=list_next(e);
-	// }
+	while(e!=list_end(&curr->mmap_list)){
+		fp=list_entry(e, struct mmap_file, file_elem);
+		if (fp == NULL) {
+			e = list_next(e);
+			continue;
+		}
+		e=list_next(e);
+		syscall_munmap(fp -> va);
+	}
 	// supplemental_page_table_init(&curr -> spt);
 	// supplemental_page_table_kill (&curr->spt);
 #endif
