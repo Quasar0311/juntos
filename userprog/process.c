@@ -485,6 +485,10 @@ process_cleanup (void) {
 	while(e!=list_end(&curr->mmap_list)){
 		// struct page *p;
 		fp=list_entry(e, struct mmap_file, file_elem);
+		if (fp == NULL) {
+			e = list_next(e);
+			continue;
+		}
 		e=list_next(e);
 		// printf("process cleanup: %p\n", fp->va);
 		
