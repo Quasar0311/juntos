@@ -417,6 +417,8 @@ thread_exit (void) {
 	
 	// printf("p exit\n");
 	process_exit ();
+	// supplemental_page_table_kill (&curr->spt);
+
 	// sema_up(&curr -> exit_sema);
 	// if (curr -> run_file != NULL) file_allow_write(curr->run_file);
 	// sema_down(&curr -> child_sema);
