@@ -120,6 +120,7 @@ syscall_handler (struct intr_frame *f) {
 
 		/*** SYS_OPEN ***/
 		case 7:
+			printf("sys open\n");
 			thread_current() -> tf.rsp = f -> rsp;
 			
 			check_address(f -> R.rdi);
@@ -269,7 +270,7 @@ syscall_open(const char *file){
 	struct file *f;
 	int fd=-1;
 	struct thread *curr = thread_current();
-	
+	printf("syscall open\n");
 	lock_acquire(&filesys_lock);
 	
 	f=filesys_open(file);
@@ -279,7 +280,7 @@ syscall_open(const char *file){
 	}
 
 	lock_release(&filesys_lock);
-
+	printf("syscall open finish\n");
 	return fd;
 }
 
@@ -434,7 +435,7 @@ syscall_dup2(int oldfd, int newfd){
 void *
 syscall_mmap (void *addr, size_t length, int writable, int fd, off_t offset){
 	if(fd==0 || fd==1) return NULL;
-	// printf("syscall mmap addr: %p\n", addr);
+	printf("syscall mmap addr: %p\n", addr);
 
 	return do_mmap(addr, length, writable, process_get_file(fd), offset);
 }

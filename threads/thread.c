@@ -296,7 +296,6 @@ thread_create (const char *name, int priority,
 	sema_init(&t->exit_sema, 0);
 	sema_init(&t->load_sema, 0);
 	sema_init(&t -> child_sema, 0);
-	lock_init(&t -> load_lock);
 
 	/*** add to child_list ***/
 	list_push_back(&curr->child_list, &t->child_elem);
