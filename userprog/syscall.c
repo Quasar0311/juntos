@@ -39,7 +39,7 @@ unsigned syscall_tell(int fd);
 void syscall_close(int fd);
 int syscall_dup2(int oldfd, int newfd);
 void *syscall_mmap (void *addr, size_t length, int writable, int fd, off_t offset);
-void syscall_munmap (void *addr);
+// void syscall_munmap (void *addr);
 
 /* System call.
  *

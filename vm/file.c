@@ -193,6 +193,7 @@ do_munmap (void *addr) {
 
 					pml4_clear_page(curr->pml4, p->va);
 				}
+				else m=list_next(m);
 				// printf("while file map destroy : %d\n", p -> file.ofs);
 				// vm_dealloc_page(p);
 			}

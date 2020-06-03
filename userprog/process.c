@@ -408,13 +408,14 @@ process_wait (tid_t child_tid) {
 	if (child -> tid != child_tid) {
 		return -1;
 	}
-	
+	// printf("sema_Down\n");
 	sema_down(&child -> exit_sema);
-
+	// printf("sd\n");
 	for (e = list_begin(&thread_current() -> child_list); e != list_end(&thread_current() -> child_list); e = list_next(e)) {
 		child = list_entry(e, struct thread, child_elem);
 		if (child -> tid == child_tid && child -> exit_status != -2 && child -> exit_status != -1) {
 			sema_up(&child -> child_sema);
+			// printf("sema_up\n");
 			list_remove(e);
 			return child -> exit_status;
 		}
@@ -445,10 +446,16 @@ process_exit (void) {
 	}
 	
 	free(curr -> fd_table);
-	// printf("asdf\n");
+	// printf("process exit\n");
 	/*** release file descriptor ***/
+	// supplemental_page_table_kill (&curr->spt);
 	process_cleanup ();
+
 	lock_release(&writable_lock);
+
+	sema_up(&curr -> exit_sema);
+	if (curr -> run_file != NULL) file_allow_write(curr->run_file);
+	sema_down(&curr -> child_sema);
 	
 }
 
@@ -457,19 +464,19 @@ static void
 process_cleanup (void) {
 	struct thread *curr = thread_current ();
 	struct list mmap_list = curr -> mmap_list;
-
+	struct supplemental_page_table *spt = &curr -> spt;
 	struct list_elem *e=list_begin(&curr->mmap_list);
 	struct mmap_file *fp;
 #ifdef VM
-	
-	while(e!=list_end(&curr->mmap_list)){
-		fp=list_entry(e, struct mmap_file, file_elem);
-		do_munmap(fp -> va);
+	// printf("cleanup\n");
+	// while(e!=list_end(&curr->mmap_list)){
+	// 	fp=list_entry(e, struct mmap_file, file_elem);
+	// 	syscall_munmap(fp -> va);
 
-		e=list_next(e);
-	}
-	
-	supplemental_page_table_kill (&curr->spt);
+	// 	e=list_next(e);
+	// }
+	// supplemental_page_table_init(&curr -> spt);
+	// supplemental_page_table_kill (&curr->spt);
 #endif
 
 	uint64_t *pml4;
