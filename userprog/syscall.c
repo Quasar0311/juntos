@@ -228,8 +228,8 @@ syscall_exit (int status) {
 pid_t
 syscall_fork(const char *thread_name, struct intr_frame *parent_frame){
 	struct intr_frame *parent_copy = parent_frame;
+	
 	return process_fork(thread_name, parent_copy);
-
 }
 
 int
@@ -269,7 +269,7 @@ syscall_open(const char *file){
 	struct file *f;
 	int fd=-1;
 	struct thread *curr = thread_current();
-	
+
 	lock_acquire(&filesys_lock);
 	
 	f=filesys_open(file);
@@ -279,7 +279,6 @@ syscall_open(const char *file){
 	}
 
 	lock_release(&filesys_lock);
-
 	return fd;
 }
 

@@ -147,8 +147,6 @@ struct thread {
 
 	struct list mmap_list;
 
-	struct lock load_lock;
-
 #endif
 
 	/* Owned by thread.c. */

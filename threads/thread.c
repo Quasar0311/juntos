@@ -296,7 +296,6 @@ thread_create (const char *name, int priority,
 	sema_init(&t->exit_sema, 0);
 	sema_init(&t->load_sema, 0);
 	sema_init(&t -> child_sema, 0);
-	lock_init(&t -> load_lock);
 
 	/*** add to child_list ***/
 	list_push_back(&curr->child_list, &t->child_elem);
@@ -418,6 +417,11 @@ thread_exit (void) {
 	
 	// printf("p exit\n");
 	process_exit ();
+	// supplemental_page_table_kill (&curr->spt);
+
+	// sema_up(&curr -> exit_sema);
+	// if (curr -> run_file != NULL) file_allow_write(curr->run_file);
+	// sema_down(&curr -> child_sema);
 #endif
 
 	/* Just set our status to dying and schedule another process.

@@ -323,6 +323,7 @@ supplemental_page_table_copy (struct supplemental_page_table *dst,
 		if(p->frame!=NULL)
 			memcpy(newpage->frame->kva, p->frame->kva, PGSIZE);
 		// printf("memcpy finish\n");
+		// if(page_get_type(p)==VM_FILE) printf("vm file\n");
 	}
 	
 	return true;

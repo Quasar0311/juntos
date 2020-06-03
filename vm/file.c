@@ -120,14 +120,16 @@ do_mmap (void *addr, size_t length, int writable,
 	mmap_file=(struct mmap_file *) malloc(sizeof(struct mmap_file));
 
 	list_init(&mmap_file->page_list);
-	
+	// mmap_file->file=file_reopen(file);
 	mmap_file->va=addr;
 
 	list_push_back(&curr->mmap_list, &mmap_file->file_elem);
-	// printf("do mmap file: %p\n", mmap_file->file);
+	// printf("list push back: %p\n", mmap_file->file);
+	// printf("do mmap file: %ld\n", list_size(&curr->mmap_list));
 
 	while(length>0){
 		size_t page_read_bytes = length < PGSIZE ? length : PGSIZE;
+		
 		mmap_file->file=file_reopen(file);
 		mmap_file->ofs=offset;
 		mmap_file->read_bytes=page_read_bytes; 
@@ -149,9 +151,11 @@ do_mmap (void *addr, size_t length, int writable,
 		page -> mapped = true;
 		page->file.f=mmap_file->file;
 		page->file.ofs=mmap_file->ofs;
-		// printf("mmap page offset: %d\n", mmap_file->ofs);
 		page->file.read_bytes=mmap_file->read_bytes;
-		// printf("length: %ld, page_read_bytes: %ld, addr: %p, offset: %d\n", length, page_read_bytes, addr, offset);
+
+		// printf("mmap page: %p\n", page->va);
+		// printf(page->mapped? "mapped\n" : "unmapped\n");
+
 		length-=page_read_bytes;
 		addr+=PGSIZE;
 		offset+=PGSIZE;
@@ -171,13 +175,27 @@ do_munmap (void *addr) {
 	struct thread *curr=thread_current();
 	struct list_elem *e=list_begin(&curr->mmap_list);
 	struct mmap_file *fp;
-	printf("do munmap\n");
+
+	// printf(list_empty(&curr->mmap_list)? "mmap list empty\n" : "mmap list not empty\n");
+	// printf(e==NULL ? "list begin null\n" : "list begin not null\n");
+	// printf(list_next(e)==NULL ? "list next null\n" : "list next not null\n");
+	// printf("do munmap mmap list: %ld\n", list_size(&curr->mmap_list));
 
 	while(e!=list_end(&curr->mmap_list)){
 		fp=list_entry(e, struct mmap_file, file_elem);
-		printf("do munmap1 : %p\n", fp -> va);
+		// printf("while\n");
+
+		// if(list_empty(&fp->page_list)) printf("list is empty\n");
+		// if(!list_empty(&fp->page_list)) printf("list is not empty\n");
+
+		// if(&fp->page_list==NULL) printf("page list is null\n");
+		// printf("length of page list: %ld\n", list_size(&fp->page_list));
+
 		if(fp->va==addr){
 			struct list_elem *m=list_begin(&fp->page_list);
+			// printf("list is empty\n");
+			// if(m==NULL) printf("m is null\n");
+			// if(list_next(m)==NULL) printf("list next is null\n");
 			// printf("length of page list: %ld\n", list_size(&fp->page_list));
 			printf("do munmap2\n");
 			while(m!=list_end(&fp->page_list)){
@@ -185,7 +203,8 @@ do_munmap (void *addr) {
 				// size_t read_bytes=fp->read_bytes;
 				// size_t page_read_bytes = read_bytes < PGSIZE ? read_bytes : PGSIZE;
 				struct page *p=list_entry(m, struct page, mmap_elem);
-				printf("page addr : %p, mapped : %d\n", p -> va, p -> mapped);
+				// printf("unmap page: %p\n", p->va);
+				// printf(p->mapped? "mapped\n" : "unmapped\n");
 				if (p -> mapped) {
 					m=list_next(m);
 					p -> unmapped = true;
@@ -193,22 +212,24 @@ do_munmap (void *addr) {
 					file_map_destroy(p);
 					printf("do munmap3\n");
 					pml4_clear_page(curr->pml4, p->va);
+					// printf("while file map destroy : %d\n", p -> file.ofs);
 				}
-				else {
-					printf("here\n");
-					m=list_next(m);
-				}
+				// else m=list_next(m);
 				// printf("while file map destroy : %d\n", p -> file.ofs);
 				// vm_dealloc_page(p);
+				// printf("while file map destroy: %d\n", *(int *)p->va);
 			}
-			printf("ee\n");
+			// printf("not same\n");
 			e=list_next(e);
+			list_remove(&fp->file_elem);
 			free(fp);
 		}
 		else {
 			e = list_next(e);
 		}
 	}
+	// file_close(fp->file);
+	// free(fp);
 
 	// printf("munmap finished\n");
 }

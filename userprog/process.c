@@ -357,6 +357,18 @@ process_exec (void *f_name) { //start_process
 
 	/* We first kill the current context */
 	// process_cleanup ();
+	// struct list_elem *e=list_begin(&curr->mmap_list);
+	// struct mmap_file *fp;
+
+	// printf("mmap list: %d\n", list_size(&curr->mmap_list));
+	// while(e!=list_end(&curr->mmap_list)){
+	// 	printf("munmap\n");
+	// 	fp=list_entry(e, struct mmap_file, file_elem);
+	// 	do_munmap(fp -> va);
+
+	// 	e=list_next(e);
+	// }
+
 	/* And then load the binary */
 	if (curr -> tid > 3) lock_acquire(&writable_lock);
 	
@@ -455,6 +467,7 @@ process_exit (void) {
 
 	sema_up(&curr -> exit_sema);
 	if (curr -> run_file != NULL) file_allow_write(curr->run_file);
+	// supplemental_page_table_kill (&curr->spt);
 	sema_down(&curr -> child_sema);
 	
 }
@@ -468,13 +481,13 @@ process_cleanup (void) {
 	struct list_elem *e=list_begin(&curr->mmap_list);
 	struct mmap_file *fp;
 #ifdef VM
+	// printf("cleanup mmap list: %ld\n", list_size(&curr->mmap_list));
 	while(e!=list_end(&curr->mmap_list)){
+		// struct page *p;
 		fp=list_entry(e, struct mmap_file, file_elem);
-		if (fp == NULL) {
-			e = list_next(e);
-			continue;
-		}
 		e=list_next(e);
+		// printf("process cleanup: %p\n", fp->va);
+		
 		syscall_munmap(fp -> va);
 	}
 	// supplemental_page_table_init(&curr -> spt);
