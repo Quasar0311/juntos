@@ -17,10 +17,12 @@ test_main (void)
 	if (child == 0) {
 		CHECK ((child = exec ("child-mm-wrt")) != -1, "exec \"child-mm-wrt\"");
 	} else {
+		// check_file ("sample.txt", sample, sizeof sample);
 		CHECK (wait (child) == 0, "wait for child (should return 0)");
 		quiet = false;
 		
 		/* Check file contents. */
+		// msg(sample);
 		check_file ("sample.txt", sample, sizeof sample);
 	} 
 }

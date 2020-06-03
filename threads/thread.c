@@ -410,11 +410,15 @@ thread_exit (void) {
 		list_remove(e);
 		sema_up(&child -> child_sema);
 	}
+	
 	sema_up(&curr -> exit_sema);
 	if (curr -> run_file != NULL) file_allow_write(curr->run_file);
 	sema_down(&curr -> child_sema);
 	
 	process_exit ();
+	// sema_up(&curr -> exit_sema);
+	// if (curr -> run_file != NULL) file_allow_write(curr->run_file);
+	// sema_down(&curr -> child_sema);
 #endif
 
 	/* Just set our status to dying and schedule another process.
