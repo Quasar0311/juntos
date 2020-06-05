@@ -110,7 +110,6 @@ do_mmap (void *addr, size_t length, int writable,
 	struct page *page;
 	// off_t ofs=offset;
 	// size_t read_bytes=length;
-
 	mmap_file=(struct mmap_file *) malloc(sizeof(struct mmap_file));
 
 	list_init(&mmap_file->page_list);
@@ -156,6 +155,8 @@ do_mmap (void *addr, size_t length, int writable,
 		length-=page_read_bytes;
 		addr+=PGSIZE;
 		offset+=PGSIZE;
+
+		if (is_kernel_vaddr(addr)) return NULL;
 		// printf("do mmap file: %p\n", page->file.f);
 	}
 	// mmap_file->ofs=ofs;

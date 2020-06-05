@@ -30,6 +30,7 @@ pid_t syscall_fork(const char *thread_name, struct intr_frame *parent_frame);
 int syscall_exec(const char *cmd_line);
 int syscall_wait (pid_t pid);
 bool syscall_create (const char *file, unsigned initial_size);
+bool syscall_remove (const char *file);
 int syscall_open(const char *file);
 int syscall_filesize(int fd);
 int syscall_read(int fd, void *buffer, unsigned size);
@@ -115,7 +116,10 @@ syscall_handler (struct intr_frame *f) {
 			f -> R.rax = syscall_create((char *) f -> R.rdi, (unsigned) f -> R.rsi);
 			break;
 
+		/*** SYS_REMOVE ***/
 		case 6:
+			check_address((uint64_t) f -> R.rdi);
+			f -> R.rax = syscall_remove((char *) f -> R.rdi);
 			break;
 
 		/*** SYS_OPEN ***/
@@ -262,6 +266,11 @@ syscall_create (const char *file, unsigned initial_size) {
 		return filesys_create(file, (off_t) initial_size);
 	}
 	
+}
+
+bool 
+syscall_remove (const char *file) {
+	return filesys_remove(file);
 }
 
 int
@@ -439,6 +448,10 @@ syscall_mmap (void *addr, size_t length, int writable, int fd, off_t offset){
 	if(length==0) return NULL;
 
 	if ((int) addr % 4096 != 0 || addr == NULL || addr==0) return NULL;
+
+	if (offset % 4096 != 0) return NULL;
+
+	if (!is_user_vaddr(addr)) return NULL;
 
 	return do_mmap(addr, length, writable, process_get_file(fd), offset);
 }
