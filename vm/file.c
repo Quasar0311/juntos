@@ -178,29 +178,10 @@ do_munmap (void *addr) {
 	struct list_elem *e=list_begin(&curr->mmap_list);
 	struct mmap_file *fp;
 
-<<<<<<< HEAD
-	// printf(list_empty(&curr->mmap_list)? "mmap list empty\n" : "mmap list not empty\n");
-	// printf(e==NULL ? "list begin null\n" : "list begin not null\n");
-	// printf(list_next(e)==NULL ? "list next null\n" : "list next not null\n");
-	printf("do munmap mmap list: %ld\n", list_size(&curr->mmap_list));
-
-=======
->>>>>>> origin/lab3_vm5
 	while(e!=list_end(&curr->mmap_list)){
 		// printf("size : %d\n", list_size(&curr -> mmap_list));
 		fp=list_entry(e, struct mmap_file, file_elem);
-<<<<<<< HEAD
-		// printf("while\n");
-
-		// if(list_empty(&fp->page_list)) printf("list is empty\n");
-		// if(!list_empty(&fp->page_list)) printf("list is not empty\n");
-
-		// if(&fp->page_list==NULL) printf("page list is null\n");
-		printf("length of page list: %ld\n", list_size(&fp->page_list));
-
-=======
 		// printf("s : %p\n", fp -> va);
->>>>>>> origin/lab3_vm5
 		if(fp->va==addr){
 			struct list_elem *m=list_begin(&fp->page_list);
 
@@ -212,13 +193,8 @@ do_munmap (void *addr) {
 				// size_t read_bytes=fp->read_bytes;
 				// size_t page_read_bytes = read_bytes < PGSIZE ? read_bytes : PGSIZE;
 				struct page *p=list_entry(m, struct page, mmap_elem);
-<<<<<<< HEAD
-				printf("unmap page: %p\n", p->va);
-				printf(p->mapped? "mapped\n" : "unmapped\n");
-=======
 				// printf("unmap page: %p\n", p->va);
 				// if (p == NULL) continue;
->>>>>>> origin/lab3_vm5
 				if (p -> mapped) {
 					m=list_next(m);
 
