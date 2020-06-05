@@ -210,7 +210,7 @@ do_munmap (void *addr) {
 			
 			e=list_next(e);
 			list_remove(&fp->file_elem);
-			free(fp);
+			// free(fp);
 			
 		}
 		else {

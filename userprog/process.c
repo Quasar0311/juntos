@@ -489,13 +489,12 @@ process_cleanup (void) {
 			e = list_next(e);
 			continue;
 		}
-		e=list_next(e);
-		// printf("process cleanup: %p\n", fp->va);
-		
+
 		syscall_munmap(fp -> va);
+		e=list_next(e);
+		free(fp);
 	}
-	// supplemental_page_table_init(&curr -> spt);
-	// supplemental_page_table_kill (&curr->spt);
+
 #endif
 
 	uint64_t *pml4;
