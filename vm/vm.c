@@ -84,8 +84,10 @@ vm_alloc_page_with_initializer (enum vm_type type, void *upage, bool writable,
 		/* TODO: Insert the page into the spt. */
 		spt_insert_page(spt, uninit_page);
 		// printf("insert finish\n");
+
+		return true;
 	}
-	return true;
+	else goto err;
 err:
 	return false;
 }
@@ -266,6 +268,7 @@ vm_do_claim_page (struct page *page) {
 		free(frame);
 		return false;
 	}
+	pml4_set_dirty(curr -> pml4, page -> va, false);
 	// printf("vm do claim page 2\n");
 
 	return swap_in (page, frame->kva);

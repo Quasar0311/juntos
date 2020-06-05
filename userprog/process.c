@@ -482,14 +482,15 @@ process_cleanup (void) {
 	struct mmap_file *fp;
 #ifdef VM
 	// printf("cleanup mmap list: %ld\n", list_size(&curr->mmap_list));
-	while(e!=list_end(&curr->mmap_list)){
+	while(e!=list_end(&curr->mmap_list) && curr -> exit_status != -1){
 		// struct page *p;
 		fp=list_entry(e, struct mmap_file, file_elem);
 		if (fp == NULL) {
 			e = list_next(e);
 			continue;
 		}
-
+		// printf("fp va : %p\n", fp -> va);
+		// printf("fp list size : %d\n", list_size(&fp -> page_list));
 		syscall_munmap(fp -> va);
 		e=list_next(e);
 		free(fp);

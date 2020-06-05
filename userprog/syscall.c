@@ -175,7 +175,7 @@ syscall_handler (struct intr_frame *f) {
 		/*** SYS_MMAP ***/
 		case SYS_MMAP:
 			// printf("sys mmap\n");
-			check_address(f->R.rdi);
+			// check_address(f->R.rdi);
 			f->R.rax=syscall_mmap((void *)f->R.rdi, (size_t)f->R.rsi, (int)f->R.rdx, 
 				(int)f->R.r10, (off_t)f->R.r8);
 			break;
@@ -329,6 +329,8 @@ syscall_write(int fd, void *buffer, unsigned size){
 	off_t bytes_read;
 	struct thread *curr = thread_current();
 
+	// printf("syscall write dirty : %d\n", pml4_is_dirty(curr -> pml4, 0x54321000));
+
 	lock_acquire(&filesys_lock);
 
 	if (fd == 0) {
@@ -434,6 +436,9 @@ void *
 syscall_mmap (void *addr, size_t length, int writable, int fd, off_t offset){
 	if(fd==0 || fd==1) return NULL;
 	// printf("syscall mmap addr: %p\n", addr);
+	if(length==0) return NULL;
+
+	if ((int) addr % 4096 != 0 || addr == NULL || addr==0) return NULL;
 
 	return do_mmap(addr, length, writable, process_get_file(fd), offset);
 }
