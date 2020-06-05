@@ -260,6 +260,7 @@ vm_do_claim_page (struct page *page) {
 	// printf("pml4 set page va: %p, kva: %p\n", page->va, frame->kva);
 
 	/* TODO: Insert page table entry to map page's VA to frame's PA. */
+	// printf("writable : %d\n", page -> writable);
 	if(!pml4_set_page(curr->pml4, page->va, frame->kva, page->writable)){
 		palloc_free_page(frame->kva);
 		free(frame);
