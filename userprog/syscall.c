@@ -200,9 +200,9 @@ void
 check_address (uint64_t reg) {
 	/*** check if the address is in user address ***/
 	
-	if ((char *) reg == NULL) {
-		syscall_exit(-1);
-	}
+	// if ((char *) reg == NULL) {
+	// 	syscall_exit(-1);
+	// }
 	
 	if (is_user_vaddr((char *) &reg)) {
 		printf("bad address for address : %p\n", &reg);
@@ -432,6 +432,7 @@ syscall_dup2(int oldfd, int newfd){
 
 void *
 syscall_mmap (void *addr, size_t length, int writable, int fd, off_t offset){
+	void *va;
 	if(fd==0 || fd==1) return NULL;
 	// printf("syscall mmap addr: %p\n", addr);
 
