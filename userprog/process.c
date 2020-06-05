@@ -462,6 +462,7 @@ process_exit (void) {
 	/*** release file descriptor ***/
 	// supplemental_page_table_kill (&curr->spt);
 	process_cleanup ();
+	printf("process cleanup finished\n");
 
 	lock_release(&writable_lock);
 
@@ -469,7 +470,7 @@ process_exit (void) {
 	if (curr -> run_file != NULL) file_allow_write(curr->run_file);
 	// supplemental_page_table_kill (&curr->spt);
 	sema_down(&curr -> child_sema);
-	
+	printf("process exit\n");
 }
 
 /* Free the current process's resources. */
@@ -481,15 +482,18 @@ process_cleanup (void) {
 	struct list_elem *e=list_begin(&curr->mmap_list);
 	struct mmap_file *fp;
 #ifdef VM
-	// printf("cleanup mmap list: %ld\n", list_size(&curr->mmap_list));
+	// printf("cleanup mmap list size: %ld\n", list_size(&curr->mmap_list));
 	while(e!=list_end(&curr->mmap_list)){
 		// struct page *p;
+		printf("cleanup mmap list size: %ld\n", list_size(&curr->mmap_list));
 		fp=list_entry(e, struct mmap_file, file_elem);
 		e=list_next(e);
-		// printf("process cleanup: %p\n", fp->va);
+		printf("process cleanup: %p\n", fp->va);
 		
 		syscall_munmap(fp -> va);
+		printf("munmap finished size: %ld\n", list_size(&curr->mmap_list));
 	}
+	printf("process cleanup finished\n");
 	// supplemental_page_table_init(&curr -> spt);
 	// supplemental_page_table_kill (&curr->spt);
 #endif

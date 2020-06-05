@@ -179,7 +179,7 @@ do_munmap (void *addr) {
 	// printf(list_empty(&curr->mmap_list)? "mmap list empty\n" : "mmap list not empty\n");
 	// printf(e==NULL ? "list begin null\n" : "list begin not null\n");
 	// printf(list_next(e)==NULL ? "list next null\n" : "list next not null\n");
-	// printf("do munmap mmap list: %ld\n", list_size(&curr->mmap_list));
+	printf("do munmap mmap list: %ld\n", list_size(&curr->mmap_list));
 
 	while(e!=list_end(&curr->mmap_list)){
 		fp=list_entry(e, struct mmap_file, file_elem);
@@ -189,7 +189,7 @@ do_munmap (void *addr) {
 		// if(!list_empty(&fp->page_list)) printf("list is not empty\n");
 
 		// if(&fp->page_list==NULL) printf("page list is null\n");
-		// printf("length of page list: %ld\n", list_size(&fp->page_list));
+		printf("length of page list: %ld\n", list_size(&fp->page_list));
 
 		if(fp->va==addr){
 			struct list_elem *m=list_begin(&fp->page_list);
@@ -203,33 +203,42 @@ do_munmap (void *addr) {
 				// size_t read_bytes=fp->read_bytes;
 				// size_t page_read_bytes = read_bytes < PGSIZE ? read_bytes : PGSIZE;
 				struct page *p=list_entry(m, struct page, mmap_elem);
-				// printf("unmap page: %p\n", p->va);
-				// printf(p->mapped? "mapped\n" : "unmapped\n");
+				printf("unmap page: %p\n", p->va);
+				printf(p->mapped? "mapped\n" : "unmapped\n");
 				if (p -> mapped) {
 					m=list_next(m);
+
 					p -> unmapped = true;
 					p -> mapped = false;
+
+					printf("mmap elem remove\n");
+					list_remove(&p->mmap_elem);
+					printf("length of page list: %ld\n", list_size(&fp->page_list));
 					file_map_destroy(p);
 
 					pml4_clear_page(curr->pml4, p->va);
 					// printf("while file map destroy : %d\n", p -> file.ofs);
 				}
-				// else m=list_next(m);
+				else m=list_next(m);
 				// printf("while file map destroy : %d\n", p -> file.ofs);
 				// vm_dealloc_page(p);
 				// printf("while file map destroy: %d\n", *(int *)p->va);
 			}
-			// printf("not same\n");
 			e=list_next(e);
+			printf("file elem remove\n");
 			list_remove(&fp->file_elem);
+			printf("do munmap mmap list: %ld\n", list_size(&curr->mmap_list));
 			free(fp);
 		}
 		else {
+			printf("not same\n");
 			e = list_next(e);
 		}
 	}
 	// file_close(fp->file);
 	// free(fp);
-
-	// printf("munmap finished\n");
+	printf("munmap finished\n");
+	// printf("length of page list: %ld\n", list_size(&fp->page_list));
+	// printf("do munmap mmap list: %ld\n", list_size(&curr->mmap_list));
+	printf(list_empty(&fp->page_list) ? "empty\n" : "no\n");
 }
