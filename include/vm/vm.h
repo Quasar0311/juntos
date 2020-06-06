@@ -71,6 +71,7 @@ struct frame {
 	// void *pa;
 	struct page *page;
 	enum vm_type type;
+	struct list_elem lru_elem;
 };
 
 /* The function table for page operations.
@@ -107,6 +108,7 @@ bool spt_insert_page (struct supplemental_page_table *spt, struct page *page);
 void spt_remove_page (struct supplemental_page_table *spt, struct page *page);
 
 void vm_init (void);
+void lru_list_init(void);
 bool vm_try_handle_fault (struct intr_frame *f, void *addr, bool user,
 		bool write, bool not_present);
 

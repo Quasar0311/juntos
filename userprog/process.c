@@ -498,6 +498,8 @@ process_cleanup (void) {
 		free(fp);
 	}
 
+	// supplemental_page_table_kill(&curr->spt);
+
 #endif
 
 	uint64_t *pml4;
