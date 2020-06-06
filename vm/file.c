@@ -62,7 +62,7 @@ file_map_destroy (struct page *page) {
 	off_t write;
 	// printf("file map destroy: %p\n", page->va);
 	// printf("pml4 dirty? : %d\n", pml4_is_dirty(curr->pml4, page -> va));
-	if(pml4_is_dirty(curr->pml4, page->va)){
+	if(pml4_is_dirty(thread_current()->pml4, page->va)){
 		// printf("pml4 is dirty\n");
 		write=file_write_at(file_page->f, page->va, 
 			(off_t)file_page->read_bytes, file_page->ofs);
@@ -76,12 +76,12 @@ bool
 lazy_file_segment(struct page *page, void *aux){
 	struct mmap_file *f=aux;
 	void *addr=page->va;
+	struct thread *curr = thread_current();
 	// void *addr=page->frame->kva;
 	off_t read;
 	// printf("offset: %d\n", page->file.ofs);
 	/*** file into addr ***/
 	// syscall_lock_acquire();
-	// printf("%d, %p\n",pml4_is_dirty(&thread_current() -> pml4, addr), addr);
 	read=file_read_at(f->file, addr, (off_t)f->read_bytes, page->file.ofs);
 	// printf("%d\n",pml4_is_dirty(&thread_current() -> pml4, addr));
 	// syscall_lock_release();

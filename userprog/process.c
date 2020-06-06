@@ -933,7 +933,7 @@ lazy_load_segment (struct page *page, void *aux) {
 	void *kva=page->frame->kva;
 	struct thread *curr=thread_current();
 	// printf("lazy load segment: %ld, offset : %d\n", f -> read_bytes, f -> ofs);
-	
+	// printf("dirty bit : %d\n", pml4_is_dirty(curr -> pml4, 0x54321000));
 	// lock_acquire(&lazy_lock);
 	// lock_acquire(&curr -> parent -> load_lock);
 	// printf("here : %s\n", curr -> parent -> name);
@@ -942,12 +942,14 @@ lazy_load_segment (struct page *page, void *aux) {
 			// lock_release(&curr->load_lock);
 			return false;
 	}
+	// printf("dirty bit : %d\n", pml4_is_dirty(curr -> pml4, 0x54321000));
 	// printf("current lock holding : %d\n", curr -> tid);
 	// lock_release(&lazy_lock);
 	// lock_release(&curr -> parent -> load_lock);
 	// printf("file read at finished : %d\n", f -> read_bytes);
 	
 	memset(kva+f->read_bytes, 0, f->zero_bytes);
+	// printf("dirty bit! : %d\n", pml4_is_dirty(curr -> pml4, 0x54321000));
 	// syscall_lock_release();
 	return true;
 }

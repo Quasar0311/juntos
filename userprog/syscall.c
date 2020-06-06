@@ -341,7 +341,7 @@ syscall_write(int fd, void *buffer, unsigned size){
 	// printf("syscall write dirty : %d\n", pml4_is_dirty(curr -> pml4, 0x54321000));
 
 	lock_acquire(&filesys_lock);
-
+	// printf("dirty bit : %d\n", pml4_is_dirty(curr -> pml4, 0x54321000));
 	if (fd == 0) {
 		syscall_exit(-1);
 	}
