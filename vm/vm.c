@@ -10,6 +10,10 @@
 #include <stdio.h>
 #include <string.h>
 
+struct list lru_list;
+struct lock lru_list_lock;
+struct list_elem *lru_clock;
+
 /* Initializes the virtual memory subsystem by invoking each subsystem's
  * intialize codes. */
 void
@@ -22,6 +26,7 @@ vm_init (void) {
 	register_inspect_intr ();
 	/* DO NOT MODIFY UPPER LINES. */
 	/* TODO: Your code goes here. */
+	lru_list_init();
 }
 
 /* Get the type of the page. This function is useful if you want to know the
@@ -129,11 +134,49 @@ spt_remove_page (struct supplemental_page_table *spt, struct page *page) {
 	vm_dealloc_page (page);
 }
 
+void 
+lru_list_init(void){
+	list_init(&lru_list);
+	lock_init(&lru_list_lock);
+	lru_clock=NULL;
+}
+
+static void
+add_frame_to_lru_list(struct frame *frame){
+	list_push_back(&lru_list, &frame->lru_elem);
+}
+
+static void
+del_frame_from_lru_list(struct frame *frame){
+	list_remove(&frame->lru_elem);
+}
+
+static void
+free_page(void *kva){
+
+}
+
+static void
+__free_page(struct frame *frame){
+
+}
+
 /* Get the struct frame, that will be evicted. */
 static struct frame *
 vm_get_victim (void) {
-	struct frame *victim = NULL;
+	struct frame *victim=list_entry(lru_clock, struct frame, lru_elem);
 	/* TODO: The policy for eviction is up to you. */
+	struct thread *curr=thread_current();
+
+	while(pml4_is_accessed(curr->pml4, victim->page->va)){
+		pml4_set_accessed(curr->pml4, victim->page->va, 0);
+
+		if(lru_clock==list_end(&lru_list)) 
+			lru_clock=list_begin(&lru_list);
+		else lru_clock=list_next(lru_clock);
+
+		victim=list_entry(lru_clock, struct frame, lru_elem);
+	}
 
 	return victim;
 }
@@ -142,7 +185,7 @@ vm_get_victim (void) {
  * Return NULL on error.*/
 static struct frame *
 vm_evict_frame (void) {
-	struct frame *victim UNUSED = vm_get_victim ();
+	struct frame *victim = vm_get_victim ();
 	/* TODO: swap out the victim and return the evicted frame. */
 
 	return NULL;
@@ -166,6 +209,8 @@ vm_get_frame (void) {
 	frame->kva=kva; 
 	// frame->pa=(void *)vtop(kva);
 	frame->page=NULL;
+
+	add_frame_to_lru_list(frame);
 
 	ASSERT (frame != NULL);
 	ASSERT (frame->page == NULL);
