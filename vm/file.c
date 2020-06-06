@@ -63,7 +63,7 @@ file_map_destroy (struct page *page) {
 	// printf("file map destroy: %p\n", page->va);
 	// printf("pml4 dirty? : %d\n", pml4_is_dirty(curr->pml4, page -> va));
 	if(pml4_is_dirty(curr->pml4, page->va)){
-		printf("pml4 is dirty\n");
+		// printf("pml4 is dirty\n");
 		/*** writes page->va into file_page->f ***/
 		write=file_write_at(file_page->f, page->va, 
 			(off_t)file_page->read_bytes, file_page->ofs);
