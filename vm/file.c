@@ -62,6 +62,7 @@ file_map_destroy (struct page *page) {
 	off_t write;
 	// printf("file map destroy: %p\n", page->va);
 	// printf("pml4 dirty? : %d\n", pml4_is_dirty(curr->pml4, page -> va));
+	// if(!pml4_is_dirty(curr->pml4, file_page->f)){
 	if(pml4_is_dirty(curr->pml4, page->va)){
 		// printf("pml4 is dirty\n");
 		/*** writes page->va into file_page->f ***/
@@ -168,7 +169,8 @@ do_mmap (void *addr, size_t length, int writable,
 	// printf("finish mmap va: %p\n", mmap_file->va);
 	// printf("memory: %d\n", *(int *)mmap_file->va);
 	pml4_set_dirty(curr->pml4, mmap_file->va, 0);
-	pml4_set_accessed(curr->pml4, mmap_file->va, 0);
+	// pml4_set_dirty(curr->pml4, mmap_file->file, 0);
+	// pml4_set_accessed(curr->pml4, mmap_file->va, 0);
 	// printf(!pml4_is_dirty(curr->pml4, mmap_file->va) ? "mmap file clean\n": "mmap file dirty\n");
 	return mmap_file->va;
 	// return page->va;

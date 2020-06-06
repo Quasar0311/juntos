@@ -202,12 +202,15 @@ vm_try_handle_fault (struct intr_frame *f, void *addr,
 	// printf("vm try handle fault addr: %p, rsp : %p\n", addr, rsp);
 	// if(page==NULL) printf("page is null\n");
 	// if(is_kernel_vaddr(addr)) printf("is kernel vaddr\n");
-	if(user) rsp=(void *)f->rsp;
-	if(!user) rsp=(void *)thread_current()->tf.rsp;
+	// if(user) rsp=(void *)f->rsp;
+	if(!user){
+		rsp=thread_current()->kernel_rsp;
+	}
 	
 	if (page == NULL) {
 		if(addr >= rsp - 8 && addr+PGSIZE<(void *)USER_STACK+1024*1024){
-			// printf("here\n");
+		// if(addr+PGSIZE<(void *)USER_STACK+1024*1024){
+			// printf("vm stack growth\n");
 			return vm_stack_growth(addr);
 		}
 	}

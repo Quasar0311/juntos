@@ -477,7 +477,6 @@ process_exit (void) {
 static void
 process_cleanup (void) {
 	struct thread *curr = thread_current ();
-	struct list mmap_list = curr -> mmap_list;
 	// struct supplemental_page_table *spt = &curr -> spt;
 	struct list_elem *e=list_begin(&curr->mmap_list);
 	struct mmap_file *fp;
@@ -942,7 +941,7 @@ lazy_load_segment (struct page *page, void *aux) {
 	// printf("here : %s\n", curr -> parent -> name);
 	if(file_read_at(f->file, kva, (off_t)f->read_bytes, f->ofs)
 		<(off_t)f->read_bytes){
-			// lock_release(&curr->load_lock);
+			// lock_release(&lazy_lock);
 			return false;
 	}
 	// printf("current lock holding : %d\n", curr -> tid);
@@ -950,8 +949,9 @@ lazy_load_segment (struct page *page, void *aux) {
 	// lock_release(&curr -> parent -> load_lock);
 	// printf("file read at finished : %d\n", f -> read_bytes);
 	
-	memset(kva+f->read_bytes, 0, f->zero_bytes);
+	memset(kva+f->read_bytes, 0, f->zero_bytes); 
 	// syscall_lock_release();
+	// lock_release(&lazy_lock);
 	return true;
 }
 
@@ -997,11 +997,13 @@ load_segment (struct file *file, off_t ofs, uint8_t *upage,
 
 		void *aux = load_file;
 		
+		// lock_acquire(&lazy_lock);
 		if (!vm_alloc_page_with_initializer (VM_ANON, upage,
 					writable, lazy_load_segment, aux)){
 						return false;
 					}
-			
+		// lock_release(&lazy_lock);
+		
 		/* Advance. */
 		read_bytes -= page_read_bytes;
 		zero_bytes -= page_zero_bytes;

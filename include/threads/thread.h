@@ -147,6 +147,7 @@ struct thread {
 
 	struct list mmap_list;
 
+	void *kernel_rsp;
 #endif
 
 	/* Owned by thread.c. */

@@ -124,7 +124,8 @@ syscall_handler (struct intr_frame *f) {
 
 		/*** SYS_OPEN ***/
 		case 7:
-			thread_current() -> tf.rsp = f -> rsp;
+			// thread_current() -> tf.rsp = f -> rsp;
+			curr->kernel_rsp=f->rsp; 
 			
 			check_address(f -> R.rdi);
 			f -> R.rax = syscall_open((char *)f->R.rdi);
@@ -138,12 +139,21 @@ syscall_handler (struct intr_frame *f) {
 		/*** SYS_READ ***/
 		case 9:
 			check_address(f -> R.rsi);
-			curr -> tf.rsp = f -> rsp;
-			// printf("rsi : %p\n", f -> R.rsi);
+			curr->kernel_rsp=f->rsp; 
+			// printf("rsi : %p, rsp: %p\n", f -> R.rsi, f->rsp);
+
+			// if(f->R.rsi >= (void *)f->rsp - 8 && f->R.rsi+PGSIZE<(void *)USER_STACK+1024*1024){
+			// 	printf("here\n");
+			// 	return vm_stack_growth(f->R.rsi);
+			// }
+			
 			if (f -> R.rsi < (void *) 0x600000) {
+			// if (f -> R.rsi > (void *) f->rsp) {
 			// if(spt_find_page(&curr->spt, (void *)f->R.rsi)->writable){
+				// printf("invalid address\n");
 				syscall_exit(-1);
 			}
+
 			f -> R.rax = syscall_read((int)f->R.rdi, (void *)f->R.rsi, (unsigned)f->R.rdx);
 			break;
 		
@@ -166,7 +176,8 @@ syscall_handler (struct intr_frame *f) {
 		
 		/*** SYS_CLOSE ***/
 		case 13:
-			thread_current() -> tf.rsp = f -> rsp;
+			// thread_current() -> tf.rsp = f -> rsp;
+			curr->kernel_rsp=f->rsp; 
 			
 			syscall_close((int)f->R.rdi);
 			break;
@@ -204,9 +215,9 @@ void
 check_address (uint64_t reg) {
 	/*** check if the address is in user address ***/
 	
-	// if ((char *) reg == NULL) {
-	// 	syscall_exit(-1);
-	// }
+	if ((char *) reg == NULL) {
+		syscall_exit(-1);
+	}
 	
 	if (is_user_vaddr((char *) &reg)) {
 		printf("bad address for address : %p\n", &reg);
