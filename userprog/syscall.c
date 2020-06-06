@@ -349,8 +349,6 @@ syscall_write(int fd, void *buffer, unsigned size){
 	off_t bytes_read;
 	struct thread *curr = thread_current();
 
-	// printf("syscall write dirty : %d\n", pml4_is_dirty(curr -> pml4, 0x54321000));
-
 	lock_acquire(&filesys_lock);
 
 	if (fd == 0) {

@@ -81,6 +81,7 @@ lazy_file_segment(struct page *page, void *aux){
 	struct mmap_file *f=aux;
 	void *addr=page->va;
 	// void *addr=page->frame->kva;
+	struct thread *curr = thread_current();
 	off_t read;
 	// printf("offset: %d\n", page->file.ofs);
 	/*** file into addr ***/
@@ -100,7 +101,7 @@ lazy_file_segment(struct page *page, void *aux){
 		memset(addr+read, 0, f->read_bytes-read);
 		// printf("lazy file segment finish\n");
 	}
-
+	pml4_set_dirty(curr -> pml4, page -> va, false);
 	return true;
 }
 

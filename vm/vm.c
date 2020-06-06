@@ -199,7 +199,6 @@ vm_try_handle_fault (struct intr_frame *f, void *addr,
 	void *rsp=(void *)f->rsp;
 	/* TODO: Validate the fault */
 	/* TODO: Your code goes here */
-	// printf("vm try handle fault addr: %p, rsp : %p\n", addr, rsp);
 	// if(page==NULL) printf("page is null\n");
 	// if(is_kernel_vaddr(addr)) printf("is kernel vaddr\n");
 	// if(user) rsp=(void *)f->rsp;
@@ -271,7 +270,7 @@ vm_do_claim_page (struct page *page) {
 		free(frame);
 		return false;
 	}
-	pml4_set_dirty(curr -> pml4, page -> va, false);
+	// pml4_set_dirty(curr -> pml4, page -> va, false);
 	// printf("vm do claim page 2\n");
 
 	return swap_in (page, frame->kva);
