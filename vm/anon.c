@@ -2,6 +2,8 @@
 
 #include "vm/vm.h"
 #include "devices/disk.h"
+#include "threads/malloc.h"
+#include "threads/vaddr.h"
 
 /* DO NOT MODIFY BELOW LINE */
 static struct disk *swap_disk;
@@ -17,12 +19,19 @@ static const struct page_operations anon_ops = {
 	.type = VM_ANON,
 };
 
+static bool *disk_table;
+
 /* Initialize the data for anonymous pages */
 void
 vm_anon_init (void) {
+	int size;
 	/* TODO: Set up the swap_disk. */
 	swap_disk = disk_get(1, 1);
 	// printf("anon init\n");
+	size = (int) disk_size(swap_disk);
+
+	disk_table = calloc(size / 8, sizeof(bool));
+	for (int i = 0; i < (size / 8); i++) disk_table[i] = false;
 }
 
 /* Initialize the file mapping */
@@ -33,6 +42,8 @@ anon_initializer (struct page *page, enum vm_type type, void *kva) {
 	page->operations = &anon_ops;
 
 	struct anon_page *anon_page = &page->anon;
+
+	anon_page -> disk_location = -1;
 	// printf("finish anon initializer\n");
 	return true;
 }
@@ -42,6 +53,16 @@ static bool
 anon_swap_in (struct page *page, void *kva) {
 	struct anon_page *anon_page = &page->anon;
 
+	int disk_sector = anon_page -> disk_location;
+
+	for (int i = 0; i < 8; i++) {
+		disk_read(swap_disk, (disk_sector * 8) + i,
+			kva + (512 * i));
+	}
+
+	anon_page -> disk_location = -1;
+	disk_table[disk_sector] = false;
+
 	return true;
 }
 
@@ -49,6 +70,27 @@ anon_swap_in (struct page *page, void *kva) {
 static bool
 anon_swap_out (struct page *page) {
 	struct anon_page *anon_page = &page->anon;
+	int free_disk = -1;
+	void *page_addr = page -> frame -> kva;
+	int size = (int) disk_size(swap_disk);
+
+	for (int i = 0; i < (size / 8); i++) {
+		if (!disk_table[i]) {
+			free_disk = i;
+			disk_table[free_disk] = true;
+			break;
+		}
+	}
+
+	if (free_disk == -1) PANIC("NO MORE DISK AREA");
+
+	for (int i = 0; i < 8; i++) {
+		disk_write(swap_disk, (free_disk * 8) + i, 
+			page_addr + (512 * i));
+	}
+
+	anon_page -> disk_location = free_disk;
+	return true;
 }
 
 /* Destroy the anonymous page. PAGE will be freed by the caller. */
