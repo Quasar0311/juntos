@@ -171,17 +171,17 @@ vm_get_victim (void) {
 
 	if(lru_clock==NULL){
 		// printf("lru clock is null\n");
-		lru_clock=list_head(&lru_list);
+		lru_clock=list_begin(&lru_list);
 	} 
 
 	victim=list_entry(lru_clock, struct frame, lru_elem);
 	start=victim;
 
-	printf("while: %p\n", victim->page->va);
+	// printf("while: %p\n", victim->page->va);
 	while(pml4_is_accessed(curr->pml4, victim->page->va)){
 		pml4_set_accessed(curr->pml4, victim->page->va, 0);
 
-		if(lru_clock==list_end(&lru_list)) 
+		if(lru_clock==list_back(&lru_list)) 
 			lru_clock=list_begin(&lru_list);
 			
 		else lru_clock=list_next(lru_clock); 
@@ -200,7 +200,8 @@ static struct frame *
 vm_evict_frame (void) {
 	struct frame *victim = vm_get_victim ();
 	/* TODO: swap out the victim and return the evicted frame. */
-	printf("vm evict frame\n");
+	// printf("vm evict frame\n");
+	del_frame_from_lru_list(victim);
 	swap_out(victim->page);
 
 	return victim;
