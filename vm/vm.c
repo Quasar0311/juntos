@@ -63,7 +63,7 @@ vm_alloc_page_with_initializer (enum vm_type type, void *upage, bool writable,
 		/* TODO: Create the page, fetch the initialier according to the VM type,
 		 * TODO: and then create "uninit" page struct by calling uninit_new. You
 		 * TODO: should modify the field after calling the uninit_new. */
-		struct page *uninit_page=(struct page *)malloc(PGSIZE);
+		struct page *uninit_page=(struct page *)malloc(sizeof(struct page));
 		
 		switch(type){
 			case VM_ANON:
@@ -164,18 +164,31 @@ __free_page(struct frame *frame){
 /* Get the struct frame, that will be evicted. */
 static struct frame *
 vm_get_victim (void) {
-	struct frame *victim=list_entry(lru_clock, struct frame, lru_elem);
+	struct frame *victim, *start;
 	/* TODO: The policy for eviction is up to you. */
 	struct thread *curr=thread_current();
+	// printf("vm get victim: %p\n", victim->page->va);
 
+	if(lru_clock==NULL){
+		// printf("lru clock is null\n");
+		lru_clock=list_head(&lru_list);
+	} 
+
+	victim=list_entry(lru_clock, struct frame, lru_elem);
+	start=victim;
+
+	printf("while: %p\n", victim->page->va);
 	while(pml4_is_accessed(curr->pml4, victim->page->va)){
 		pml4_set_accessed(curr->pml4, victim->page->va, 0);
 
 		if(lru_clock==list_end(&lru_list)) 
 			lru_clock=list_begin(&lru_list);
-		else lru_clock=list_next(lru_clock);
+			
+		else lru_clock=list_next(lru_clock); 
 
 		victim=list_entry(lru_clock, struct frame, lru_elem);
+		
+		if(victim==start) break;
 	}
 
 	return victim;
@@ -187,8 +200,10 @@ static struct frame *
 vm_evict_frame (void) {
 	struct frame *victim = vm_get_victim ();
 	/* TODO: swap out the victim and return the evicted frame. */
+	printf("vm evict frame\n");
+	swap_out(victim->page);
 
-	return NULL;
+	return victim;
 }
 
 /* palloc() and get frame. If there is no available page, evict the page
@@ -202,15 +217,16 @@ vm_get_frame (void) {
 	/*** allocate a new physical frame and 
 	 * return its kernel virtual address ***/ 
 	void *kva=palloc_get_page(PAL_USER); 
-	if(kva==NULL) PANIC("todo");
-	// return vm_evict_frame(); 
+	if(kva==NULL) //PANIC("todo");
+		return vm_evict_frame(); 
 
 	frame=(struct frame *)malloc(sizeof(struct frame));
 	frame->kva=kva; 
 	// frame->pa=(void *)vtop(kva);
 	frame->page=NULL;
 
-	add_frame_to_lru_list(frame);
+	// printf("add frame to lru list\n");
+	// add_frame_to_lru_list(frame);
 
 	ASSERT (frame != NULL);
 	ASSERT (frame->page == NULL);
@@ -253,8 +269,6 @@ vm_try_handle_fault (struct intr_frame *f, void *addr,
 	
 	if (page == NULL) {
 		if(addr >= rsp - 8 && addr+PGSIZE<(void *)USER_STACK+1024*1024){
-		// if(addr+PGSIZE<(void *)USER_STACK+1024*1024){
-			// printf("vm stack growth\n");
 			return vm_stack_growth(addr);
 		}
 	}
@@ -317,6 +331,7 @@ vm_do_claim_page (struct page *page) {
 	}
 	// pml4_set_dirty(curr -> pml4, page -> va, false);
 	// printf("vm do claim page 2\n");
+	add_frame_to_lru_list(frame);
 
 	return swap_in (page, frame->kva);
 }
