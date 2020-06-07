@@ -63,8 +63,8 @@ vm_alloc_page_with_initializer (enum vm_type type, void *upage, bool writable,
 		/* TODO: Create the page, fetch the initialier according to the VM type,
 		 * TODO: and then create "uninit" page struct by calling uninit_new. You
 		 * TODO: should modify the field after calling the uninit_new. */
-		struct page *uninit_page=(struct page *)malloc(PGSIZE);
-		
+		struct page *uninit_page=(struct page *)malloc(sizeof(struct page));
+		if (uninit_page == NULL) printf("null\n");
 		switch(type){
 			case VM_ANON:
 				uninit_new(uninit_page, upage, init, type, aux, anon_initializer);
@@ -247,6 +247,7 @@ vm_try_handle_fault (struct intr_frame *f, void *addr,
 	// if(page==NULL) printf("page is null\n");
 	// if(is_kernel_vaddr(addr)) printf("is kernel vaddr\n");
 	// if(user) rsp=(void *)f->rsp;
+	
 	if(!user){
 		rsp=thread_current()->kernel_rsp;
 	}
