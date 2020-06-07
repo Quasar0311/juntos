@@ -356,18 +356,8 @@ process_exec (void *f_name) { //start_process
 	// supplemental_page_table_init(&curr->spt);
 
 	/* We first kill the current context */
+	// printf("process cleanup\n");
 	// process_cleanup ();
-	// struct list_elem *e=list_begin(&curr->mmap_list);
-	// struct mmap_file *fp;
-
-	// printf("mmap list: %d\n", list_size(&curr->mmap_list));
-	// while(e!=list_end(&curr->mmap_list)){
-	// 	printf("munmap\n");
-	// 	fp=list_entry(e, struct mmap_file, file_elem);
-	// 	do_munmap(fp -> va);
-
-	// 	e=list_next(e);
-	// }
 
 	/* And then load the binary */
 	if (curr -> tid > 3) lock_acquire(&writable_lock);

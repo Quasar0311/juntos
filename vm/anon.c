@@ -32,6 +32,7 @@ vm_anon_init (void) {
 
 	disk_table = calloc(size / 8, sizeof(bool));
 	for (int i = 0; i < (size / 8); i++) disk_table[i] = false;
+	printf("size: %d, disk table: %d\n", size, size/8);
 }
 
 /* Initialize the file mapping */
@@ -73,6 +74,7 @@ anon_swap_out (struct page *page) {
 	int free_disk = -1;
 	void *page_addr = page -> frame -> kva;
 	int size = (int) disk_size(swap_disk);
+	printf("anon swap out\n");
 
 	for (int i = 0; i < (size / 8); i++) {
 		if (!disk_table[i]) {
