@@ -74,20 +74,20 @@ anon_swap_in (struct page *page, void *kva) {
 static bool
 anon_swap_out (struct page *page) {
 	struct anon_page *anon_page = &page->anon;
-	// int free_disk = -1;
+	int free_disk = -1;
 	void *page_addr = page -> frame -> kva;
 	int size = (int) disk_size(swap_disk);
 
-	if(disk_table[free_disk+1]){
-		for (int i = 0; i < (size / 8); i++) {
-			if (!disk_table[i]) {
-				free_disk = i;
-				disk_table[free_disk] = true;
-				break;
-			}
+	// if(disk_table[free_disk+1]){
+	for (int i = 0; i < (size / 8); i++) {
+		if (!disk_table[i]) {
+			free_disk = i;
+			disk_table[free_disk] = true;
+			break;
 		}
 	}
-	else free_disk=free_disk+1;
+	// }
+	// else free_disk=free_disk+1;
 
 	if (free_disk == -1) PANIC("NO MORE DISK AREA");
 
