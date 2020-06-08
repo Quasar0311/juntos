@@ -151,15 +151,10 @@ del_frame_from_lru_list(struct frame *frame){
 	list_remove(&frame->lru_elem);
 }
 
-static void
-free_page(void *kva){
-
-}
-
-static void
-__free_page(struct frame *frame){
-
-}
+// static void
+// __free_frame(struct frame *frame){
+// 	del_frame_from_lru_list(frame);
+// }
 
 /* Get the struct frame, that will be evicted. */
 static struct frame *
@@ -170,25 +165,23 @@ vm_get_victim (void) {
 	// printf("vm get victim: %p\n", victim->page->va);
 
 	if(lru_clock==NULL){
-		// printf("lru clock is null\n");
-		lru_clock=list_head(&lru_list);
+		lru_clock=list_begin(&lru_list);
 	} 
 
 	victim=list_entry(lru_clock, struct frame, lru_elem);
 	start=victim;
 
-	printf("while: %p\n", victim->page->va);
 	while(pml4_is_accessed(curr->pml4, victim->page->va)){
 		pml4_set_accessed(curr->pml4, victim->page->va, 0);
 
-		if(lru_clock==list_end(&lru_list)) 
+		if(lru_clock==list_back(&lru_list))
 			lru_clock=list_begin(&lru_list);
-			
+
 		else lru_clock=list_next(lru_clock); 
 
 		victim=list_entry(lru_clock, struct frame, lru_elem);
 		
-		if(victim==start) break;
+		if(victim==start) return victim;
 	}
 
 	return victim;
@@ -200,10 +193,12 @@ static struct frame *
 vm_evict_frame (void) {
 	struct frame *victim = vm_get_victim ();
 	/* TODO: swap out the victim and return the evicted frame. */
-	printf("vm evict frame\n");
-	swap_out(victim->page);
+	// printf("vm evict frame\n");
+	if(pml4_is_dirty(thread_current()->pml4, victim->page->va))
+		swap_out(victim->page);
+	del_frame_from_lru_list(victim);
 
-	return victim;
+	return victim; 
 }
 
 /* palloc() and get frame. If there is no available page, evict the page
@@ -222,7 +217,6 @@ vm_get_frame (void) {
 
 	frame=(struct frame *)malloc(sizeof(struct frame));
 	frame->kva=kva; 
-	// frame->pa=(void *)vtop(kva);
 	frame->page=NULL;
 
 	// printf("add frame to lru list\n");
@@ -330,7 +324,7 @@ vm_do_claim_page (struct page *page) {
 		return false;
 	}
 	// pml4_set_dirty(curr -> pml4, page -> va, false);
-	// printf("vm do claim page 2\n");
+	// printf("add frame to lru list: %p\n", frame->page->va);
 	add_frame_to_lru_list(frame);
 
 	return swap_in (page, frame->kva);
