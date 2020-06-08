@@ -213,7 +213,7 @@ vm_get_frame (void) {
 	/* TODO: Fill this function. */
 	/*** allocate a new physical frame and 
 	 * return its kernel virtual address ***/ 
-	void *kva=palloc_get_page(PAL_USER); 
+	void *kva=palloc_get_page(PAL_USER|PAL_ZERO); 
 	if(kva==NULL) //PANIC("todo");
 		return vm_evict_frame(); 
 
