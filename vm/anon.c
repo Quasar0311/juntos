@@ -76,7 +76,6 @@ anon_swap_out (struct page *page) {
 	// int free_disk = -1;
 	void *page_addr = page -> frame -> kva;
 	int size = (int) disk_size(swap_disk);
-	// printf("anon swap out\n");
 
 	if(disk_table[free_disk+1]){
 		for (int i = 0; i < (size / 8); i++) {
@@ -97,7 +96,7 @@ anon_swap_out (struct page *page) {
 	}
 
 	anon_page -> disk_location = free_disk;
-	printf("anon swap out free disk: %d\n", free_disk);
+	// printf("anon swap out free disk: %d\n", free_disk);
 	return true;
 }
 
