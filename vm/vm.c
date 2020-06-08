@@ -165,16 +165,18 @@ vm_get_victim (void) {
 	// printf("vm get victim: %p\n", victim->page->va);
 
 	if(lru_clock==NULL){
+		// printf("lru clock is null\n");
 		lru_clock=list_begin(&lru_list);
 	} 
 
 	victim=list_entry(lru_clock, struct frame, lru_elem);
 	start=victim;
 
+	// printf("while: %p\n", victim->page->va);
 	while(pml4_is_accessed(curr->pml4, victim->page->va)){
 		pml4_set_accessed(curr->pml4, victim->page->va, 0);
 
-		if(lru_clock==list_back(&lru_list))
+		if(lru_clock==list_back(&lru_list)) 
 			lru_clock=list_begin(&lru_list);
 
 		else lru_clock=list_next(lru_clock); 
@@ -257,6 +259,7 @@ vm_try_handle_fault (struct intr_frame *f, void *addr,
 	// if(page==NULL) printf("page is null\n");
 	// if(is_kernel_vaddr(addr)) printf("is kernel vaddr\n");
 	// if(user) rsp=(void *)f->rsp;
+	
 	if(!user){
 		rsp=thread_current()->kernel_rsp;
 	}
