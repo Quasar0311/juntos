@@ -151,10 +151,12 @@ del_frame_from_lru_list(struct frame *frame){
 	list_remove(&frame->lru_elem);
 }
 
-// static void
-// __free_frame(struct frame *frame){
-// 	del_frame_from_lru_list(frame);
-// }
+void
+__free_frame(struct frame *frame){
+	del_frame_from_lru_list(frame);
+	palloc_free_page(frame->kva);
+	free(frame);
+}
 
 /* Get the struct frame, that will be evicted. */
 static struct frame *
@@ -194,11 +196,14 @@ vm_get_victim (void) {
 static struct frame *
 vm_evict_frame (void) {
 	struct frame *victim = vm_get_victim ();
+	struct thread *curr=thread_current();
 	/* TODO: swap out the victim and return the evicted frame. */
 	// printf("vm evict frame\n");
-	if(pml4_is_dirty(thread_current()->pml4, victim->page->va))
+	if(pml4_is_dirty(curr->pml4, victim->page->va))
 		swap_out(victim->page);
+
 	del_frame_from_lru_list(victim);
+	pml4_clear_page(curr->pml4, victim->page->va);
 
 	return victim; 
 }
@@ -322,12 +327,13 @@ vm_do_claim_page (struct page *page) {
 	/* TODO: Insert page table entry to map page's VA to frame's PA. */
 	// printf("writable : %d\n", page -> writable);
 	if(!pml4_set_page(curr->pml4, page->va, frame->kva, page->writable)){
-		palloc_free_page(frame->kva);
-		free(frame);
+		// palloc_free_page(frame->kva);
+		// free(frame);
+		__free_frame(frame);
 		return false;
 	}
 	// pml4_set_dirty(curr -> pml4, page -> va, false);
-	// printf("add frame to lru list: %p\n", frame->page->va);
+	// printf("add frame to lru list: %p\n", frame->kva);
 	add_frame_to_lru_list(frame);
 
 	return swap_in (page, frame->kva);

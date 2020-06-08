@@ -63,11 +63,13 @@ file_map_destroy (struct page *page) {
 
 	if(pml4_is_dirty(curr->pml4, page->va)){
 		/*** writes page->va into file_page->f ***/
+		printf("pml4 is dirty\n");
 		write=file_write_at(file_page->f, page->va, 
 			(off_t)file_page->read_bytes, file_page->ofs);
 	}
 	
-	palloc_free_page(pml4_get_page(curr->pml4, page->va));
+	if(pml4_get_page(curr->pml4, page->va)!=NULL)
+		__free_frame(page->frame);
 
 	file_close(file_page->f);
 }
