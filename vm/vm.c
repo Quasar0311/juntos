@@ -333,7 +333,7 @@ vm_do_claim_page (struct page *page) {
 		return false;
 	}
 	// pml4_set_dirty(curr -> pml4, page -> va, false);
-	// printf("add frame to lru list: %p\n", frame->page->va);
+	// printf("add frame to lru list: %p\n", frame->kva);
 	add_frame_to_lru_list(frame);
 
 	return swap_in (page, frame->kva);
