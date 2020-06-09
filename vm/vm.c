@@ -4,6 +4,7 @@
 #include "threads/thread.h"
 #include "vm/vm.h"
 #include "vm/inspect.h"
+#include "vm/file.h"
 #include <hash.h>
 #include "threads/vaddr.h"
 #include "threads/mmu.h"
@@ -72,7 +73,7 @@ vm_alloc_page_with_initializer (enum vm_type type, void *upage, bool writable,
 				break;
 
 			case VM_FILE:
-				// printf("case vm file\n");
+				// printf("case vm file : %d\n", type);
 				uninit_new(uninit_page, upage, init, type, aux, file_map_initializer);
 				break;
 
@@ -268,6 +269,7 @@ vm_try_handle_fault (struct intr_frame *f, void *addr,
 	// if(page==NULL) printf("page is null\n");
 	// if(is_kernel_vaddr(addr)) printf("is kernel vaddr\n");
 	// if(user) rsp=(void *)f->rsp;
+	// printf("fault : %p\n", addr);
 	if(!user){
 		rsp=thread_current()->kernel_rsp;
 	}
@@ -287,7 +289,7 @@ vm_try_handle_fault (struct intr_frame *f, void *addr,
 	if (page -> unmapped) {
 		return false;
 	}
-
+	
 	if (page -> mapped) {
 		mmap_file = page -> aux;
 		// printf("map : %d\n", (mmap_file -> length / 4096));
@@ -299,7 +301,7 @@ vm_try_handle_fault (struct intr_frame *f, void *addr,
 			}
 		}
 	}
-
+	
 	/*** bogus page fault ***/
 	return vm_do_claim_page (page); 
 }
@@ -332,7 +334,7 @@ static bool
 vm_do_claim_page (struct page *page) {
 	struct frame *frame = vm_get_frame ();
 	struct thread *curr=thread_current();
-	// printf("vm do claim page\n");
+	// printf("vm do claim page type : %d, %p\n", page -> uninit.type, frame);
 	// if(frame->page!=NULL) 
 	// 	page->anon.disk_location=frame->page->anon.disk_location;
 	
