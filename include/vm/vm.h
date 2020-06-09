@@ -52,6 +52,7 @@ struct page {
 	vm_initializer *init;
 	void *aux;
 	struct list_elem mmap_elem;
+	// int disk_location;
 
 	/* Per-type data are binded into the union.
 	 * Each function automatically detects the current union */
@@ -109,6 +110,7 @@ void spt_remove_page (struct supplemental_page_table *spt, struct page *page);
 
 void vm_init (void);
 void lru_list_init(void);
+void __free_frame(struct frame *frame);
 bool vm_try_handle_fault (struct intr_frame *f, void *addr, bool user,
 		bool write, bool not_present);
 

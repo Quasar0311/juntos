@@ -4,6 +4,7 @@
 #include "threads/thread.h"
 #include "vm/vm.h"
 #include "vm/inspect.h"
+#include "vm/file.h"
 #include <hash.h>
 #include "threads/vaddr.h"
 #include "threads/mmu.h"
@@ -55,6 +56,7 @@ bool
 vm_alloc_page_with_initializer (enum vm_type type, void *upage, bool writable,
 		vm_initializer *init, void *aux) {
 	ASSERT (VM_TYPE(type) != VM_UNINIT)
+	// printf("vm alloc page with initializer: %p\n", upage);
 
 	struct supplemental_page_table *spt = &thread_current ()->spt;
 	
@@ -71,7 +73,7 @@ vm_alloc_page_with_initializer (enum vm_type type, void *upage, bool writable,
 				break;
 
 			case VM_FILE:
-				// printf("case vm file\n");
+				// printf("case vm file : %d\n", type);
 				uninit_new(uninit_page, upage, init, type, aux, file_map_initializer);
 				break;
 
@@ -85,6 +87,7 @@ vm_alloc_page_with_initializer (enum vm_type type, void *upage, bool writable,
 		uninit_page -> aux = aux;
 		uninit_page -> unmapped = false;
 		uninit_page -> mapped = false;
+		// uninit_page->disk_location=-1;
 		
 		/* TODO: Insert the page into the spt. */
 		spt_insert_page(spt, uninit_page);
@@ -151,10 +154,12 @@ del_frame_from_lru_list(struct frame *frame){
 	list_remove(&frame->lru_elem);
 }
 
-// static void
-// __free_frame(struct frame *frame){
-// 	del_frame_from_lru_list(frame);
-// }
+void
+__free_frame(struct frame *frame){
+	del_frame_from_lru_list(frame);
+	palloc_free_page(frame->kva);
+	free(frame);
+}
 
 /* Get the struct frame, that will be evicted. */
 static struct frame *
@@ -194,11 +199,15 @@ vm_get_victim (void) {
 static struct frame *
 vm_evict_frame (void) {
 	struct frame *victim = vm_get_victim ();
+	struct thread *curr=thread_current();
 	/* TODO: swap out the victim and return the evicted frame. */
 	// printf("vm evict frame\n");
-	if(pml4_is_dirty(thread_current()->pml4, victim->page->va))
-		swap_out(victim->page);
+	// if(pml4_is_dirty(curr->pml4, victim->page->va))
+	swap_out(victim->page);
+
 	del_frame_from_lru_list(victim);
+	pml4_clear_page(curr->pml4, victim->page->va);
+	// printf("frame out to disk : %d, %p, va : %p\n", victim -> page -> anon.disk_location, victim -> kva, victim -> page -> va);
 
 	return victim; 
 }
@@ -213,7 +222,7 @@ vm_get_frame (void) {
 	/* TODO: Fill this function. */
 	/*** allocate a new physical frame and 
 	 * return its kernel virtual address ***/ 
-	void *kva=palloc_get_page(PAL_USER); 
+	void *kva=palloc_get_page(PAL_USER|PAL_ZERO); 
 	if(kva==NULL) //PANIC("todo");
 		return vm_evict_frame(); 
 
@@ -254,12 +263,13 @@ vm_try_handle_fault (struct intr_frame *f, void *addr,
 	struct supplemental_page_table *spt = &thread_current ()->spt;
 	struct page *page = spt_find_page(spt, addr);
 	void *rsp=(void *)f->rsp;
+	struct mmap_file *mmap_file;
 	/* TODO: Validate the fault */
 	/* TODO: Your code goes here */
 	// if(page==NULL) printf("page is null\n");
 	// if(is_kernel_vaddr(addr)) printf("is kernel vaddr\n");
 	// if(user) rsp=(void *)f->rsp;
-	
+	// printf("fault : %p\n", addr);
 	if(!user){
 		rsp=thread_current()->kernel_rsp;
 	}
@@ -279,7 +289,19 @@ vm_try_handle_fault (struct intr_frame *f, void *addr,
 	if (page -> unmapped) {
 		return false;
 	}
-
+	
+	if (page -> mapped) {
+		mmap_file = page -> aux;
+		// printf("map : %d\n", (mmap_file -> length / 4096));
+		if ((mmap_file -> length / 4096) > 1) {
+			for (int i = 0; i < ((mmap_file -> length / 4096) + 1); i++) {
+				page = spt_find_page(spt, addr);
+				vm_do_claim_page(page);
+				addr += 4096;
+			}
+		}
+	}
+	
 	/*** bogus page fault ***/
 	return vm_do_claim_page (page); 
 }
@@ -312,7 +334,9 @@ static bool
 vm_do_claim_page (struct page *page) {
 	struct frame *frame = vm_get_frame ();
 	struct thread *curr=thread_current();
-	// printf("vm do claim page\n");
+	// printf("vm do claim page type : %d, %p\n", page -> uninit.type, frame);
+	// if(frame->page!=NULL) 
+	// 	page->anon.disk_location=frame->page->anon.disk_location;
 	
 	/* Set links */
 	frame->page = page;
@@ -322,14 +346,15 @@ vm_do_claim_page (struct page *page) {
 	/* TODO: Insert page table entry to map page's VA to frame's PA. */
 	// printf("writable : %d\n", page -> writable);
 	if(!pml4_set_page(curr->pml4, page->va, frame->kva, page->writable)){
-		palloc_free_page(frame->kva);
-		free(frame);
+		// palloc_free_page(frame->kva);
+		// free(frame);
+		__free_frame(frame);
 		return false;
 	}
 	// pml4_set_dirty(curr -> pml4, page -> va, false);
-	// printf("add frame to lru list: %p\n", frame->page->va);
+	// printf("add frame to lru list: %p\n", frame->page->anon.disk_location);
 	add_frame_to_lru_list(frame);
-
+	printf("swap in: %p\n", page->va);
 	return swap_in (page, frame->kva);
 }
 
