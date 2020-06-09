@@ -43,14 +43,27 @@ file_map_initializer (struct page *page, enum vm_type type, void *kva) {
 /* Swap in the page by read contents from the file. */
 static bool
 file_map_swap_in (struct page *page, void *kva) {
-	struct file_page *file_page UNUSED = &page->file;
+	struct file_page *file_page = &page->file;
+
+	file_read_at(file_page->f, kva, 
+		(off_t)file_page->read_bytes, file_page->ofs);
+
 	return true;
 }
 
 /* Swap out the page by writeback contents to the file. */
 static bool
 file_map_swap_out (struct page *page) {
-	struct file_page *file_page UNUSED = &page->file;
+	struct file_page *file_page = &page->file;
+	struct thread *curr = thread_current();
+
+	if (pml4_is_dirty(curr -> pml4, page -> va)) {
+		file_write_at(file_page->f, page->va, 
+			(off_t)file_page->read_bytes, file_page->ofs);
+	}
+
+	pml4_set_dirty(curr -> pml4, page -> va, false);
+
 	return true;
 }
 
@@ -62,7 +75,7 @@ file_map_destroy (struct page *page) {
 
 	if(pml4_is_dirty(curr->pml4, page->va)){
 		/*** writes page->va into file_page->f ***/
-		printf("pml4 is dirty\n");
+		// printf("pml4 is dirty\n");
 		file_write_at(file_page->f, page->va, 
 			(off_t)file_page->read_bytes, file_page->ofs);
 	}

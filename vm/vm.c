@@ -200,12 +200,12 @@ vm_evict_frame (void) {
 	struct thread *curr=thread_current();
 	/* TODO: swap out the victim and return the evicted frame. */
 	// printf("vm evict frame\n");
-	if(pml4_is_dirty(curr->pml4, victim->page->va))
-		swap_out(victim->page);
+	// if(pml4_is_dirty(curr->pml4, victim->page->va))
+	swap_out(victim->page);
 
 	del_frame_from_lru_list(victim);
 	pml4_clear_page(curr->pml4, victim->page->va);
-	// printf("vm evict frame: %p\n", victim->page->anon.disk_location);
+	// printf("frame out to disk : %d, %p, va : %p\n", victim -> page -> anon.disk_location, victim -> kva, victim -> page -> va);
 
 	return victim; 
 }
@@ -319,11 +319,9 @@ static bool
 vm_do_claim_page (struct page *page) {
 	struct frame *frame = vm_get_frame ();
 	struct thread *curr=thread_current();
-	// printf("vm do claim page: %p\n", page->anon.disk_location);
-	// printf("vm do claim page: %p\n", frame->page->anon.disk_location);
-	if(frame->page!=NULL) 
-		page->anon.disk_location=frame->page->anon.disk_location;
-	//printf("vm do claim page: %p\n", frame->page->anon.disk_location);
+	// printf("vm do claim page\n");
+	// if(frame->page!=NULL) 
+	// 	page->anon.disk_location=frame->page->anon.disk_location;
 	
 	/* Set links */
 	frame->page = page;
@@ -341,7 +339,7 @@ vm_do_claim_page (struct page *page) {
 	// pml4_set_dirty(curr -> pml4, page -> va, false);
 	// printf("add frame to lru list: %p\n", frame->page->anon.disk_location);
 	add_frame_to_lru_list(frame);
-
+	
 	return swap_in (page, frame->kva);
 }
 
