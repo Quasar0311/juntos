@@ -21,7 +21,8 @@ struct mmap_file{
 	off_t ofs;
     size_t read_bytes;
 	struct list_elem file_elem;
-	struct list page_list;	
+	struct list page_list;
+	size_t length;	
 };
 
 void vm_file_init (void);
