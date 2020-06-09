@@ -52,6 +52,7 @@ struct page {
 	vm_initializer *init;
 	void *aux;
 	struct list_elem mmap_elem;
+	// int disk_location;
 
 	/* Per-type data are binded into the union.
 	 * Each function automatically detects the current union */

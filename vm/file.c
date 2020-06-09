@@ -59,12 +59,11 @@ static void
 file_map_destroy (struct page *page) {
 	struct file_page *file_page = &page->file;
 	struct thread *curr=thread_current();
-	off_t write;
 
 	if(pml4_is_dirty(curr->pml4, page->va)){
 		/*** writes page->va into file_page->f ***/
 		printf("pml4 is dirty\n");
-		write=file_write_at(file_page->f, page->va, 
+		file_write_at(file_page->f, page->va, 
 			(off_t)file_page->read_bytes, file_page->ofs);
 	}
 	
