@@ -58,10 +58,12 @@ anon_swap_in (struct page *page, void *kva) {
 
 	int disk_sector = anon_page -> disk_location;
 
-	printf("disk size: %d, disk sector: %d, kva: %p\n", (int)disk_size(swap_disk), disk_sector, kva);
-	for (int i = 0; i < 8; i++) {
-		disk_read(swap_disk, (disk_sector * 8) + i,
-			kva + (512 * i));
+	// printf("swap in disk sector: %d, kva: %p, va : %p\n", disk_sector, kva, page -> va);
+	if (disk_sector != -1) {
+		for (int i = 0; i < 8; i++) {
+			disk_read(swap_disk, (disk_sector * 8) + i,
+				kva + (512 * i));
+		}
 	}
 
 	anon_page -> disk_location = -1;
@@ -77,7 +79,7 @@ anon_swap_out (struct page *page) {
 	int free_disk = -1;
 	void *page_addr = page -> frame -> kva;
 	int size = (int) disk_size(swap_disk);
-
+	// printf("swap_out\n");
 	// if(disk_table[free_disk+1]){
 		for (int i = 0; i < (size / 8); i++) {
 			if (!disk_table[i]) {
@@ -97,7 +99,7 @@ anon_swap_out (struct page *page) {
 	}
 
 	anon_page -> disk_location = free_disk;
-	printf("anon swap out free disk: %d, kva: %p\n", free_disk, page->frame->kva);
+	// printf("anon swap out free disk: %d, kva: %p, va : %p\n", free_disk, page->frame->kva, page -> va);
 	return true;
 }
 
