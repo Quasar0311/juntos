@@ -86,6 +86,7 @@ vm_alloc_page_with_initializer (enum vm_type type, void *upage, bool writable,
 		uninit_page -> aux = aux;
 		uninit_page -> unmapped = false;
 		uninit_page -> mapped = false;
+		uninit_page -> lazy_file = false;
 		
 		/* TODO: Insert the page into the spt. */
 		spt_insert_page(spt, uninit_page);
@@ -288,7 +289,7 @@ vm_try_handle_fault (struct intr_frame *f, void *addr,
 	if (page -> unmapped) {
 		return false;
 	}
-	if (page -> mapped) {
+	if (page -> lazy_file) {
 		mmap_file = page -> aux;
 		printf("map : %d\n", (mmap_file -> length / 4096));
 		// if ((mmap_file -> length / 4096) > 100) {

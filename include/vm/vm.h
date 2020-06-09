@@ -49,6 +49,7 @@ struct page {
 	bool is_loaded;
 	bool mapped;
 	bool unmapped;
+	bool lazy_file;
 	vm_initializer *init;
 	void *aux;
 	struct list_elem mmap_elem;
