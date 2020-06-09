@@ -12,7 +12,7 @@ static bool file_map_swap_in (struct page *page, void *kva);
 static bool file_map_swap_out (struct page *page);
 static void file_map_destroy (struct page *page);
 
-// struct lock file_lock;
+struct lock file_lock;
 
 /* DO NOT MODIFY this struct */
 static const struct page_operations file_ops = {
@@ -44,11 +44,13 @@ file_map_initializer (struct page *page, enum vm_type type, void *kva) {
 static bool
 file_map_swap_in (struct page *page, void *kva) {
 	struct file_page *file_page = &page->file;
-	// printf("In\n");
+	printf("file map swap in: %p\n", page->va);
+	lock_acquire(&file_lock);
 	/*** file into addr ***/
 	file_read_at(file_page->f, kva, 
 		(off_t)file_page->read_bytes, file_page->ofs);
-
+	lock_release(&file_lock);
+	printf("file read at: %p\n", file_page->f);
 	return true;
 }
 
@@ -57,7 +59,7 @@ static bool
 file_map_swap_out (struct page *page) {
 	struct file_page *file_page = &page->file;
 	struct thread *curr = thread_current();
-	// printf("Out\n");
+	printf("file map swap out\n");
 	if (pml4_is_dirty(curr -> pml4, page -> va)) {
 		/*** writes page->va into file_page->f ***/
 		file_write_at(file_page->f, page->va, 
@@ -138,7 +140,7 @@ do_mmap (void *addr, size_t length, int writable,
 		mmap_file->read_bytes=page_read_bytes; 
 
 		void *aux=mmap_file;
-		printf ("mmap page : %p\n", addr);
+		// printf ("mmap page : %p\n", addr);
 		if(!vm_alloc_page_with_initializer(VM_FILE, addr, writable, 
 			lazy_file_segment, aux)){
 				return NULL;

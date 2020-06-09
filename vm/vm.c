@@ -354,7 +354,7 @@ vm_do_claim_page (struct page *page) {
 	// pml4_set_dirty(curr -> pml4, page -> va, false);
 	// printf("add frame to lru list: %p\n", frame->page->anon.disk_location);
 	add_frame_to_lru_list(frame);
-	printf("swap in: %p\n", page->va);
+	// printf("swap in: %p\n", page->va);
 	return swap_in (page, frame->kva);
 }
 
