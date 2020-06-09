@@ -33,7 +33,7 @@ bool
 file_map_initializer (struct page *page, enum vm_type type, void *kva) {
 	/* Set up the handler */
 	page->operations = &file_ops;
-	printf("file map initializer, %p\n", page -> va);
+	// printf("file map initializer, %p\n", page -> va);
 
 	struct file_page *file_page = &page->file;
 
@@ -93,7 +93,7 @@ lazy_file_segment(struct page *page, void *aux){
 	void *addr=page->va;
 	off_t read;
 	int iter = (f -> length) / 4096;
-	printf("lazy_file : %p, page : %p, iter : %d\n", f -> file, addr, iter);
+	// printf("lazy_file : %p, page : %p, iter : %d, offset : %d\n", f -> file, addr, iter, page -> file.ofs);
 	/*** file into addr ***/
 	
 	// for (int i = 0; i < iter; i++) {
@@ -102,8 +102,9 @@ lazy_file_segment(struct page *page, void *aux){
 	// 	// 	memset(addr+read, 0, f->read_bytes-read);
 	// 	// }
 	// }
-	read=file_read_at(f->file, addr, (off_t)f->read_bytes, page->file.ofs);
-
+	// read=file_read_at(f->file, addr, (off_t)f->read_bytes, page->file.ofs);
+	read=file_read_at(f->file, addr, 4096, page->file.ofs);
+	// printf("lazy_file : %p, page : %p, iter : %d, offset : %d, read : %d, read bytes : %d\n", f -> file, addr, iter, page -> file.ofs, read, f -> read_bytes);
 	if(read<(off_t)f->read_bytes){
 		memset(addr+read, 0, f->read_bytes-read);
 	}
@@ -128,7 +129,7 @@ do_mmap (void *addr, size_t length, int writable,
 
 	list_init(&mmap_file->page_list);
 	list_push_back(&curr->mmap_list, &mmap_file->file_elem);
-	printf("mmap length : %d\n", length);
+	// printf("mmap length : %d\n", length);
 	while(length>0){
 		size_t page_read_bytes = length < PGSIZE ? length : PGSIZE;
 		
@@ -137,7 +138,7 @@ do_mmap (void *addr, size_t length, int writable,
 		mmap_file->read_bytes=page_read_bytes; 
 
 		void *aux=mmap_file;
-		printf ("mmap page : %p\n", addr);
+		// printf ("mmap page : %p, offset : %d, read : %d\n", addr, offset, page_read_bytes);
 		if(!vm_alloc_page_with_initializer(VM_FILE, addr, writable, 
 			lazy_file_segment, aux)){
 				return NULL;
