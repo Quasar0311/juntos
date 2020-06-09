@@ -290,14 +290,14 @@ vm_try_handle_fault (struct intr_frame *f, void *addr,
 	}
 	if (page -> mapped) {
 		mmap_file = page -> aux;
-		// printf("map : %d\n", (mmap_file -> length / 4096));
-		if ((mmap_file -> length / 4096) > 100) {
+		printf("map : %d\n", (mmap_file -> length / 4096));
+		// if ((mmap_file -> length / 4096) > 100) {
 			for (int i = 0; i < ((mmap_file -> length / 4096) + 1); i++) {
 				page = spt_find_page(spt, addr);
 				vm_do_claim_page(page);
 				addr += 4096;
 			}
-		}
+		// }
 	}
 	
 	/*** bogus page fault ***/

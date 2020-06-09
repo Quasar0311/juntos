@@ -33,7 +33,7 @@ bool
 file_map_initializer (struct page *page, enum vm_type type, void *kva) {
 	/* Set up the handler */
 	page->operations = &file_ops;
-	// printf("file map initializer, %p\n", page -> va);
+	printf("file map initializer, %p\n", page -> va);
 
 	struct file_page *file_page = &page->file;
 
@@ -138,7 +138,7 @@ do_mmap (void *addr, size_t length, int writable,
 		mmap_file->read_bytes=page_read_bytes; 
 
 		void *aux=mmap_file;
-		// printf ("mmap page : %p, offset : %d, read : %d\n", addr, offset, page_read_bytes);
+		printf ("mmap page : %p, offset : %d, read : %d\n", addr, offset, page_read_bytes);
 		if(!vm_alloc_page_with_initializer(VM_FILE, addr, writable, 
 			lazy_file_segment, aux)){
 				return NULL;
