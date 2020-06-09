@@ -110,6 +110,7 @@ lazy_file_segment(struct page *page, void *aux){
 	}
 
 	pml4_set_dirty(thread_current()->pml4, f->va, 0);
+	page -> lazy_file = false;
 
 	return true;
 }
@@ -151,6 +152,7 @@ do_mmap (void *addr, size_t length, int writable,
 		page->file.f=mmap_file->file;
 		page->file.ofs=mmap_file->ofs;
 		page->file.read_bytes=mmap_file->read_bytes;
+		page -> lazy_file = true;
 
 		length-=page_read_bytes;
 		addr+=PGSIZE;
