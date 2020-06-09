@@ -66,7 +66,7 @@ anon_swap_in (struct page *page, void *kva) {
 				kva + (512 * i));
 		}
 	}
-	disk_print_stats();
+	// disk_print_stats();
 
 	anon_page -> disk_location = -1;
 	disk_table[disk_sector] = false;

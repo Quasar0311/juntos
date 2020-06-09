@@ -33,7 +33,7 @@ bool
 file_map_initializer (struct page *page, enum vm_type type, void *kva) {
 	/* Set up the handler */
 	page->operations = &file_ops;
-	// printf("file map initializer\n");
+	printf("file map initializer\n");
 
 	struct file_page *file_page = &page->file;
 
@@ -44,7 +44,8 @@ file_map_initializer (struct page *page, enum vm_type type, void *kva) {
 static bool
 file_map_swap_in (struct page *page, void *kva) {
 	struct file_page *file_page = &page->file;
-
+	// printf("In\n");
+	/*** file into addr ***/
 	file_read_at(file_page->f, kva, 
 		(off_t)file_page->read_bytes, file_page->ofs);
 
@@ -56,8 +57,9 @@ static bool
 file_map_swap_out (struct page *page) {
 	struct file_page *file_page = &page->file;
 	struct thread *curr = thread_current();
-
+	// printf("Out\n");
 	if (pml4_is_dirty(curr -> pml4, page -> va)) {
+		/*** writes page->va into file_page->f ***/
 		file_write_at(file_page->f, page->va, 
 			(off_t)file_page->read_bytes, file_page->ofs);
 	}

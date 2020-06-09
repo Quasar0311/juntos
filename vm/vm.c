@@ -55,6 +55,7 @@ bool
 vm_alloc_page_with_initializer (enum vm_type type, void *upage, bool writable,
 		vm_initializer *init, void *aux) {
 	ASSERT (VM_TYPE(type) != VM_UNINIT)
+	// printf("vm alloc page with initializer: %p\n", upage);
 
 	struct supplemental_page_table *spt = &thread_current ()->spt;
 	
@@ -261,12 +262,12 @@ vm_try_handle_fault (struct intr_frame *f, void *addr,
 	struct supplemental_page_table *spt = &thread_current ()->spt;
 	struct page *page = spt_find_page(spt, addr);
 	void *rsp=(void *)f->rsp;
+	struct mmap_file *mmap_file;
 	/* TODO: Validate the fault */
 	/* TODO: Your code goes here */
 	// if(page==NULL) printf("page is null\n");
 	// if(is_kernel_vaddr(addr)) printf("is kernel vaddr\n");
 	// if(user) rsp=(void *)f->rsp;
-	
 	if(!user){
 		rsp=thread_current()->kernel_rsp;
 	}
@@ -285,6 +286,18 @@ vm_try_handle_fault (struct intr_frame *f, void *addr,
 
 	if (page -> unmapped) {
 		return false;
+	}
+
+	if (page -> mapped) {
+		mmap_file = page -> aux;
+		// printf("map : %d\n", (mmap_file -> length / 4096));
+		if ((mmap_file -> length / 4096) > 1) {
+			for (int i = 0; i < ((mmap_file -> length / 4096) + 1); i++) {
+				page = spt_find_page(spt, addr);
+				vm_do_claim_page(page);
+				addr += 4096;
+			}
+		}
 	}
 
 	/*** bogus page fault ***/
@@ -339,7 +352,7 @@ vm_do_claim_page (struct page *page) {
 	// pml4_set_dirty(curr -> pml4, page -> va, false);
 	// printf("add frame to lru list: %p\n", frame->page->anon.disk_location);
 	add_frame_to_lru_list(frame);
-	
+	printf("swap in: %p\n", page->va);
 	return swap_in (page, frame->kva);
 }
 
