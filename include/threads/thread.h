@@ -5,6 +5,11 @@
 #include <list.h>
 #include <stdint.h>
 #include "threads/interrupt.h"
+#include "threads/synch.h"
+#ifdef VM
+#include "vm/vm.h"
+#endif
+
 
 /* States in a thread's life cycle. */
 enum thread_status {
@@ -24,6 +29,7 @@ typedef int tid_t;
 #define PRI_DEFAULT 31                  /* Default priority. */
 #define PRI_MAX 63                      /* Highest priority. */
 
+typedef int pid_t;
 /* A kernel thread or user process.
  *
  * Each thread structure is stored in its own 4 kB page.  The
@@ -89,17 +95,73 @@ struct thread {
 	int priority;                       /* Priority. */
 	int64_t alarm;						/* Used for alarm ticks. */
 
+	int64_t alarm;						/*** Used for alarm ticks. ***/
+
+	int init_priority;
+	int priority_saver;					/*** Take care about when priority changes while donation.***/
+	struct list donations;
+	struct list_elem donation_elem;
+	struct lock *lock_waiting;
+
 	/* Shared between thread.c and synch.c. */
 	struct list_elem elem;              /* List element. */
+	
+	struct list_elem all_elem;			/*** all_list element ***/
 
-#ifdef USERPROG
+#ifdef USERPROG	
 	/* Owned by userprog/process.c. */
 	uint64_t *pml4;                     /* Page map level 4 */
+
+	/*** file descriptor table ***/
+	struct file **fd_table;
+	/*** size of fd of current table+ 1 ***/
+	int next_fd;
+	int max_fd;
+
+	/*** parent descriptor, pointer of parent process ***/
+	struct thread *parent;
+	/*** child_list element ***/
+	struct list_elem child_elem;
+	struct list child_list;
+
+	/*** True: process program memory loaded ***/
+	bool process_load;
+	/*** True: process terminated ***/
+	bool process_terminate;
+	/*** exit semaphore ***/
+	struct semaphore exit_sema;
+	struct semaphore child_sema;
+	/*** load semaphore ***/
+	struct semaphore load_sema;
+	int exit_status;
+
+	pid_t pid;
+
+	struct file *run_file;
+	int std_out;
+	int std_in;
+
+#endif
+#ifdef VM
+	/* Table for whole virtual memory owned by thread. */
+	struct supplemental_page_table spt;
+
+	struct list mmap_list;
+
+	void *kernel_rsp;
 #endif
 
 	/* Owned by thread.c. */
 	struct intr_frame tf;               /* Information for switching */
+	struct intr_frame fork_frame;
 	unsigned magic;                     /* Detects stack overflow. */
+
+	/*** advanced scheduler ***/
+	int nice;
+	int recent_cpu;
+	
+	
+
 };
 
 /* If false (default), use round-robin scheduler.
@@ -110,8 +172,6 @@ extern bool thread_mlfqs;
 /*** Prototype for alarm functions. ***/
 void thread_sleep (int64_t ticks);
 void thread_wakeup (int64_t ticks);
-void earliest_time (int64_t ticks);
-
 
 void thread_init (void);
 void thread_start (void);
@@ -124,6 +184,8 @@ tid_t thread_create (const char *name, int priority, thread_func *, void *);
 
 void thread_block (void);
 void thread_unblock (struct thread *);
+/*** compares the priority of two threads A and B ***/
+bool priority_less_func(const struct list_elem *a, const struct list_elem *b, void *aux UNUSED);
 
 struct thread *thread_current (void);
 tid_t thread_tid (void);
@@ -134,6 +196,14 @@ void thread_yield (void);
 
 int thread_get_priority (void);
 void thread_set_priority (int);
+/*** scheduling by comparing current thread's priority 
+and highest thread's priority ***/
+void cmp_max_priority(void);
+
+/*** priority donation function. ***/
+void priority_donation (struct lock *lock);
+void remove_lock (struct lock *lock);
+void restore_priority (void);
 
 int thread_get_nice (void);
 void thread_set_nice (int);
@@ -141,5 +211,11 @@ int thread_get_recent_cpu (void);
 int thread_get_load_avg (void);
 
 void do_iret (struct intr_frame *tf);
+
+void mlfqs_priority(struct thread *t);
+void mlfqs_recent_cpu(struct thread *t);
+void mlfqs_load_avg(void);
+void mlfqs_incr_cpu(void);
+void mlfqs_all(void);
 
 #endif /* threads/thread.h */

@@ -27,8 +27,10 @@
 #include "userprog/gdt.h"
 #include "userprog/syscall.h"
 #include "userprog/tss.h"
-#else
+#endif
 #include "tests/threads/tests.h"
+#ifdef VM
+#include "vm/vm.h"
 #endif
 #ifdef FILESYS
 #include "devices/disk.h"
@@ -46,6 +48,8 @@ static bool format_filesys;
 
 /* -q: Power off after kernel tasks complete? */
 bool power_off_when_done;
+
+bool thread_tests;
 
 static void bss_init (void);
 static void paging_init (uint64_t mem_end);
@@ -106,6 +110,10 @@ main (void) {
 	/* Initialize file system. */
 	disk_init ();
 	filesys_init (format_filesys);
+#endif
+
+#ifdef VM
+	vm_init ();
 #endif
 
 	printf ("Boot complete.\n");
@@ -216,6 +224,8 @@ parse_options (char **argv) {
 #ifdef USERPROG
 		else if (!strcmp (name, "-ul"))
 			user_page_limit = atoi (value);
+		else if (!strcmp (name, "-threads-tests"))
+			thread_tests = true;
 #endif
 		else
 			PANIC ("unknown option `%s' (use -h for help)", name);
@@ -231,7 +241,11 @@ run_task (char **argv) {
 
 	printf ("Executing '%s':\n", task);
 #ifdef USERPROG
-	process_wait (process_create_initd (task));
+	if (thread_tests){
+		run_test (task);
+	} else {
+		process_wait (process_create_initd (task));
+	}
 #else
 	run_test (task);
 #endif
