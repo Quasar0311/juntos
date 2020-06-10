@@ -132,6 +132,9 @@ struct thread {
 	struct semaphore child_sema;
 	/*** load semaphore ***/
 	struct semaphore load_sema;
+
+	struct semaphore wait_sema;
+
 	int exit_status;
 
 	pid_t pid;
