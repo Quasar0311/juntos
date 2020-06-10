@@ -328,10 +328,8 @@ __do_fork (void *aux) {
 
 	/*** if memory load finish, resume parent process ***/
 	sema_up(&thread_current()->parent->load_sema);
-	// for (int i = 0; i < 1000000000; i++) {
-	// 	;
-	// }
 	sema_down(&thread_current() -> parent -> wait_sema);
+	
 	process_init ();
 
 	// lock_acquire(&page_lock);
