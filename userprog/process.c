@@ -32,9 +32,9 @@ static void __do_fork (void *);
 
 struct lock writable_lock;
 
-struct lock lazy_lock;
+// struct lock lazy_lock;
 
-struct lock page_lock;
+// struct lock page_lock;
 
 int 
 process_add_file(struct file *f){
@@ -148,9 +148,9 @@ process_create_initd (const char *file_name) { //process_execute
 	char *token, *save_ptr;
 
 	lock_init(&writable_lock);
-	lock_init(&lazy_lock);
+	// lock_init(&lazy_lock);
 
-	lock_init(&page_lock);
+	// lock_init(&page_lock);
 
 	for (token = strtok_r(file_title, " ", &save_ptr); token != NULL;
 	token = strtok_r(NULL, " ", &save_ptr)) {
@@ -340,6 +340,7 @@ __do_fork (void *aux) {
 	}
 
 error:
+	// printf("__do_fork error\n");
 	parent->process_load=false;
 	sema_up(&thread_current()->parent->load_sema);
 	thread_exit ();
@@ -379,7 +380,7 @@ process_exec (void *f_name) { //start_process
 	
 	/* If load failed, quit. */
 	if (!success){
-		// printf("load failed\n");
+		printf("load failed\n");
 		return -1;
 	}
 	
@@ -444,6 +445,8 @@ process_wait (tid_t child_tid) {
 	}
 	return -1;
 }
+
+// struct lock clean_lock;
 
 /* Exit the process. This function is called by thread_exit (). */
 void
@@ -1000,16 +1003,14 @@ load_segment (struct file *file, off_t ofs, uint8_t *upage,
 		load_file->read_bytes=page_read_bytes;
 		load_file->zero_bytes=page_zero_bytes; 
 		// load_file->inode=file_get_inode(file);
-		// printf("load segment: %d, offset : %d\n", page_read_bytes, ofs);
+		printf("load segment: %ld, offset : %d, upage: %p\n", page_read_bytes, ofs, upage);
 
 		void *aux = load_file;
 		
-		// lock_acquire(&lazy_lock);
 		if (!vm_alloc_page_with_initializer (VM_ANON, upage,
 					writable, lazy_load_segment, aux)){
 						return false;
 					}
-		// lock_release(&lazy_lock);
 		
 		/* Advance. */
 		read_bytes -= page_read_bytes;

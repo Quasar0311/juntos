@@ -159,10 +159,16 @@ static void
 pt_destroy (uint64_t *pt) {
 	for (unsigned i = 0; i < PGSIZE / sizeof(uint64_t *); i++) {
 		uint64_t *pte = ptov((uint64_t *) pt[i]);
-		if (((uint64_t) pte) & PTE_P)
+		if (((uint64_t) pte) & PTE_P){
+			// printf("pt_destroy: %p\n", (void *)PTE_ADDR(pte));
 			palloc_free_page ((void *) PTE_ADDR (pte));
+			// printf("pt_destroy success: %p\n", (void *)PTE_ADDR(pte));
+		}
 	}
+	// printf("palloc free page: %p\n", (void *)pt);
 	palloc_free_page ((void *) pt);
+	// printf("palloc free page success: %p\n", (void *)pt);
+
 }
 
 static void
@@ -194,7 +200,7 @@ pml4_destroy (uint64_t *pml4) {
 
 	/* if PML4 (vaddr) >= 1, it's kernel space by define. */
 	uint64_t *pdpe = ptov ((uint64_t *) pml4[0]);
-	if (((uint64_t) pdpe) & PTE_P)
+	if (((uint64_t) pdpe) & PTE_P )
 		pdpe_destroy ((void *) PTE_ADDR (pdpe));
 	palloc_free_page ((void *) pml4);
 }

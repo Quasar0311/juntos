@@ -22,12 +22,12 @@ test_main (void)
 {
 	size_t i;
     char *mem;
-
+    
     for (i = 0 ; i < PAGE_COUNT ; i++) {
         mem = (big_chunks+(i*PAGE_SIZE));
         *mem = (char)i;
     }
-
+    
     for (i = 0 ; i < PAGE_COUNT ; i++) {
         mem = (big_chunks+(i*PAGE_SIZE));
         if((char)i != *mem) {

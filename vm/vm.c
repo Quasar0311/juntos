@@ -146,7 +146,6 @@ spt_insert_page (struct supplemental_page_table *spt,
 
 void
 spt_remove_page (struct supplemental_page_table *spt, struct page *page) {
-
 	lock_acquire(&hash_lock);
 	hash_delete(&spt->vm, &page->page_elem);
 	pml4_clear_page(thread_current() -> pml4, page -> va);
@@ -250,7 +249,6 @@ vm_get_frame (void) {
 	frame->kva=kva; 
 	frame->page=NULL;
 
-	
 	// add_frame_to_lru_list(frame);
 
 	ASSERT (frame != NULL);
@@ -291,6 +289,7 @@ vm_try_handle_fault (struct intr_frame *f, void *addr,
 	// if(is_kernel_vaddr(addr)) printf("is kernel vaddr\n");
 	// if(user) rsp=(void *)f->rsp;
 	// printf("fault : %p\n", addr);
+	printf("vm try handle fault: %p, round: %p\n", addr, pg_round_down(addr));
 
 	if(!user){
 		rsp=thread_current()->kernel_rsp;
@@ -305,12 +304,14 @@ vm_try_handle_fault (struct intr_frame *f, void *addr,
 	/*** valid page fault ***/
 	if(page==NULL || is_kernel_vaddr(addr)|| !not_present){
 		if(page!=NULL) free(page);
+		printf("valid page fault: %p\n", addr);
 		return false;
 	}
 
 	if (page -> unmapped) {
 		return false;
 	}
+
 	if (page -> lazy_file) {
 		mmap_file = page -> aux;
 		// printf("map : %d\n", (mmap_file -> length / 4096));
@@ -439,8 +440,8 @@ supplemental_page_table_copy (struct supplemental_page_table *dst,
 		// printf("memcpy begin: %p\n", p->frame->kva);
 		if(p->frame!=NULL)
 			memcpy(newpage->frame->kva, p->frame->kva, PGSIZE);
-		// printf("memcpy finish\n");
 		// if(page_get_type(p)==VM_FILE) printf("vm file\n");
+		// printf("spt copy va: %p, kva: %p\n", newpage->va, newpage->frame->kva);
 	}
 	
 	lock_release(&hash_lock);

@@ -17,14 +17,17 @@ test_main (void)
   
 	/* Spawn children */
     for(i =0; i < CHILD_CNT; i++) {
+    msg("fork child");
 	  child[i] = fork("child-swap");
 	  if (child[i] == 0) {
+      msg("child exec");
 	  	if(exec ("child-swap") == -1)
             fail("exec \"child-swap\"");
 	  }
     }
 	/* Wait for children */
     for(i =0; i < CHILD_CNT; i++) {
+      msg("wait child");
   	  if(wait (child[i]) != 0)
           fail("More than one child process' stack is corrupted");
     }
