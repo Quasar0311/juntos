@@ -262,7 +262,7 @@ vm_get_frame (void) {
 static bool
 vm_stack_growth (void *addr) {
 	void *pg_addr=pg_round_down(addr);
-
+	// printf("stack grow\n");
 	if(!vm_alloc_page_with_initializer(VM_ANON, pg_round_down(addr), true, NULL, NULL))
 		return false;
 	if(!vm_claim_page(pg_addr))
@@ -297,6 +297,7 @@ vm_try_handle_fault (struct intr_frame *f, void *addr,
 	}
 	
 	if (page == NULL) {
+		// printf("stack : %p\n", rsp);
 		if(addr >= rsp - 8 && addr+PGSIZE<(void *)USER_STACK+1024*1024){
 			return vm_stack_growth(addr);
 		}
@@ -418,7 +419,7 @@ supplemental_page_table_copy (struct supplemental_page_table *dst,
 
 	hash_first(&i, &src -> vm);
 	// printf("copy\n");
-	while (hash_next(&i)) {
+	while (hash_next(&i) != NULL) {
 		struct page *p, *newpage;
 
 		p=hash_entry(hash_cur(&i), struct page, page_elem);
@@ -442,7 +443,7 @@ supplemental_page_table_copy (struct supplemental_page_table *dst,
 		// printf("memcpy finish\n");
 		// if(page_get_type(p)==VM_FILE) printf("vm file\n");
 	}
-	
+	// printf("fork copy spt\n");
 	lock_release(&hash_lock);
 
 	return true;

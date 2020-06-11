@@ -325,14 +325,17 @@ __do_fork (void *aux) {
 
 	parent->process_load=true;
 
-
+	// printf("do fork middle1\n");
 	/*** if memory load finish, resume parent process ***/
 	sema_up(&thread_current()->parent->load_sema);
+	// printf("do fork middle 2\n");
+	// printf("sema : %p, tid : %d\n", &thread_current() -> parent -> wait_sema, current -> tid);
 	sema_down(&thread_current() -> parent -> wait_sema);
-	
+	// printf("do fork middle 3\n");
 	process_init ();
-
+	// printf("do fork middle 4\n");
 	// lock_acquire(&page_lock);
+	// printf("do fork finish\n");
 	
 	/* Finally, switch to the newly created process. */
 	if (succ) {
@@ -358,6 +361,10 @@ process_exec (void *f_name) { //start_process
 	struct intr_frame _if;
 	struct thread *curr=thread_current();
 
+	// printf("file name : %p\n", file_name);
+	char *file_copy = malloc(strlen(file_name) + 1);
+	memcpy(file_copy, file_name, strlen(file_name) + 1);
+
 	_if.ds = _if.es = _if.ss = SEL_UDSEG;
 	_if.cs = SEL_UCSEG;
 	_if.eflags = FLAG_IF | FLAG_MBS;
@@ -368,14 +375,14 @@ process_exec (void *f_name) { //start_process
 	/* We first kill the current context */
 	// printf("process cleanup\n");
 	// supplemental_page_table_kill(&curr -> spt);
-	// process_cleanup ();
+	process_cleanup ();
 
 	/* And then load the binary */
 	if (curr -> tid > 3) lock_acquire(&writable_lock);
 	
 	// lock_acquire(&page_lock);
 	supplemental_page_table_init(&curr->spt);
-	success = load (file_name, &_if);
+	success = load (file_copy, &_if);
 	
 	/* If load failed, quit. */
 	if (!success){
@@ -423,7 +430,7 @@ process_wait (tid_t child_tid) {
 	if (child -> tid != child_tid) {
 		return -1;
 	}
-	// printf("sema_Down\n");
+	// printf("sema_Down : %d\n", child_tid);
 	if (curr -> tid > 1) sema_up(&curr -> wait_sema);
 	sema_down(&child -> exit_sema);
 	// printf("sd\n");
@@ -504,6 +511,7 @@ process_cleanup (void) {
 	}
 
 	// supplemental_page_table_kill(&curr->spt);
+	// printf("problem\n");
 
 #endif
 
@@ -617,9 +625,10 @@ load (const char *file_name, struct intr_frame *if_) {
 	char *file_copy_argc = palloc_get_page(0);
 	char *file_copy_argv = palloc_get_page(0);
 	char *file_title = palloc_get_page(0);
-	strlcpy(file_copy_argc, file_name, strlen(file_name) + 1);
-	strlcpy(file_copy_argv, file_name, strlen(file_name) + 1);
-	strlcpy(file_title, file_name, strlen(file_name) + 1);
+	// printf("%p\n", file_name);
+	memcpy(file_copy_argc, file_name, strlen(file_name) + 1);
+	memcpy(file_copy_argv, file_name, strlen(file_name) + 1);
+	memcpy(file_title, file_name, strlen(file_name) + 1);
 
 	/* Allocate and activate page directory. */
 	t->pml4 = pml4_create ();
@@ -1032,7 +1041,7 @@ setup_stack (struct intr_frame *if_) {
 	 * TODO: If success, set the rsp accordingly.
 	 * TODO: You should mark the page is stack. */
 	/* TODO: Your code goes here */ 
-	// printf("stack setup\n");
+	// printf("stack setup : %p\n", stack_bottom);
 	vm_alloc_page_with_initializer(VM_ANON, stack_bottom, true, NULL, NULL);
 	success=vm_claim_page(stack_bottom);
 	if(success){
