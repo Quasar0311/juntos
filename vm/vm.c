@@ -282,6 +282,7 @@ vm_try_handle_fault (struct intr_frame *f, void *addr,
 	struct page *page = spt_find_page(spt, addr);
 	void *rsp=(void *)f->rsp;
 	struct mmap_file *mmap_file;
+	struct page *newpage;
 
 	/* TODO: Validate the fault */
 	/* TODO: Your code goes here */
@@ -289,8 +290,12 @@ vm_try_handle_fault (struct intr_frame *f, void *addr,
 	// if(is_kernel_vaddr(addr)) printf("is kernel vaddr\n");
 	// if(user) rsp=(void *)f->rsp;
 	// printf("fault : %p\n", addr);
-	printf("vm try handle fault: %p, round: %p\n", addr, pg_round_down(addr));
+	// printf("vm try handle fault: %p, round: %p\n", addr, pg_round_down(addr));
 
+	// if(page->writable==false){
+	// 	printf("copy on write\n");
+	// }
+	
 	if(!user){
 		rsp=thread_current()->kernel_rsp;
 	}
@@ -304,7 +309,7 @@ vm_try_handle_fault (struct intr_frame *f, void *addr,
 	/*** valid page fault ***/
 	if(page==NULL || is_kernel_vaddr(addr)|| !not_present){
 		if(page!=NULL) free(page);
-		printf("valid page fault: %p\n", addr);
+		// printf("valid page fault: %p\n", addr);
 		return false;
 	}
 
@@ -323,7 +328,7 @@ vm_try_handle_fault (struct intr_frame *f, void *addr,
 			}
 		}
 	}
-	
+
 	/*** bogus page fault ***/
 	return vm_do_claim_page (page); 
 }
@@ -415,36 +420,54 @@ supplemental_page_table_copy (struct supplemental_page_table *dst,
 	struct page *page;
 	struct thread *curr = thread_current();
 	
-	lock_acquire(&hash_lock);
+	// lock_acquire(&hash_lock);
 
 	hash_first(&i, &src -> vm);
 	// printf("copy\n");
 	while (hash_next(&i)) {
 		struct page *p, *newpage;
+		void *kva;
 
 		p=hash_entry(hash_cur(&i), struct page, page_elem);
 		
-		if(!vm_alloc_page_with_initializer(page_get_type(p), p->va, 
-			p->writable, p->init, p->aux)) {
-				lock_release(&hash_lock);
-				return false;
-		}
+		// if(!vm_alloc_page_with_initializer(page_get_type(p), p->va, 
+		// 	p->writable, p->init, p->aux)) {
+		// 		lock_release(&hash_lock);
+		// 		return false;
+		// }
 
-		if(!vm_claim_page(p->va)) {
-			lock_release(&hash_lock);
-			return false;
-		}
+		// if(!vm_claim_page(p->va)) {
+		// 	printf("vm claim page failed\n");
+		// 	// lock_release(&hash_lock);
+		// 	return false;
+		// }
+		memcpy(p->frame->kva, kva, PGSIZE);
+		vm_do_claim_page(p);
+		del_frame_from_lru_list(p->frame->kva;
+		free(p->frame->kva);
+		p->frame->kva=kva;
+
+		// printf("pml4 set page va: %p, kva: %p", p->va, p->frame->kva);
+		// if(!pml4_set_page(curr->pml4, p->va, p->frame->kva, p->writable)){
+		// 	printf("pml4 set page failed\n");
+		// 	__free_frame(frame);
+		// 	return false;
+		// }
+		// printf("pml4 set page finished\n");
 
 		// printf("spt find page begin\n");
 		newpage=spt_find_page(dst, p->va);
+		// newpage=p;
 		// printf("memcpy begin: %p\n", p->frame->kva);
 		if(p->frame!=NULL)
 			memcpy(newpage->frame->kva, p->frame->kva, PGSIZE);
 		// if(page_get_type(p)==VM_FILE) printf("vm file\n");
 		// printf("spt copy va: %p, kva: %p\n", newpage->va, newpage->frame->kva);
+		p->writable=false;
+		newpage->writable=false;
 	}
 	
-	lock_release(&hash_lock);
+	// lock_release(&hash_lock);
 
 	return true;
 }

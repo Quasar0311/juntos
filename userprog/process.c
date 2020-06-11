@@ -325,7 +325,6 @@ __do_fork (void *aux) {
 
 	parent->process_load=true;
 
-
 	/*** if memory load finish, resume parent process ***/
 	sema_up(&thread_current()->parent->load_sema);
 	sema_down(&thread_current() -> parent -> wait_sema);
@@ -344,7 +343,6 @@ error:
 	parent->process_load=false;
 	sema_up(&thread_current()->parent->load_sema);
 	thread_exit ();
-	
 }
 
 /* Switch the current execution context to the f_name.
@@ -380,7 +378,7 @@ process_exec (void *f_name) { //start_process
 	
 	/* If load failed, quit. */
 	if (!success){
-		printf("load failed\n");
+		// printf("load failed\n");
 		return -1;
 	}
 	
@@ -1003,7 +1001,7 @@ load_segment (struct file *file, off_t ofs, uint8_t *upage,
 		load_file->read_bytes=page_read_bytes;
 		load_file->zero_bytes=page_zero_bytes; 
 		// load_file->inode=file_get_inode(file);
-		printf("load segment: %ld, offset : %d, upage: %p\n", page_read_bytes, ofs, upage);
+		// printf("load segment: %ld, offset : %d, upage: %p\n", page_read_bytes, ofs, upage);
 
 		void *aux = load_file;
 		

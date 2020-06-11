@@ -27,7 +27,7 @@ test_main (void)
 
 		pa_child = get_phys_addr((void*)large);
 		CHECK (pa_parent == pa_child, "two phys addrs should be the same.");
-
+		
 		large[0] = '@';
 		CHECK (memcmp (buf, large, strlen (buf)) != 0, "check data change");
 

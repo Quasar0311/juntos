@@ -143,6 +143,8 @@ page_fault (struct intr_frame *f) {
 	write = (f->error_code & PF_W) != 0;
 	user = (f->error_code & PF_U) != 0;
 
+	// printf("copy on write: %d\n", spt_find_page(&thread_current()->spt, fault_addr)->writable);
+
 	/*** page fault in the kernel merely sets rax to -1 
 	and copies its former value into %rip ***/
 	// if(!user){
@@ -163,7 +165,7 @@ page_fault (struct intr_frame *f) {
 	/* Count page faults. */
 	page_fault_cnt++;
 
-	// syscall_exit(-1);
+	syscall_exit(-1);
 
 	/* If the fault is true fault, show info and exit. */
 	printf ("Page fault at %p: %s error %s page in %s context.\n",
