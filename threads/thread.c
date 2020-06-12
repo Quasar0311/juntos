@@ -403,7 +403,6 @@ thread_exit (void) {
 	ASSERT (!intr_context ());
 
 #ifdef USERPROG
-	// printf("th exit\n");
 	curr -> process_terminate = true;
 	for (e = list_begin(&curr -> child_list); e != list_end(&curr -> child_list)
 	; e = list_next(e)) {
@@ -412,17 +411,9 @@ thread_exit (void) {
 		sema_up(&child -> child_sema);
 	}
 	
-	// sema_up(&curr -> exit_sema);
-	// if (curr -> run_file != NULL) file_allow_write(curr->run_file);
-	// sema_down(&curr -> child_sema);
-	
-	// printf("p exit\n");
-	process_exit ();
-	// supplemental_page_table_kill (&curr->spt);
 
-	// sema_up(&curr -> exit_sema);
-	// if (curr -> run_file != NULL) file_allow_write(curr->run_file);
-	// sema_down(&curr -> child_sema);
+	process_exit ();
+
 #endif
 
 	/* Just set our status to dying and schedule another process.

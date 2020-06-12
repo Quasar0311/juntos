@@ -124,7 +124,6 @@ syscall_handler (struct intr_frame *f) {
 
 		/*** SYS_OPEN ***/
 		case 7:
-			// thread_current() -> tf.rsp = f -> rsp;
 			curr->kernel_rsp=f->rsp; 
 			
 			check_address(f -> R.rdi);
@@ -140,17 +139,8 @@ syscall_handler (struct intr_frame *f) {
 		case 9:
 			check_address(f -> R.rsi);
 			curr->kernel_rsp=f->rsp; 
-			// printf("rsi : %p, rsp: %p\n", f -> R.rsi, f->rsp);
-
-			// if(f->R.rsi >= (void *)f->rsp - 8 && f->R.rsi+PGSIZE<(void *)USER_STACK+1024*1024){
-			// 	printf("here\n");
-			// 	return vm_stack_growth(f->R.rsi);
-			// }
 			
 			if (f -> R.rsi < (void *) 0x600000) {
-			// if (f -> R.rsi > (void *) f->rsp) {
-			// if(spt_find_page(&curr->spt, (void *)f->R.rsi)->writable){
-				// printf("invalid address\n");
 				syscall_exit(-1);
 			}
 
@@ -159,7 +149,6 @@ syscall_handler (struct intr_frame *f) {
 		
 		/*** SYS_WRITE ***/
 		case 10:
-			// thread_current() -> tf.rsp = f -> rsp;
 			check_address(f -> R.rsi);
 			f -> R.rax = syscall_write((int) f -> R.rdi, (void *) f -> R.rsi, (unsigned) f -> R.rdx);
 			break; 
@@ -176,7 +165,6 @@ syscall_handler (struct intr_frame *f) {
 		
 		/*** SYS_CLOSE ***/
 		case 13:
-			// thread_current() -> tf.rsp = f -> rsp;
 			curr->kernel_rsp=f->rsp; 
 			
 			syscall_close((int)f->R.rdi);
@@ -189,8 +177,6 @@ syscall_handler (struct intr_frame *f) {
 
 		/*** SYS_MMAP ***/
 		case SYS_MMAP:
-			// printf("sys mmap\n");
-			// check_address(f->R.rdi);
 			f->R.rax=syscall_mmap((void *)f->R.rdi, (size_t)f->R.rsi, (int)f->R.rdx, 
 				(int)f->R.r10, (off_t)f->R.r8);
 			break;
@@ -224,7 +210,6 @@ check_address (uint64_t reg) {
 		syscall_exit(-1);
 	}
 
-	// return spt_find_page(&thread_current()->spt, (void *)&reg);
 }
 
 void
@@ -459,7 +444,7 @@ void *
 syscall_mmap (void *addr, size_t length, int writable, int fd, off_t offset){
 	void *va;
 	if(fd==0 || fd==1) return NULL;
-	// printf("syscall mmap addr: %p\n", addr);
+
 	if(length==0) return NULL;
 
 	if ((int) addr % 4096 != 0 || addr == NULL || addr==0) return NULL;

@@ -325,17 +325,11 @@ __do_fork (void *aux) {
 
 	parent->process_load=true;
 
-	// printf("do fork middle1\n");
 	/*** if memory load finish, resume parent process ***/
 	sema_up(&thread_current()->parent->load_sema);
-	// printf("do fork middle 2\n");
-	// printf("sema : %p, tid : %d\n", &thread_current() -> parent -> wait_sema, current -> tid);
 	sema_down(&thread_current() -> parent -> wait_sema);
-	// printf("do fork middle 3\n");
+
 	process_init ();
-	// printf("do fork middle 4\n");
-	// lock_acquire(&page_lock);
-	// printf("do fork finish\n");
 	
 	/* Finally, switch to the newly created process. */
 	if (succ) {
@@ -361,7 +355,6 @@ process_exec (void *f_name) { //start_process
 	struct intr_frame _if;
 	struct thread *curr=thread_current();
 
-	// printf("file name : %p\n", file_name);
 	char *file_copy = malloc(strlen(file_name) + 1);
 	memcpy(file_copy, file_name, strlen(file_name) + 1);
 
@@ -369,24 +362,17 @@ process_exec (void *f_name) { //start_process
 	_if.cs = SEL_UCSEG;
 	_if.eflags = FLAG_IF | FLAG_MBS;
 
-	/*** initialize hash table ***/
-	// supplemental_page_table_init(&curr->spt);
-
 	/* We first kill the current context */
-	// printf("process cleanup\n");
-	// supplemental_page_table_kill(&curr -> spt);
 	process_cleanup ();
 
 	/* And then load the binary */
 	if (curr -> tid > 3) lock_acquire(&writable_lock);
 	
-	// lock_acquire(&page_lock);
 	supplemental_page_table_init(&curr->spt);
 	success = load (file_copy, &_if);
 	
 	/* If load failed, quit. */
 	if (!success){
-		// printf("load failed\n");
 		return -1;
 	}
 	
@@ -430,15 +416,14 @@ process_wait (tid_t child_tid) {
 	if (child -> tid != child_tid) {
 		return -1;
 	}
-	// printf("sema_Down : %d\n", child_tid);
+	
 	if (curr -> tid > 1) sema_up(&curr -> wait_sema);
 	sema_down(&child -> exit_sema);
-	// printf("sd\n");
+	
 	for (e = list_begin(&thread_current() -> child_list); e != list_end(&thread_current() -> child_list); e = list_next(e)) {
 		child = list_entry(e, struct thread, child_elem);
 		if (child -> tid == child_tid && child -> exit_status != -2 && child -> exit_status != -1) {
 			sema_up(&child -> child_sema);
-			// printf("sema_up\n");
 			list_remove(e);
 			return child -> exit_status;
 		}
@@ -469,50 +454,36 @@ process_exit (void) {
 	}
 	
 	free(curr -> fd_table);
-	// printf("process exit\n");
+
 	/*** release file descriptor ***/
-	// supplemental_page_table_kill (&curr->spt);
 	process_cleanup ();
-	// printf("process cleanup finished\n");
 
 	lock_release(&writable_lock);
-	// lock_release(&page_lock);
 
 	sema_up(&curr -> exit_sema);
 	if (curr -> run_file != NULL) file_allow_write(curr->run_file);
-	// supplemental_page_table_kill (&curr->spt);
 	sema_down(&curr -> child_sema);
-	// printf("process exit\n");
 }
 
 /* Free the current process's resources. */
 static void
 process_cleanup (void) {
 	struct thread *curr = thread_current ();
-	// struct supplemental_page_table *spt = &curr -> spt;
 	struct list_elem *e=list_begin(&curr->mmap_list);
 	struct mmap_file *fp;
 #ifdef VM
-	// printf("cleanup mmap list: %ld\n", list_size(&curr->mmap_list));
 	while(e!=list_end(&curr->mmap_list) && curr -> exit_status != -1){
-		// struct page *p;
-		// printf("cleanup mmap list size: %ld\n", list_size(&curr->mmap_list));
 		fp=list_entry(e, struct mmap_file, file_elem);
 		if (fp == NULL) {
-			// printf("fp is null\n");
 			e = list_next(e);
 			continue;
 		}
-		// printf("fp va : %p\n", fp -> va);
-		// printf("fp list size : %d\n", list_size(&fp -> page_list));
 		syscall_munmap(fp -> va);
 		e=list_next(e);
 		free(fp);
 	}
 	supplemental_page_table_init(&curr->spt);
 	supplemental_page_table_kill(&curr->spt);
-	// supplemental_page_table_kill(&curr->spt);
-	// printf("problem\n");
 
 #endif
 
@@ -626,7 +597,7 @@ load (const char *file_name, struct intr_frame *if_) {
 	char *file_copy_argc = palloc_get_page(0);
 	char *file_copy_argv = palloc_get_page(0);
 	char *file_title = palloc_get_page(0);
-	// printf("%p\n", file_name);
+	
 	memcpy(file_copy_argc, file_name, strlen(file_name) + 1);
 	memcpy(file_copy_argv, file_name, strlen(file_name) + 1);
 	memcpy(file_title, file_name, strlen(file_name) + 1);
@@ -645,10 +616,10 @@ load (const char *file_name, struct intr_frame *if_) {
 				strlcpy(file_title, token, token_len + 1);
 				break;
 	}
-	// printf("a1\n");
+
 	/* Open executable file. */
 	file = filesys_open (file_title);
-	// printf("a2\n");
+
 	if (file == NULL) {
 		printf ("load: %s: open failed\n", file_title);
 		goto done;
@@ -672,7 +643,7 @@ load (const char *file_name, struct intr_frame *if_) {
 		printf ("load: %s: error loading executable\n", file_name);
 		goto done;
 	}
-	// printf("asdf\n");
+
 	/* Read program headers. */
 	file_ofs = ehdr.e_phoff;
 	for (i = 0; i < ehdr.e_phnum; i++) {
@@ -727,7 +698,7 @@ load (const char *file_name, struct intr_frame *if_) {
 				break;
 		}
 	}
-	// printf("setup stack ready\n");
+
 	/* Set up stack. */
 	if (!setup_stack (if_)){
 		printf("setup stack failed\n");
@@ -791,7 +762,6 @@ load (const char *file_name, struct intr_frame *if_) {
 
 done:
 	/* We arrive here whether the load is successful or not. */
-	// file_close (file); 
 	return success;
 }
 
@@ -951,24 +921,14 @@ lazy_load_segment (struct page *page, void *aux) {
 	struct load_file *f=aux;
 	void *kva=page->frame->kva;
 	struct thread *curr=thread_current();
-	// printf("lazy load segment: %ld, offset : %d\n", f -> read_bytes, f -> ofs);
-	
-	// lock_acquire(&lazy_lock);
-	// lock_acquire(&curr -> parent -> load_lock);
-	// printf("here : %s\n", curr -> parent -> name);
+
 	if(file_read_at(f->file, kva, (off_t)f->read_bytes, f->ofs)
 		<(off_t)f->read_bytes){
-			// lock_release(&lazy_lock);
 			return false;
 	}
-	// printf("current lock holding : %d\n", curr -> tid);
-	// lock_release(&lazy_lock);
-	// lock_release(&curr -> parent -> load_lock);
-	// printf("file read at finished : %d\n", f -> read_bytes);
-	
+
 	memset(kva+f->read_bytes, 0, f->zero_bytes); 
-	// syscall_lock_release();
-	// lock_release(&lazy_lock);
+
 	return true;
 }
 
@@ -992,7 +952,6 @@ load_segment (struct file *file, off_t ofs, uint8_t *upage,
 	ASSERT ((read_bytes + zero_bytes) % PGSIZE == 0);
 	ASSERT (pg_ofs (upage) == 0);
 	ASSERT (ofs % PGSIZE == 0);
-	// printf("load_segment\n");
 
 	while (read_bytes > 0 || zero_bytes > 0) {
 		/* Do calculate how to fill this page.
@@ -1009,17 +968,13 @@ load_segment (struct file *file, off_t ofs, uint8_t *upage,
 		load_file->ofs=ofs;
 		load_file->read_bytes=page_read_bytes;
 		load_file->zero_bytes=page_zero_bytes; 
-		// load_file->inode=file_get_inode(file);
-		// printf("load segment: %d, offset : %d\n", page_read_bytes, ofs);
 
 		void *aux = load_file;
 		
-		// lock_acquire(&lazy_lock);
 		if (!vm_alloc_page_with_initializer (VM_ANON, upage,
 					writable, lazy_load_segment, aux)){
 						return false;
 					}
-		// lock_release(&lazy_lock);
 		
 		/* Advance. */
 		read_bytes -= page_read_bytes;
@@ -1037,23 +992,16 @@ setup_stack (struct intr_frame *if_) {
 	void *stack_bottom = (void *) (((uint8_t *) USER_STACK) - PGSIZE);
 	struct thread *curr=thread_current();
 
-	// lock_acquire(&page_lock);
 	/* TODO: Map the stack on stack_bottom and claim the page immediately.
 	 * TODO: If success, set the rsp accordingly.
 	 * TODO: You should mark the page is stack. */
 	/* TODO: Your code goes here */ 
-	// printf("stack setup : %p\n", stack_bottom);
 	vm_alloc_page_with_initializer(VM_ANON, stack_bottom, true, NULL, NULL);
 	success=vm_claim_page(stack_bottom);
 	if(success){
 		if_->rsp=USER_STACK;
 		spt_find_page(&curr->spt, stack_bottom)->is_loaded=true;
 	}
-	
-	// printf("setup stack: %p, success: %d\n", stack_bottom, success);
-	// printf(success ? "setup stack success\n" : "setup stack failed\n");
-	// if(!success) printf("setup stack really failed\n");
-	// if(success) printf("setup stack is 88\n");
 	
 	return success;
 }
