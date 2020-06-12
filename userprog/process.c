@@ -509,7 +509,8 @@ process_cleanup (void) {
 		e=list_next(e);
 		free(fp);
 	}
-
+	supplemental_page_table_init(&curr->spt);
+	supplemental_page_table_kill(&curr->spt);
 	// supplemental_page_table_kill(&curr->spt);
 	// printf("problem\n");
 

@@ -21,12 +21,14 @@ static const struct page_operations anon_ops = {
 
 static bool *disk_table;
 // int free_disk;
+struct lock disk_lock;
 
 /* Initialize the data for anonymous pages */
 void
 vm_anon_init (void) {
 	int size;
 	/* TODO: Set up the swap_disk. */
+	lock_init(&disk_lock);
 	swap_disk = disk_get(1, 1);
 	// printf("anon init\n");
 	size = (int) disk_size(swap_disk);
@@ -58,6 +60,7 @@ anon_swap_in (struct page *page, void *kva) {
 
 	int disk_sector = anon_page -> disk_location;
 
+	// printf("anon swap in\n");
 	// printf("swap in disk sector: %d, kva: %p, va : %p\n", disk_sector, kva, page -> va);
 	if (disk_sector != -1) {
 		for (int i = 0; i < 8; i++) {
@@ -79,7 +82,7 @@ anon_swap_out (struct page *page) {
 	int free_disk = -1;
 	void *page_addr = page -> frame -> kva;
 	int size = (int) disk_size(swap_disk);
-	// printf("swap_out\n");
+	// printf("size : %d\n", size);
 	// if(disk_table[free_disk+1]){
 		for (int i = 0; i < (size / 8); i++) {
 			if (!disk_table[i]) {
@@ -90,6 +93,7 @@ anon_swap_out (struct page *page) {
 		}
 	// }
 	// else free_disk=free_disk+1;
+	// printf("swap_out : %p, to disk : %d\n", page -> frame -> kva, free_disk);
 
 	if (free_disk == -1) PANIC("NO MORE DISK AREA");
 

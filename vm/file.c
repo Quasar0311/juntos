@@ -45,6 +45,7 @@ static bool
 file_map_swap_in (struct page *page, void *kva) {
 	struct file_page *file_page = &page->file;
 
+	// printf("file swap in\n");
 	file_read_at(file_page->f, kva, 
 		(off_t)file_page->read_bytes, file_page->ofs);
 

@@ -266,14 +266,18 @@ syscall_wait (pid_t pid) {
 
 bool
 syscall_create (const char *file, unsigned initial_size) {
+	lock_acquire(&filesys_lock);
 	if (!strcmp(file, "")) {
+		lock_release(&filesys_lock);
 		syscall_exit(-1);
 		return false;
 	}
 	else if (strlen(file) >= 511) {
+		lock_release(&filesys_lock);
 		return 0;
 	}
 	else {
+		lock_release(&filesys_lock);
 		return filesys_create(file, (off_t) initial_size);
 	}
 	
@@ -350,6 +354,7 @@ syscall_write(int fd, void *buffer, unsigned size){
 	struct thread *curr = thread_current();
 
 	lock_acquire(&filesys_lock);
+	// printf("writing : %d\n", curr -> tid);
 
 	if (fd == 0) {
 		syscall_exit(-1);

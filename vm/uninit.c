@@ -55,7 +55,7 @@ uninit_initialize (struct page *page, void *kva) {
 
 	init = page -> init;
 	aux = page -> aux;
-
+	// printf("uninit init\n");
 	// printf("uninit initialize : %p, type : %d, frame : %p\n", page -> va, uninit -> type, page -> frame -> kva);
 	// un=uninit->page_initializer (page, uninit->type, kva);
 	// printf(un ? "uninit true\n" : "uninit false\n");

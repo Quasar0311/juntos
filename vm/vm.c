@@ -8,6 +8,7 @@
 #include <hash.h>
 #include "threads/vaddr.h"
 #include "threads/mmu.h"
+#include "devices/disk.h"
 #include <stdio.h>
 #include <string.h>
 
@@ -187,15 +188,17 @@ vm_get_victim (void) {
 	// printf("vm get victim: %p\n", victim->page->va);
 
 	if(lru_clock==NULL){
-		// printf("lru clock is null\n");
+		// printf("lru list length : %d\n", list_size(&lru_list));
 		lru_clock=list_begin(&lru_list);
+		
 	} 
 
 	victim=list_entry(lru_clock, struct frame, lru_elem);
 	start=victim;
-
-	// printf("while: %p\n", victim->page->va);
+	pml4_set_accessed(curr -> pml4, victim -> page -> va, 1);
+	// printf("while: %p\n", victim-> kva);
 	while(pml4_is_accessed(curr->pml4, victim->page->va)){
+		// printf("loop in\n");
 		pml4_set_accessed(curr->pml4, victim->page->va, 0);
 
 		if(lru_clock==list_back(&lru_list)) 
@@ -207,7 +210,7 @@ vm_get_victim (void) {
 		
 		if(victim==start) return victim;
 	}
-
+	
 	return victim;
 }
 
@@ -218,7 +221,6 @@ vm_evict_frame (void) {
 	struct frame *victim = vm_get_victim ();
 	struct thread *curr=thread_current();
 	/* TODO: swap out the victim and return the evicted frame. */
-	// printf("vm evict frame\n");
 	// if(pml4_is_dirty(curr->pml4, victim->page->va))
 	swap_out(victim->page);
 
@@ -414,20 +416,32 @@ supplemental_page_table_copy (struct supplemental_page_table *dst,
 	void *frame_addr;
 	struct page *page;
 	struct thread *curr = thread_current();
-	
-	lock_acquire(&hash_lock);
 
+	// struct thread *c1 = list_entry(list_begin(&curr -> parent -> child_list), struct thread, child_elem);
+	struct disk *swap_disk = disk_get(1, 1);
+
+	lock_acquire(&hash_lock);
+	// if (c1 != NULL)
+	// 	src = &c1 -> spt;
 	hash_first(&i, &src -> vm);
 	// printf("copy\n");
 	while (hash_next(&i) != NULL) {
 		struct page *p, *newpage;
+		struct anon_page *anon_page;
+		
 
 		p=hash_entry(hash_cur(&i), struct page, page_elem);
+
+		
 		
 		if(!vm_alloc_page_with_initializer(page_get_type(p), p->va, 
 			p->writable, p->init, p->aux)) {
 				lock_release(&hash_lock);
 				return false;
+		}
+		
+		if (p -> operations ->type == 0) {
+			continue;
 		}
 
 		if(!vm_claim_page(p->va)) {
@@ -435,11 +449,17 @@ supplemental_page_table_copy (struct supplemental_page_table *dst,
 			return false;
 		}
 
+		
+		// printf("type : %d\n", p -> operations -> type);
 		// printf("spt find page begin\n");
 		newpage=spt_find_page(dst, p->va);
-		// printf("memcpy begin: %p\n", p->frame->kva);
-		if(p->frame!=NULL)
+
+		
+		// printf("memcpy begin: %p, %p\n", newpage -> frame -> kva, p->frame->kva);
+		if(p->frame!=NULL) {
+			// printf("copy readl\n");
 			memcpy(newpage->frame->kva, p->frame->kva, PGSIZE);
+		}
 		// printf("memcpy finish\n");
 		// if(page_get_type(p)==VM_FILE) printf("vm file\n");
 	}
@@ -452,6 +472,7 @@ supplemental_page_table_copy (struct supplemental_page_table *dst,
 static void
 vm_destroy_func(struct hash_elem *e, void *aux UNUSED){
 	destroy(hash_entry(e, struct page, page_elem));
+	pml4_clear_page(thread_current() -> pml4, hash_entry(e, struct page, page_elem));
 	// free(hash_entry(e, struct page, page_elem));
 
 	return;
@@ -464,6 +485,7 @@ supplemental_page_table_kill (struct supplemental_page_table *spt) { //vm_destro
 	 * TODO: writeback all the modified contents to the storage. */
 	lock_acquire(&hash_lock);
 	hash_destroy(&spt->vm, vm_destroy_func);
+	
 	lock_release(&hash_lock);
 
 	return;
