@@ -404,6 +404,7 @@ print_ata_string (char *string, size_t size) {
 static void
 select_sector (struct disk *d, disk_sector_t sec_no) {
 	struct channel *c = d->channel;
+	// printf("select sector sec_no: %d, capacity: %d\n", (int)sec_no, d->capacity);
 
 	ASSERT (sec_no < d->capacity);
 	ASSERT (sec_no < (1UL << 28));
