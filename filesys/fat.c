@@ -182,7 +182,7 @@ fat_create_chain (cluster_t clst) {
 
 	if(clst==0){
 		fat[ct]=EOChain;
-		printf("fat create chain clst is 0: %d\n", ct);
+		// printf("fat create chain clst is 0: %d\n", ct);
 	}
 
 	else{
