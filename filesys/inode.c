@@ -6,6 +6,7 @@
 #include "filesys/filesys.h"
 #include "filesys/free-map.h"
 #include "threads/malloc.h"
+#include "filesys/fat.h"
 
 /* Identifies an inode. */
 #define INODE_MAGIC 0x494e4f44
@@ -80,17 +81,18 @@ inode_create (disk_sector_t sector, off_t length) {
 		size_t sectors = bytes_to_sectors (length);
 		disk_inode->length = length;
 		disk_inode->magic = INODE_MAGIC;
-		if (free_map_allocate (sectors, &disk_inode->start)) {
+
+		if(fat_create_chain((cluster_t)disk_inode->start)){
 			disk_write (filesys_disk, sector, disk_inode);
 			if (sectors > 0) {
 				static char zeros[DISK_SECTOR_SIZE];
 				size_t i;
 
-				for (i = 0; i < sectors; i++) 
+				for (i = 0; i < sectors; i++)
 					disk_write (filesys_disk, disk_inode->start + i, zeros); 
 			}
 			success = true; 
-		} 
+		}
 		free (disk_inode);
 	}
 	return success;
@@ -158,11 +160,13 @@ inode_close (struct inode *inode) {
 		list_remove (&inode->elem);
 
 		/* Deallocate blocks if removed. */
-		if (inode->removed) {
-			free_map_release (inode->sector, 1);
-			free_map_release (inode->data.start,
-					bytes_to_sectors (inode->data.length)); 
-		}
+		// if (inode->removed) {
+			// free_map_release (inode->sector, 1);
+			// fat_remove_chain(inode->sector, 0);
+			// free_map_release (inode->data.start,
+			// 		bytes_to_sectors (inode->data.length)); 
+			// fat_remove_chain(inode->data.start, 0);
+		// }
 
 		free (inode); 
 	}
