@@ -14,10 +14,10 @@
 /* On-disk inode.
  * Must be exactly DISK_SECTOR_SIZE bytes long. */
 struct inode_disk {
-	disk_sector_t start;                /* First data sector. */
+	// disk_sector_t start;                /* First data sector. */
 	off_t length;                       /* File size in bytes. */
 	unsigned magic;                     /* Magic number. */
-	uint32_t unused[125];               /* Not used. */
+	// uint32_t unused[125];               /* Not used. */
 };
 
 /* Returns the number of sectors to allocate for an inode SIZE
@@ -34,7 +34,7 @@ struct inode {
 	int open_cnt;                       /* Number of openers. */
 	bool removed;                       /* True if deleted, false otherwise. */
 	int deny_write_cnt;                 /* 0: writes ok, >0: deny writes. */
-	struct inode_disk data;             /* Inode content. */
+	// struct inode_disk data;             /* Inode content. */
 };
 
 /* Returns the disk sector that contains byte offset POS within
@@ -82,21 +82,25 @@ inode_create (disk_sector_t sector, off_t length) {
 		disk_inode->length = length;
 		disk_inode->magic = INODE_MAGIC;
 		// if (free_map_allocate (sectors, &disk_inode->start)) {
-		printf("inode create: %d\n", disk_inode->start);
-		if(fat_create_chain((cluster_t)disk_inode->start)){
-			disk_write (filesys_disk, sector, disk_inode);
-			if (sectors > 0) {
-				printf("inode create sectors: %d\n", sectors);
-				static char zeros[DISK_SECTOR_SIZE];
-				size_t i;
+		// printf("inode create: %d\n", disk_inode->start);
+		// if(fat_create_chain((cluster_t)disk_inode->start)){
+		// 	disk_write (filesys_disk, sector, disk_inode);
+		// 	if (sectors > 0) {
+		// 		static char zeros[DISK_SECTOR_SIZE];
+		// 		size_t i;
 
-				for (i = 0; i < sectors; i++){
-					printf("inode create disk write\n");
-					disk_write (filesys_disk, disk_inode->start + i, zeros); 
-				}
-			}
-			success = true; 
+		// 		for (i = 0; i < sectors; i++){
+		// 			printf("inode create sectors: %d\n", sectors);
+		// 			disk_write (filesys_disk, disk_inode->start + i, zeros); 
+		// 		}
+		// 	}
+		// 	success = true; 
+		// }
+		
+		if(length>0){
+
 		}
+
 		free (disk_inode);
 	}
 	return success;
