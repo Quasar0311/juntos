@@ -282,7 +282,7 @@ thread_create (const char *name, int priority,
 	t->max_fd=256;
 
 	/*** allocate memory to fd table ***/
-	t->fd_table=calloc(256, sizeof(struct file*));
+	t->fd_table=calloc(256, sizeof(struct file *));
 	if (t -> fd_table == NULL) {
 		return TID_ERROR;
 	}

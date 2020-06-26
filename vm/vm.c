@@ -80,6 +80,7 @@ vm_alloc_page_with_initializer (enum vm_type type, void *upage, bool writable,
 				break;
 
 			case VM_PAGE_CACHE:
+				uninit_new(uninit_page, upage, init, type, aux, page_cahce_initializer);
 				break;
 		}
 
