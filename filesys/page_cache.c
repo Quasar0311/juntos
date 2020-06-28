@@ -3,7 +3,7 @@
 #include "vm/vm.h"
 #include "filesys/filesys.h"
 static bool page_cache_readahead (struct page *page, void *kva);
-static bool page_cache_writeback (struct page *page);
+static bool page_cache_writeback (/*struct page *page*/struct page_cache *p_writeback_entry);
 static void page_cache_destroy (struct page *page);
 
 /* DO NOT MODIFY this struct */
@@ -41,11 +41,31 @@ page_cache_initializer (struct page *page, enum vm_type type, void *kva) {
 /* Utilze the Swap in mechanism to implement readhead */
 static bool
 page_cache_readahead (struct page *page, void *kva) {
+
+}
+
+// static void
+// pc_writeback_entry(struct page_cache *p_writeback_entry){
+// 	if(p_writeback_entry->dirty)
+// 		disk_write(filesys_disk, pc->sector, pc->data);
+	
+// 	p_writeback_entry->dirty=false;
+// }
+
+void
+pc_writeback_all_entries(void){
+	for(int i=0; i<64; i++){
+		if(pc_table[i]!=NULL && pc_table[i]->dirty)
+			page_cache_writeback(pc_table[i]);
+	}
 }
 
 /* Utilze the Swap out mechanism to implement writeback */
 static bool
-page_cache_writeback (struct page *page) {
+page_cache_writeback (/*struct page *page*/struct page_cache *p_writeback_entry) {
+	disk_write(filesys_disk, p_writeback_entry->sector, p_writeback_entry->data);
+	p_writeback_entry->dirty=false;
+	return true;
 }
 
 /* Destory the page_cache. */
@@ -85,7 +105,8 @@ pc_select_victim(void){
 	pc=pc_table[pc_clock];
 
 	if(pc->dirty){
-		disk_write(filesys_disk, pc->sector, pc->data);
+		// disk_write(filesys_disk, pc->sector, pc->data);
+		page_cache_writeback(pc);
 	}
 
 	return pc;
@@ -95,10 +116,9 @@ static struct page_cache *
 pc_get(void){
 	struct page_cache *pc;
 
-	for(i=0; i<64; i++){
+	for(int i=0; i<64; i++){
 		if(pc_table[i]==NULL){
 			pc=(struct page_cache *)malloc(sizeof(struct page_cache));
-		
 			pc->data=(void *)(p_page_cache + i*DISK_SECTOR_SIZE);
 
 			return pc;
@@ -140,5 +160,23 @@ pc_read(disk_sector_t sector_idx, void *buffer, off_t bytes_read,
 bool
 pc_write(disk_sector_t sector_idx, void *buffer, off_t bytes_written,
     int chunk_size, int sector_ofs){
+	struct page_cache *pc;
 
+	pc=pc_lookup(sector_idx);
+
+	if(pc!=NULL){
+		memcpy(pc->data+sector_ofs, buffer+bytes_written, chunk_size);
+		pc->dirty=true;
+		return true;
+	}
+
+	pc=pc_get();
+
+	memcpy(pc->data+sector_ofs, buffer+bytes_written, chunk_size);
+
+	pc->sector=sector_idx;
+	pc->clock++;
+	pc->dirty=true;
+
+	return true;
 }
