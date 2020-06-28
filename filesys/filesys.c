@@ -8,6 +8,7 @@
 #include "filesys/directory.h"
 #include "devices/disk.h"
 #include "filesys/fat.h"
+#include "filesys/page_cache.h"
 
 /* The disk that contains the file system. */
 struct disk *filesys_disk;
@@ -49,6 +50,7 @@ filesys_done (void) {
 	/* Original FS */
 #ifdef EFILESYS
 	fat_close ();
+	pc_writeback_all_entries();
 #else
 	free_map_close ();
 #endif

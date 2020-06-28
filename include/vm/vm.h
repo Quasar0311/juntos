@@ -3,6 +3,7 @@
 #include <stdbool.h>
 #include "threads/palloc.h"
 #include <hash.h>
+#include "filesys/page_cache.h"
 
 enum vm_type {
 	/* page not initialized */
@@ -64,7 +65,7 @@ struct page {
 		struct anon_page anon;
 		struct file_page file;
 #ifdef EFILESYS
-		struct page_cache page_cache;
+		// struct page_cache page_cache;
 #endif
 	};
 };
