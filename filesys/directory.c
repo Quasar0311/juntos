@@ -135,7 +135,7 @@ dir_add (struct dir *dir, const char *name, disk_sector_t inode_sector) {
 	/* Check NAME for validity. */
 	if (*name == '\0' || strlen (name) > NAME_MAX)
 		return false;
-
+	printf("here1\n");
 	/* Check that NAME is not in use. */
 	if (lookup (dir, name, NULL, NULL))
 		goto done;
