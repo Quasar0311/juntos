@@ -2,7 +2,6 @@
 #include <debug.h>
 #include "filesys/inode.h"
 #include "threads/malloc.h"
-#include "filesys/inode.h"
 
 /* An open file. */
 struct file {
@@ -142,12 +141,6 @@ off_t
 file_length (struct file *file) {
 	ASSERT (file != NULL);
 	return inode_length (file->inode);
-
-	// struct inode_disk *disk_inode = NULL;
-	// disk_inode = calloc (1, sizeof *disk_inode);
-	// get_disk_inode(file->inode, disk_inode);
-
-	// return disk_inode->length;
 }
 
 /* Sets the current position in FILE to NEW_POS bytes from the
