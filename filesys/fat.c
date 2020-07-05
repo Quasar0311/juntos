@@ -3,6 +3,7 @@
 #include "filesys/filesys.h"
 #include "threads/malloc.h"
 #include "threads/synch.h"
+#include "filesys/inode.h"
 #include <stdio.h>
 #include <string.h>
 
@@ -154,7 +155,8 @@ void
 fat_fs_init (void) {
 	/* TODO: Your code goes here. */
 	fat_fs->fat_length=fat_fs->bs.fat_sectors;
-	fat_fs->data_start=fat_fs->bs.fat_start;
+	fat_fs->data_start=fat_fs->bs.fat_start+1;
+	// inode_create(cluster_to_sector(ROOT_DIR_CLUSTER), 0);
 }
 
 /*----------------------------------------------------------------------------*/
@@ -234,6 +236,6 @@ cluster_to_sector (cluster_t clst) {
 	unsigned int *fat=fat_fs->fat;
 	// printf("clsuter to sector: %d, cluster: %d\n", 
 		// (int)(SECTORS_PER_CLUSTER*fat[clst]), (int)fat[clst]);
-
+	// printf("fat_length : %d\n", fat_fs -> fat_length);
 	return (disk_sector_t) ((SECTORS_PER_CLUSTER*clst) + fat_fs -> fat_length);
 }

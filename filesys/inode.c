@@ -83,10 +83,21 @@ inode_create (disk_sector_t sector, off_t length) {
 		size_t sectors = bytes_to_sectors (length);
 		disk_inode->length = length;
 		disk_inode->magic = INODE_MAGIC;
+
+		if (length > 0) {
+			static char zeros[DISK_SECTOR_SIZE];
+			size_t i;
+			cluster_t ct = fat_create_chain(0);
+			disk_inode -> start = cluster_to_sector(ct);
+			for (i = 1; i < sectors; i++) {
+				ct = fat_create_chain(ct);
+			}
+		}
+		
 		// if (free_map_allocate (sectors, &disk_inode->start)) {
 		// printf("inode create: %d\n", disk_inode->start);
 		// if(fat_create_chain((cluster_t)disk_inode->start)){
-		// 	disk_write (filesys_disk, sector, disk_inode);
+			// disk_write (filesys_disk, sector, disk_inode);
 		// 	if (sectors > 0) {
 		// 		static char zeros[DISK_SECTOR_SIZE];
 		// 		size_t i;
@@ -98,19 +109,21 @@ inode_create (disk_sector_t sector, off_t length) {
 		// 	}
 		// 	success = true; 
 		// }
-		printf("sector : %d\n", sectors);
-		for (int i = 0; i < sectors; i++) {
-			static char zeros[DISK_SECTOR_SIZE];
-			cluster = fat_create_chain(i);
-			disk_write(filesys_disk, cluster_to_sector(cluster), zeros);
-			if (i == 0) {
-				disk_inode -> start = cluster_to_sector(cluster);
-			}
-		}
-		success = true;
-		start = disk_inode -> start;
 
-		free (disk_inode);
+		// printf("sector : %d\n", sectors);
+		// for (int i = 0; i < sectors; i++) {
+		// 	static char zeros[DISK_SECTOR_SIZE];
+		// 	cluster = fat_create_chain(i);
+		// 	disk_write(filesys_disk, cluster_to_sector(cluster), zeros);
+		// 	if (i == 0) {
+		// 		disk_inode -> start = cluster_to_sector(cluster);
+		// 	}
+		// }
+		// disk_write (filesys_disk, sector, disk_inode);
+		// success = true;
+		// start = disk_inode -> start;
+
+		// free (disk_inode);
 	}
 	printf("succc : %d, %d\n", success, start);
 	return start;
