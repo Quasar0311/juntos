@@ -148,7 +148,7 @@ inode_open (disk_sector_t sector) {
 	inode->deny_write_cnt = 0;
 	inode->removed = false;
 	lock_init(&inode->extend_lock);
-	// disk_read (filesys_disk, inode->sector, &inode->data);
+	disk_read (filesys_disk, inode->sector, &inode->data);
 	return inode;
 }
 
@@ -223,11 +223,12 @@ inode_read_at (struct inode *inode, void *buffer_, off_t size, off_t offset) {
 
 	while (size > 0) {
 		/* Disk sector to read, starting byte offset within sector. */
-		disk_sector_t sector_idx = byte_to_sector (disk_inode/*inode*/, offset);
+		disk_sector_t sector_idx = byte_to_sector (disk_inode, offset);
 		int sector_ofs = offset % DISK_SECTOR_SIZE;
 
 		/* Bytes left in inode, bytes left in sector, lesser of the two. */
 		off_t inode_left = inode_length (inode) - offset;
+		// off_t inode_left=disk_inode->length-offset;
 		int sector_left = DISK_SECTOR_SIZE - sector_ofs;
 		int min_left = inode_left < sector_left ? inode_left : sector_left;
 
@@ -258,6 +259,7 @@ inode_read_at (struct inode *inode, void *buffer_, off_t size, off_t offset) {
 		bytes_read += chunk_size;
 	}
 	free (bounce);
+	free(disk_inode);
 
 	return bytes_read;
 }
@@ -293,7 +295,7 @@ inode_write_at (struct inode *inode, const void *buffer_, off_t size,
 
 	lock_release(&inode->extend_lock);
 
-
+	printf("inode write at size: %d, offset: %d\n", size, offset);
 	while (size > 0) {
 		/* Sector to write, starting byte offset within sector. */
 		disk_sector_t sector_idx = byte_to_sector (disk_inode, offset);
@@ -301,6 +303,7 @@ inode_write_at (struct inode *inode, const void *buffer_, off_t size,
 
 		/* Bytes left in inode, bytes left in sector, lesser of the two. */
 		off_t inode_left = inode_length (inode) - offset;
+		// off_t inode_left=disk_inode->length-offset;
 		int sector_left = DISK_SECTOR_SIZE - sector_ofs;
 		int min_left = inode_left < sector_left ? inode_left : sector_left;
 
@@ -338,7 +341,7 @@ inode_write_at (struct inode *inode, const void *buffer_, off_t size,
 		bytes_written += chunk_size;
 	}
 	free (bounce);
-
+	printf("inode write at: %d\n", bytes_written);
 	return bytes_written;
 }
 
@@ -364,5 +367,10 @@ inode_allow_write (struct inode *inode) {
 /* Returns the length, in bytes, of INODE's data. */
 off_t
 inode_length (const struct inode *inode) {
+	// struct inode_disk *disk_inode = NULL;
+	// disk_inode = calloc (1, sizeof *disk_inode);
+	// get_disk_inode(inode, disk_inode);
+
+	// return disk_inode->length;
 	return inode->data.length;
 }
