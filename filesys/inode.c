@@ -51,17 +51,17 @@ get_disk_inode(const struct inode *inode, struct inode_disk *inode_disk){
  * POS. */
 static disk_sector_t
 // byte_to_sector (const struct inode *inode, off_t pos) {
-byte_to_sector (const struct inode_disk *inode_disk, off_t pos) {
-	// ASSERT (inode != NULL);
-	// if (pos < inode->data.length)
-	// 	return inode->data.start + pos / DISK_SECTOR_SIZE;
-	// else
-	// 	return -1;
-	ASSERT(inode_disk!=NULL);
-	if(pos<inode_disk->length)
-		return inode_disk->start+pos/DISK_SECTOR_SIZE;
+byte_to_sector (const struct inode *inode, off_t pos) {
+	ASSERT (inode != NULL);
+	if (pos < inode->data.length)
+		return inode->data.start + pos / DISK_SECTOR_SIZE;
 	else
 		return -1;
+	// ASSERT(inode_disk!=NULL);
+	// if(pos<inode_disk->length)
+	// 	return inode_disk->start+pos/DISK_SECTOR_SIZE;
+	// else
+	// 	return -1;
 }
 
 /* List of open inodes, so that opening a single inode twice
@@ -95,18 +95,26 @@ inode_create (disk_sector_t sector, off_t length) {
 	if (disk_inode != NULL) {
 		cluster_t cluster;
 		size_t sectors = bytes_to_sectors (length);
+		static char zeros[DISK_SECTOR_SIZE];
 		disk_inode->length = length;
 		disk_inode->magic = INODE_MAGIC;
+
+		// printf("sector, sectors, root sector : %d, %d, %d\n", sector, sectors, cluster_to_sector(sector));
+
+		cluster = fat_create_chain(0);
+		disk_write(filesys_disk, cluster_to_sector(cluster), zeros);
+		disk_inode -> start = cluster_to_sector(cluster);
+
+		disk_write(filesys_disk, sector, disk_inode);
  
-		for(int i=0; i<sectors; i++){
+		for(int i=1; i<sectors; i++){
 			static char zeros[DISK_SECTOR_SIZE];
-
-			cluster=fat_create_chain(i);
+			cluster=fat_create_chain(cluster);
+			// printf("cluster : %d\n", cluster);
 			disk_write(filesys_disk, cluster_to_sector(cluster), zeros);
-
-			if(i==0){
-				disk_inode->start=cluster_to_sector(cluster);
-			}
+			// if(i==0){
+			// 	disk_inode->start=cluster_to_sector(cluster);
+			// }
 		}
 		success=true;
 		start=disk_inode->start;
@@ -125,6 +133,10 @@ struct inode *
 inode_open (disk_sector_t sector) {
 	struct list_elem *e;
 	struct inode *inode;
+
+	if (sector == cluster_to_sector(ROOT_DIR_SECTOR)) {
+		inode_create(cluster_to_sector(ROOT_DIR_SECTOR), DISK_SECTOR_SIZE);
+	}
 
 	/* Check whether this inode is already open. */
 	for (e = list_begin (&open_inodes); e != list_end (&open_inodes);
@@ -148,7 +160,7 @@ inode_open (disk_sector_t sector) {
 	inode->deny_write_cnt = 0;
 	inode->removed = false;
 	lock_init(&inode->extend_lock);
-	// disk_read (filesys_disk, inode->sector, &inode->data);
+	disk_read (filesys_disk, inode->sector, &inode->data);
 	return inode;
 }
 
@@ -223,7 +235,7 @@ inode_read_at (struct inode *inode, void *buffer_, off_t size, off_t offset) {
 
 	while (size > 0) {
 		/* Disk sector to read, starting byte offset within sector. */
-		disk_sector_t sector_idx = byte_to_sector (disk_inode/*inode*/, offset);
+		disk_sector_t sector_idx = byte_to_sector (inode/*inode*/, offset);
 		int sector_ofs = offset % DISK_SECTOR_SIZE;
 
 		/* Bytes left in inode, bytes left in sector, lesser of the two. */
@@ -274,7 +286,7 @@ inode_write_at (struct inode *inode, const void *buffer_, off_t size,
 	off_t bytes_written = 0;
 	uint8_t *bounce = NULL;
 	struct inode_disk *disk_inode = NULL;
-
+	printf("inode write at : %d, %d\n", size, offset);
 	if (inode->deny_write_cnt)
 		return 0;
 
@@ -296,7 +308,7 @@ inode_write_at (struct inode *inode, const void *buffer_, off_t size,
 
 	while (size > 0) {
 		/* Sector to write, starting byte offset within sector. */
-		disk_sector_t sector_idx = byte_to_sector (disk_inode, offset);
+		disk_sector_t sector_idx = byte_to_sector (inode, offset);
 		int sector_ofs = offset % DISK_SECTOR_SIZE;
 
 		/* Bytes left in inode, bytes left in sector, lesser of the two. */
@@ -304,11 +316,14 @@ inode_write_at (struct inode *inode, const void *buffer_, off_t size,
 		int sector_left = DISK_SECTOR_SIZE - sector_ofs;
 		int min_left = inode_left < sector_left ? inode_left : sector_left;
 
+		// printf("inode left, sector left, min left : %d, %d, %d\n", inode_left, sector_left, min_left);
+
 		/* Number of bytes to actually write into this sector. */
 		int chunk_size = size < min_left ? size : min_left;
+		// printf("chunk size : %d, %d, %d\n", chunk_size, DISK_SECTOR_SIZE, sector_ofs);
 		if (chunk_size <= 0)
 			break;
-
+		// printf("yogi : %d, %d\n", sector_ofs, chunk_size);
 		if (sector_ofs == 0 && chunk_size == DISK_SECTOR_SIZE) {
 			/* Write full sector directly to disk. */
 			disk_write (filesys_disk, sector_idx, buffer + bytes_written); 
