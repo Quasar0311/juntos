@@ -39,17 +39,29 @@ struct inode {
 	struct lock extend_lock;
 };
 
+static bool
+get_disk_inode(const struct inode *inode, struct inode_disk *inode_disk){
+	disk_read(filesys_disk, inode->sector, inode_disk);
+	return true;
+}
+
 /* Returns the disk sector that contains byte offset POS within
  * INODE.
  * Returns -1 if INODE does not contain data for a byte at offset
  * POS. */
 static disk_sector_t
+// byte_to_sector (const struct inode *inode, off_t pos) {
 byte_to_sector (const struct inode *inode, off_t pos) {
 	ASSERT (inode != NULL);
 	if (pos < inode->data.length)
 		return inode->data.start + pos / DISK_SECTOR_SIZE;
 	else
 		return -1;
+	// ASSERT(inode_disk!=NULL);
+	// if(pos<inode_disk->length)
+	// 	return inode_disk->start+pos/DISK_SECTOR_SIZE;
+	// else
+	// 	return -1;
 }
 
 /* List of open inodes, so that opening a single inode twice
@@ -83,6 +95,7 @@ inode_create (disk_sector_t sector, off_t length) {
 	if (disk_inode != NULL) {
 		cluster_t cluster;
 		size_t sectors = bytes_to_sectors (length);
+		static char zeros[DISK_SECTOR_SIZE];
 		disk_inode->length = length;
 		disk_inode->magic = INODE_MAGIC;
 
@@ -139,6 +152,10 @@ inode_open (disk_sector_t sector) {
 	struct list_elem *e;
 	struct inode *inode;
 
+	if (sector == cluster_to_sector(ROOT_DIR_SECTOR)) {
+		inode_create(cluster_to_sector(ROOT_DIR_SECTOR), DISK_SECTOR_SIZE);
+	}
+
 	/* Check whether this inode is already open. */
 	for (e = list_begin (&open_inodes); e != list_end (&open_inodes);
 			e = list_next (e)) {
@@ -160,6 +177,7 @@ inode_open (disk_sector_t sector) {
 	inode->open_cnt = 1;
 	inode->deny_write_cnt = 0;
 	inode->removed = false;
+	lock_init(&inode->extend_lock);
 	disk_read (filesys_disk, inode->sector, &inode->data);
 	return inode;
 }
@@ -193,13 +211,20 @@ inode_close (struct inode *inode) {
 		list_remove (&inode->elem);
 
 		/* Deallocate blocks if removed. */
-		// if (inode->removed) {
+		if (inode->removed) {
 			// free_map_release (inode->sector, 1);
-			// fat_remove_chain(inode->sector, 0);
 			// free_map_release (inode->data.start,
-			// 		bytes_to_sectors (inode->data.length)); 
-			// fat_remove_chain(inode->data.start, 0);
-		// }
+					// bytes_to_sectors (inode->data.length));
+			struct inode_disk *disk_inode = NULL;
+
+			disk_inode = calloc (1, sizeof *disk_inode);
+			get_disk_inode(inode, disk_inode);
+
+			fat_remove_chain(disk_inode->start, 0);
+			fat_remove_chain(inode->sector, 0);
+
+			free(disk_inode);
+		}
 
 		free (inode); 
 	}
@@ -221,11 +246,14 @@ inode_read_at (struct inode *inode, void *buffer_, off_t size, off_t offset) {
 	uint8_t *buffer = buffer_;
 	off_t bytes_read = 0;
 	uint8_t *bounce = NULL;
-	// printf("inode read at\n");
+
+	struct inode_disk *disk_inode = NULL;
+	disk_inode = calloc (1, sizeof *disk_inode);
+	get_disk_inode(inode, disk_inode);
 
 	while (size > 0) {
 		/* Disk sector to read, starting byte offset within sector. */
-		disk_sector_t sector_idx = byte_to_sector (inode, offset);
+		disk_sector_t sector_idx = byte_to_sector (inode/*inode*/, offset);
 		int sector_ofs = offset % DISK_SECTOR_SIZE;
 
 		/* Bytes left in inode, bytes left in sector, lesser of the two. */
@@ -304,11 +332,14 @@ inode_write_at (struct inode *inode, const void *buffer_, off_t size,
 		int sector_left = DISK_SECTOR_SIZE - sector_ofs;
 		int min_left = inode_left < sector_left ? inode_left : sector_left;
 
+		// printf("inode left, sector left, min left : %d, %d, %d\n", inode_left, sector_left, min_left);
+
 		/* Number of bytes to actually write into this sector. */
 		int chunk_size = size < min_left ? size : min_left;
+		// printf("chunk size : %d, %d, %d\n", chunk_size, DISK_SECTOR_SIZE, sector_ofs);
 		if (chunk_size <= 0)
 			break;
-
+		// printf("yogi : %d, %d\n", sector_ofs, chunk_size);
 		if (sector_ofs == 0 && chunk_size == DISK_SECTOR_SIZE) {
 			/* Write full sector directly to disk. */
 			disk_write (filesys_disk, sector_idx, buffer + bytes_written); 
