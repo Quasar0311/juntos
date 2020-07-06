@@ -64,8 +64,8 @@ bool
 filesys_create (const char *name, off_t initial_size) {
 	disk_sector_t inode_sector = 0;
 	disk_sector_t start;
-	// start = inode_create(inode_sector, initial_size);
-	// printf("start : %d\n", start);
+	start = inode_create(inode_sector, initial_size);
+	printf("start : %d\n", start);
 	struct dir *dir = dir_open_root ();
 	bool success = dir != NULL;
 			// && free_map_allocate (1, &inode_sector)

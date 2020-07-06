@@ -3,6 +3,7 @@
 #include "filesys/filesys.h"
 #include "threads/malloc.h"
 #include "threads/synch.h"
+#include "filesys/inode.h"
 #include <stdio.h>
 #include <string.h>
 
@@ -139,7 +140,7 @@ void
 fat_boot_create (void) {
 	unsigned int fat_sectors =
 	    (disk_size (filesys_disk) - 1)
-	    / (DISK_SECTOR_SIZE / sizeof (cluster_t) * SECTORS_PER_CLUSTER + 1);
+	    / (DISK_SECTOR_SIZE / sizeof (cluster_t) * SECTORS_PER_CLUSTER + 1) + 1;
 	fat_fs->bs = (struct fat_boot){
 	    .magic = FAT_MAGIC,
 	    .sectors_per_cluster = SECTORS_PER_CLUSTER,
@@ -154,7 +155,8 @@ void
 fat_fs_init (void) {
 	/* TODO: Your code goes here. */
 	fat_fs->fat_length=fat_fs->bs.fat_sectors;
-	fat_fs->data_start=fat_fs->bs.fat_start;
+	fat_fs->data_start=fat_fs->bs.fat_start+1;
+	// inode_create(cluster_to_sector(ROOT_DIR_CLUSTER), 0);
 }
 
 /*----------------------------------------------------------------------------*/
@@ -179,9 +181,10 @@ fat_create_chain (cluster_t clst) {
 		else if(i==fat_fs->fat_length) 
 			return 0;
 	}
-
+	// printf("fat length : %d, cl : %d\n", fat_fs -> fat_length, sizeof(cluster_t));
 	if(clst==0){
 		fat[ct]=EOChain;
+		// printf("fat create chain clst is 0: %d\n", ct);
 	}
 
 	else{
@@ -231,6 +234,8 @@ disk_sector_t
 cluster_to_sector (cluster_t clst) {
 	/* TODO: Your code goes here. */
 	unsigned int *fat=fat_fs->fat;
-
-	return (disk_sector_t)((SECTORS_PER_CLUSTER*clst)+fat_fs->fat_length);
+	// printf("clsuter to sector: %d, cluster: %d\n", 
+		// (int)(SECTORS_PER_CLUSTER*fat[clst]), (int)fat[clst]);
+	// printf("fat_length : %d\n", fat_fs -> fat_length);
+	return (disk_sector_t) ((SECTORS_PER_CLUSTER*clst) + fat_fs -> fat_length);
 }
