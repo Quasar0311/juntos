@@ -5,7 +5,6 @@
 #include "filesys/filesys.h"
 #include "filesys/inode.h"
 #include "threads/malloc.h"
-#include "filesys/fat.h"
 
 /* A directory. */
 struct dir {
@@ -47,7 +46,7 @@ dir_open (struct inode *inode) {
  * Return true if successful, false on failure. */
 struct dir *
 dir_open_root (void) {
-	printf("open root : %d\n", cluster_to_sector(ROOT_DIR_SECTOR));
+	printf("root open : %d\n", cluster_to_sector(ROOT_DIR_SECTOR));
 	return dir_open (inode_open (cluster_to_sector(ROOT_DIR_SECTOR)));
 }
 
@@ -137,7 +136,7 @@ dir_add (struct dir *dir, const char *name, disk_sector_t inode_sector) {
 	/* Check NAME for validity. */
 	if (*name == '\0' || strlen (name) > NAME_MAX)
 		return false;
-	printf("lookup start\n");
+	printf("lookup start: %s\n", name);
 	/* Check that NAME is not in use. */
 	if (lookup (dir, name, NULL, NULL))
 		goto done;
@@ -159,7 +158,7 @@ dir_add (struct dir *dir, const char *name, disk_sector_t inode_sector) {
 	strlcpy (e.name, name, sizeof e.name);
 	e.inode_sector = inode_sector;
 	success = inode_write_at (dir->inode, &e, sizeof e, ofs) == sizeof e;
-	printf("dir add suc ; %d\n", success);
+
 done:
 	printf("dir add success: %d\n", success);
 	return success;
