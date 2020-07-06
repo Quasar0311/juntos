@@ -120,6 +120,10 @@ sema_up (struct semaphore *sema) {
 	if (!list_empty (&sema->waiters)){
 		/*** considering priority change while thread in the waiters list,
 		 * sort the waiters list as a priority ***/
+		// if(list_front(&sema->waiters)!=NULL) {
+		// 	printf("null\n");
+		// }
+		
 		list_sort(&sema->waiters, priority_less_func, NULL);
 		unblocked_pr = list_entry(list_front(&sema->waiters), struct thread, elem) -> priority;
 		thread_unblock (list_entry (list_pop_front (&sema->waiters),

@@ -115,15 +115,18 @@ fsutil_put (char **argv) {
 	while (size > 0) {
 		int chunk_size = size > DISK_SECTOR_SIZE ? DISK_SECTOR_SIZE : size;
 		disk_read (src, sector++, buffer);
+		// printf("size1 : %d, %d\n", size, chunk_size);
 		if (file_write (dst, buffer, chunk_size) != chunk_size)
 			PANIC ("%s: write failed with %"PROTd" bytes unwritten",
 					file_name, size);
 		size -= chunk_size;
+		// printf("size : %d, %d\n", size, chunk_size);
 	}
-
+	printf("fsutil finish1\n");
 	/* Finish up. */
 	file_close (dst);
 	free (buffer);
+	printf("fsutil finish\n");
 }
 
 /* Copies file FILE_NAME from the file system to the scratch disk.
