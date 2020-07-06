@@ -86,6 +86,7 @@ inode_create (disk_sector_t sector, off_t length) {
 	disk_sector_t start;
 
 	ASSERT (length >= 0);
+	printf("push\n");
 
 	/* If this assertion fails, the inode structure is not exactly
 	 * one sector in size, and you should fix that. */
