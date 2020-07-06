@@ -99,30 +99,48 @@ inode_create (disk_sector_t sector, off_t length) {
 		disk_inode->length = length;
 		disk_inode->magic = INODE_MAGIC;
 
-		// printf("sector, sectors, root sector : %d, %d, %d\n", sector, sectors, cluster_to_sector(sector));
-
-		cluster = fat_create_chain(0);
-		disk_write(filesys_disk, cluster_to_sector(cluster), zeros);
-		disk_inode -> start = cluster_to_sector(cluster);
-
-		disk_write(filesys_disk, sector, disk_inode);
- 
-		for(int i=1; i<sectors; i++){
+		if (length > 0) {
 			static char zeros[DISK_SECTOR_SIZE];
-			cluster=fat_create_chain(cluster);
-			// printf("cluster : %d\n", cluster);
-			disk_write(filesys_disk, cluster_to_sector(cluster), zeros);
-			// if(i==0){
-			// 	disk_inode->start=cluster_to_sector(cluster);
-			// }
+			size_t i;
+			cluster_t ct = fat_create_chain(0);
+			disk_inode -> start = cluster_to_sector(ct);
+			for (i = 1; i < sectors; i++) {
+				ct = fat_create_chain(ct);
+			}
 		}
-		success=true;
-		start=disk_inode->start;
+		
+		// if (free_map_allocate (sectors, &disk_inode->start)) {
+		// printf("inode create: %d\n", disk_inode->start);
+		// if(fat_create_chain((cluster_t)disk_inode->start)){
+			// disk_write (filesys_disk, sector, disk_inode);
+		// 	if (sectors > 0) {
+		// 		static char zeros[DISK_SECTOR_SIZE];
+		// 		size_t i;
 
-		free (disk_inode);
+		// 		for (i = 0; i < sectors; i++){
+		// 			// printf("inode create sectors: %d\n", i);
+		// 			disk_write (filesys_disk, disk_inode->start + i, zeros); 
+		// 		}
+		// 	}
+		// 	success = true; 
+		// }
+
+		// printf("sector : %d\n", sectors);
+		// for (int i = 0; i < sectors; i++) {
+		// 	static char zeros[DISK_SECTOR_SIZE];
+		// 	cluster = fat_create_chain(i);
+		// 	disk_write(filesys_disk, cluster_to_sector(cluster), zeros);
+		// 	if (i == 0) {
+		// 		disk_inode -> start = cluster_to_sector(cluster);
+		// 	}
+		// }
+		// disk_write (filesys_disk, sector, disk_inode);
+		// success = true;
+		// start = disk_inode -> start;
+
+		// free (disk_inode);
 	}
 	printf("succc : %d, %d\n", success, start);
-
 	return start;
 }
 
@@ -261,7 +279,6 @@ inode_read_at (struct inode *inode, void *buffer_, off_t size, off_t offset) {
 			}
 			disk_read (filesys_disk, sector_idx, bounce);
 			memcpy (buffer + bytes_read, bounce + sector_ofs, chunk_size);
-			// pc_read(sector_idx, buffer, bytes_read, chunk_size, sector_ofs);
 		}
 
 		/* Advance. */
@@ -344,7 +361,6 @@ inode_write_at (struct inode *inode, const void *buffer_, off_t size,
 				memset (bounce, 0, DISK_SECTOR_SIZE);
 			memcpy (bounce + sector_ofs, buffer + bytes_written, chunk_size);
 			disk_write (filesys_disk, sector_idx, bounce); 
-			// pc_write(sector_idx, buffer, bytes_written, chunk_size, sector_ofs);
 		}
 
 		/* Advance. */
