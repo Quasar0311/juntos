@@ -8,6 +8,7 @@
 #include "threads/malloc.h"
 #include "filesys/fat.h"
 #include "threads/synch.h"
+#include <stdio.h>
 
 /* Identifies an inode. */
 #define INODE_MAGIC 0x494e4f44
@@ -134,10 +135,6 @@ struct inode *
 inode_open (disk_sector_t sector) {
 	struct list_elem *e;
 	struct inode *inode;
-
-	if (sector == cluster_to_sector(ROOT_DIR_SECTOR)) {
-		inode_create(cluster_to_sector(ROOT_DIR_SECTOR), DISK_SECTOR_SIZE);
-	}
 
 	/* Check whether this inode is already open. */
 	for (e = list_begin (&open_inodes); e != list_end (&open_inodes);
@@ -275,6 +272,18 @@ inode_read_at (struct inode *inode, void *buffer_, off_t size, off_t offset) {
 	return bytes_read;
 }
 
+static bool
+inode_update_file_length(struct inode_disk *inode_disk, off_t start_pos, off_t end_pos){
+	cluster_t cluster;
+	static char zeros [DISK_SECTOR_SIZE];
+	size_t sectors=bytes_to_sectors(end_pos);
+
+	for(int i=1; i<sectors; i++){
+		cluster=fat_create_chain(cluster);
+		disk_write(filesys_disk, cluster_to_sector(cluster), zeros);
+	}
+}
+
 /* Writes SIZE bytes from BUFFER into INODE, starting at OFFSET.
  * Returns the number of bytes actually written, which may be
  * less than SIZE if end of file is reached or an error occurs.
@@ -286,23 +295,20 @@ inode_write_at (struct inode *inode, const void *buffer_, off_t size,
 	const uint8_t *buffer = buffer_;
 	off_t bytes_written = 0;
 	uint8_t *bounce = NULL;
-	struct inode_disk *disk_inode = NULL;
+
 	printf("inode write at : %d, %d\n", size, offset);
 	if (inode->deny_write_cnt)
 		return 0;
 
-	disk_inode = calloc (1, sizeof *disk_inode);
-	if(disk_inode==NULL) return 0;
-
-	get_disk_inode(inode, disk_inode);
-
 	lock_acquire(&inode->extend_lock);
 
-	int old_length=disk_inode->length;
+	int old_length=inode_length(inode);
 	int write_end=offset+size-1;
 
-	// if(write_end>old_length-1)
-		// inode_update_file_length(disk_inode, )
+	if(write_end>old_length-1){
+		printf("extensible file\n");
+		inode_update_file_length(&inode->data, offset, offset+size);
+	}
 
 	lock_release(&inode->extend_lock);
 

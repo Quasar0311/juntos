@@ -32,6 +32,8 @@ filesys_init (bool format) {
 		do_format ();
 
 	fat_open ();
+
+	inode_create(cluster_to_sector(ROOT_DIR_CLUSTER), DISK_SECTOR_SIZE);
 #else
 	/* Original FS */
 	free_map_init ();
