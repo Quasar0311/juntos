@@ -152,10 +152,6 @@ inode_open (disk_sector_t sector) {
 	struct list_elem *e;
 	struct inode *inode;
 
-	if (sector == cluster_to_sector(ROOT_DIR_SECTOR)) {
-		inode_create(cluster_to_sector(ROOT_DIR_SECTOR), DISK_SECTOR_SIZE);
-	}
-
 	/* Check whether this inode is already open. */
 	for (e = list_begin (&open_inodes); e != list_end (&open_inodes);
 			e = list_next (e)) {
