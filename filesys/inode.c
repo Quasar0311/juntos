@@ -145,7 +145,7 @@ inode_create (disk_sector_t sector, off_t length) {
 		// printf("disk inode start: %d\n", disk_inode->start);
 
 		disk_write(filesys_disk, sector, disk_inode);
- 
+
 		for(int i=1; i<sectors; i++){
 			static char zeros[DISK_SECTOR_SIZE];
 			cluster=fat_create_chain(cluster);
@@ -230,7 +230,7 @@ inode_close (struct inode *inode) {
 	if (--inode->open_cnt == 0) {
 		// printf("inode close inode: %p, elem: %p\n", inode, inode->elem);
 		/* Remove from inode list and release lock. */
-		printf("ready to remove, %p, %d\n", &inode->elem, list_size(&open_inodes));
+		// printf("ready to remove, %p, %d\n", &inode->elem, list_size(&open_inodes));
 		list_remove (&inode->elem);
 		// printf("inode removed\n");
 
@@ -299,6 +299,7 @@ inode_read_at (struct inode *inode, void *buffer_, off_t size, off_t offset) {
 				if (bounce == NULL)
 					break;
 			}
+			// printf("sector : %d\n", sector_idx);
 			disk_read (filesys_disk, sector_idx, bounce);
 			memcpy (buffer + bytes_read, bounce + sector_ofs, chunk_size);
 			// pc_read(sector_idx, buffer, bytes_read, chunk_size, sector_ofs);
@@ -315,22 +316,33 @@ inode_read_at (struct inode *inode, void *buffer_, off_t size, off_t offset) {
 }
 
 static bool
-inode_update_file_length(struct inode_disk *inode_disk, off_t start_pos, off_t end_pos){
+inode_update_file_length(struct inode *inode, off_t start_pos, off_t end_pos){
 	cluster_t cluster;
 	static char zeros [DISK_SECTOR_SIZE];
 	size_t sectors=bytes_to_sectors(end_pos);
+	struct inode_disk inode_disk=inode->data;
 
-	inode_disk->length=end_pos;
+	printf("sectors : %d, start pos : %d, end pos : %d\n", sectors, start_pos, end_pos);
+
+	inode_disk.length=end_pos;
 
 	cluster=fat_create_chain(start_pos);
 	disk_write(filesys_disk, cluster_to_sector(cluster), zeros);
+	inode_disk.start = cluster_to_sector(cluster);
 
-	for(int i=cluster_to_sector(cluster); i<sectors; i++){
-		cluster=fat_create_chain(cluster);
-		disk_write(filesys_disk, cluster_to_sector(cluster), zeros);
-	}
+	printf("disk inode start: %d, cluster : %d\n", inode_disk.start, cluster);
+	disk_write(filesys_disk, inode_disk.start, &inode_disk);
 
-	// printf("inode disk length: %d\n", inode_disk->length);
+	// for(int i=1; i<sectors; i++){
+	// 	cluster=fat_create_chain(cluster);
+	// 	printf("cluster : %d, sector: %d\n", cluster, cluster_to_sector(cluster));
+	// 	disk_write(filesys_disk, cluster_to_sector(cluster), zeros);
+	// }
+
+	printf("disk read inode sector: %d, %d\n", inode->sector, inode_disk.start);
+	disk_read (filesys_disk, inode_disk.start, &inode->data);
+
+	printf("inode disk length: %d, %d\n", inode_disk.length, inode_length(inode));
 }
 
 /* Writes SIZE bytes from BUFFER into INODE, starting at OFFSET.
@@ -351,20 +363,20 @@ inode_write_at (struct inode *inode, const void *buffer_, off_t size,
 
 	// lock_acquire(&inode->extend_lock);
 
-	// int old_length=inode_length(inode);
-	// int write_end=offset+size-1;
+	int old_length=inode_length(inode);
+	int write_end=offset+size-1;
 
-	// if(write_end>old_length-1){
-	// 	// printf("extensible file\n");
-	// 	inode_update_file_length(&inode->data, offset, offset+size);
-	// }
+	if(write_end>old_length-1){
+		printf("extensible file\n");
+		inode_update_file_length(inode, offset, offset+size);
+	}
 
 	// lock_release(&inode->extend_lock);
 
 	while (size > 0) {
 		/* Sector to write, starting byte offset within sector. */
 		disk_sector_t sector_idx = byte_to_sector (inode, offset);
-		printf("sector_idx : %d\n", sector_idx);
+		// printf("sector_idx : %d\n", sector_idx);
 		int sector_ofs = offset % DISK_SECTOR_SIZE;
 
 		/* Bytes left in inode, bytes left in sector, lesser of the two. */
@@ -387,7 +399,7 @@ inode_write_at (struct inode *inode, const void *buffer_, off_t size,
 		} else {
 			// printf("else\n");
 			/* We need a bounce buffer. */
-			printf("inode : %p\n", &inode -> elem);
+			// printf("inode : %p\n", &inode -> elem);
 			if (bounce == NULL) {
 				// printf("malloc\n");
 				bounce = malloc (DISK_SECTOR_SIZE);
@@ -409,7 +421,7 @@ inode_write_at (struct inode *inode, const void *buffer_, off_t size,
 			// printf("else finish\n");
 			// pc_write(sector_idx, buffer, bytes_written, chunk_size, sector_ofs);
 
-			free (bounce);
+			// free (bounce);
 		}
 
 		/* Advance. */
@@ -417,6 +429,7 @@ inode_write_at (struct inode *inode, const void *buffer_, off_t size,
 		offset += chunk_size;
 		bytes_written += chunk_size;
 	}
+	free (bounce);
 	// printf("bytes written: %d\n", bytes_written);
 
 	return bytes_written;

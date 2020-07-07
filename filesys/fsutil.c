@@ -123,11 +123,11 @@ fsutil_put (char **argv) {
 		size -= chunk_size;
 		// printf("size : %d, %d\n", size, chunk_size);
 	}
-	printf("fsutil finish1\n");
+	// printf("fsutil finish1\n");
 	/* Finish up. */
 	file_close (dst);
 	free (buffer);
-	printf("fsutil finish\n");
+	// printf("fsutil finish\n");
 }
 
 /* Copies file FILE_NAME from the file system to the scratch disk.
