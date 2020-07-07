@@ -5,6 +5,7 @@
 #include "filesys/filesys.h"
 #include "filesys/inode.h"
 #include "threads/malloc.h"
+#include "filesys/fat.h"
 
 /* A directory. */
 struct dir {
@@ -46,8 +47,8 @@ dir_open (struct inode *inode) {
  * Return true if successful, false on failure. */
 struct dir *
 dir_open_root (void) {
-	printf("root open : %d\n", cluster_to_sector(ROOT_DIR_SECTOR));
-	return dir_open (inode_open (cluster_to_sector(ROOT_DIR_SECTOR)));
+	// printf("root open : %d\n", cluster_to_sector(ROOT_DIR_CLUSTER));
+	return dir_open (inode_open (cluster_to_sector(ROOT_DIR_CLUSTER)));
 }
 
 /* Opens and returns a new directory for the same inode as DIR.
@@ -85,7 +86,7 @@ lookup (const struct dir *dir, const char *name,
 
 	ASSERT (dir != NULL);
 	ASSERT (name != NULL);
-	printf("inode read at\n");
+	// printf("inode read at\n");
 	for (ofs = 0; inode_read_at (dir->inode, &e, sizeof e, ofs) == sizeof e;
 			ofs += sizeof e)
 		if (e.in_use && !strcmp (name, e.name)) {
@@ -111,10 +112,11 @@ dir_lookup (const struct dir *dir, const char *name,
 	ASSERT (name != NULL);
 
 	if (lookup (dir, name, &e, NULL))
-		*inode = inode_open (e.inode_sector);
+		// *inode = inode_open (e.inode_sector);
+		*inode = inode_open (159);
 	else
 		*inode = NULL;
-
+	// printf("dir lookup inode length: %d\n", inode_length(*inode));
 	return *inode != NULL;
 }
 
@@ -136,11 +138,11 @@ dir_add (struct dir *dir, const char *name, disk_sector_t inode_sector) {
 	/* Check NAME for validity. */
 	if (*name == '\0' || strlen (name) > NAME_MAX)
 		return false;
-	printf("lookup start: %s\n", name);
+	// printf("lookup start: %s\n", name);
 	/* Check that NAME is not in use. */
 	if (lookup (dir, name, NULL, NULL))
 		goto done;
-	printf("lookup finish\n");
+	// printf("lookup finish\n");
 	/* Set OFS to offset of free slot.
 	 * If there are no free slots, then it will be set to the
 	 * current end-of-file.
@@ -160,7 +162,7 @@ dir_add (struct dir *dir, const char *name, disk_sector_t inode_sector) {
 	success = inode_write_at (dir->inode, &e, sizeof e, ofs) == sizeof e;
 
 done:
-	printf("dir add success: %d\n", success);
+	// printf("dir add success: %d\n", success);
 	return success;
 }
 

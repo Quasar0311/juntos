@@ -54,16 +54,30 @@ static disk_sector_t
 // byte_to_sector (const struct inode *inode, off_t pos) {
 byte_to_sector (const struct inode *inode, off_t pos) {
 	ASSERT (inode != NULL);
+	// printf("pos : %d, inode start : %d\n", pos, inode -> data.start);
 	if (pos < inode->data.length)
 		return inode->data.start + pos / DISK_SECTOR_SIZE;
 	else
 		return -1;
-	// ASSERT(inode_disk!=NULL);
-	// if(pos<inode_disk->length)
-	// 	return inode_disk->start+pos/DISK_SECTOR_SIZE;
-	// else
-	// 	return -1;
 }
+
+// static disk_sector_t
+// // byte_to_sector (const struct inode *inode, off_t pos) {
+// byte_to_sector (const struct inode *inode, off_t pos) {
+// 	ASSERT (inode != NULL);
+// 	printf("pos : %d, inode start : %d\n", pos, inode -> data.start);
+// 	// printf("fatget161 : %d\n", fat_get(2));
+// 	if (pos < inode->data.length) {
+// 		cluster_t cluster = inode -> data.start;
+// 		for (int i = 0; i < pos / DISK_SECTOR_SIZE; i++) {
+// 			cluster = fat_get(cluster);
+// 		}
+// 		// printf("cluster : %d\n", cluster_to_sector(cluster));
+// 		return cluster_to_sector(cluster);
+// 	}
+// 	else
+// 		return -1;
+// }
 
 /* List of open inodes, so that opening a single inode twice
  * returns the same `struct inode'. */
@@ -87,7 +101,7 @@ inode_create (disk_sector_t sector, off_t length) {
 	disk_sector_t start;
 
 	ASSERT (length >= 0);
-	printf("push\n");
+	// printf("push\n");
 
 	/* If this assertion fails, the inode structure is not exactly
 	 * one sector in size, and you should fix that. */
@@ -106,13 +120,14 @@ inode_create (disk_sector_t sector, off_t length) {
 		cluster = fat_create_chain(0);
 		disk_write(filesys_disk, cluster_to_sector(cluster), zeros);
 		disk_inode -> start = cluster_to_sector(cluster);
+		// printf("disk inode start: %d\n", disk_inode->start);
 
 		disk_write(filesys_disk, sector, disk_inode);
  
 		for(int i=1; i<sectors; i++){
 			static char zeros[DISK_SECTOR_SIZE];
 			cluster=fat_create_chain(cluster);
-			// printf("cluster : %d\n", cluster);
+			// printf("cluster : %d, sector: %d\n", cluster, cluster_to_sector(cluster));
 			disk_write(filesys_disk, cluster_to_sector(cluster), zeros);
 			// if(i==0){
 			// 	disk_inode->start=cluster_to_sector(cluster);
@@ -123,7 +138,7 @@ inode_create (disk_sector_t sector, off_t length) {
 
 		free (disk_inode);
 	}
-	printf("succc : %d, %d\n", success, start);
+	// printf("succc : %d, %d\n", success, start);
 
 	return start;
 }
@@ -135,6 +150,7 @@ struct inode *
 inode_open (disk_sector_t sector) {
 	struct list_elem *e;
 	struct inode *inode;
+	// printf("inode open: %d\n", (int)sector);
 
 	/* Check whether this inode is already open. */
 	for (e = list_begin (&open_inodes); e != list_end (&open_inodes);
@@ -142,6 +158,7 @@ inode_open (disk_sector_t sector) {
 		inode = list_entry (e, struct inode, elem);
 		if (inode->sector == sector) {
 			inode_reopen (inode);
+			// printf("inode reopen\n");
 			return inode; 
 		}
 	}
@@ -159,6 +176,7 @@ inode_open (disk_sector_t sector) {
 	inode->removed = false;
 	lock_init(&inode->extend_lock);
 	disk_read (filesys_disk, inode->sector, &inode->data);
+	// printf("inode_open inode length: %d\n", inode_length(inode));
 	return inode;
 }
 
@@ -187,25 +205,29 @@ inode_close (struct inode *inode) {
 
 	/* Release resources if this was the last opener. */
 	if (--inode->open_cnt == 0) {
+		// printf("inode close inode: %p, elem: %p\n", inode, inode->elem);
 		/* Remove from inode list and release lock. */
 		list_remove (&inode->elem);
+		// printf("inode removed\n");
 
 		/* Deallocate blocks if removed. */
 		if (inode->removed) {
+			// printf("inode removed\n");
 			// free_map_release (inode->sector, 1);
 			// free_map_release (inode->data.start,
 					// bytes_to_sectors (inode->data.length));
-			struct inode_disk *disk_inode = NULL;
+			// struct inode_disk *disk_inode = NULL;
 
-			disk_inode = calloc (1, sizeof *disk_inode);
-			get_disk_inode(inode, disk_inode);
-
-			fat_remove_chain(disk_inode->start, 0);
+			// disk_inode = calloc (1, sizeof *disk_inode);
+			// get_disk_inode(inode, disk_inode);
+			// printf("inode close fat remove chain\n");
+			// fat_remove_chain(disk_inode->start, 0);
+			fat_remove_chain(inode->data.start, 0);
+			// printf("inode remove sector\n");
 			fat_remove_chain(inode->sector, 0);
 
-			free(disk_inode);
+			// free(disk_inode);
 		}
-
 		free (inode); 
 	}
 }
@@ -226,10 +248,6 @@ inode_read_at (struct inode *inode, void *buffer_, off_t size, off_t offset) {
 	uint8_t *buffer = buffer_;
 	off_t bytes_read = 0;
 	uint8_t *bounce = NULL;
-
-	struct inode_disk *disk_inode = NULL;
-	disk_inode = calloc (1, sizeof *disk_inode);
-	get_disk_inode(inode, disk_inode);
 
 	while (size > 0) {
 		/* Disk sector to read, starting byte offset within sector. */
@@ -253,7 +271,7 @@ inode_read_at (struct inode *inode, void *buffer_, off_t size, off_t offset) {
 			/* Read sector into bounce buffer, then partially copy
 			 * into caller's buffer. */
 			if (bounce == NULL) {
-				bounce = malloc (DISK_SECTOR_SIZE);
+				bounce = malloc (DISK_SECTOR_SIZE+1);
 				if (bounce == NULL)
 					break;
 			}
@@ -278,10 +296,17 @@ inode_update_file_length(struct inode_disk *inode_disk, off_t start_pos, off_t e
 	static char zeros [DISK_SECTOR_SIZE];
 	size_t sectors=bytes_to_sectors(end_pos);
 
-	for(int i=1; i<sectors; i++){
+	inode_disk->length=end_pos;
+
+	cluster=fat_create_chain(start_pos);
+	disk_write(filesys_disk, cluster_to_sector(cluster), zeros);
+
+	for(int i=cluster_to_sector(cluster); i<sectors; i++){
 		cluster=fat_create_chain(cluster);
 		disk_write(filesys_disk, cluster_to_sector(cluster), zeros);
 	}
+
+	// printf("inode disk length: %d\n", inode_disk->length);
 }
 
 /* Writes SIZE bytes from BUFFER into INODE, starting at OFFSET.
@@ -296,22 +321,21 @@ inode_write_at (struct inode *inode, const void *buffer_, off_t size,
 	off_t bytes_written = 0;
 	uint8_t *bounce = NULL;
 
-	printf("inode write at : %d, %d\n", size, offset);
+	// printf("inode write at : %d, %d\n", size, offset);
 	if (inode->deny_write_cnt)
 		return 0;
 
-	lock_acquire(&inode->extend_lock);
+	// lock_acquire(&inode->extend_lock);
 
-	int old_length=inode_length(inode);
-	int write_end=offset+size-1;
+	// int old_length=inode_length(inode);
+	// int write_end=offset+size-1;
 
-	if(write_end>old_length-1){
-		printf("extensible file\n");
-		inode_update_file_length(&inode->data, offset, offset+size);
-	}
+	// if(write_end>old_length-1){
+	// 	// printf("extensible file\n");
+	// 	inode_update_file_length(&inode->data, offset, offset+size);
+	// }
 
-	lock_release(&inode->extend_lock);
-
+	// lock_release(&inode->extend_lock);
 
 	while (size > 0) {
 		/* Sector to write, starting byte offset within sector. */
@@ -323,6 +347,7 @@ inode_write_at (struct inode *inode, const void *buffer_, off_t size,
 		int sector_left = DISK_SECTOR_SIZE - sector_ofs;
 		int min_left = inode_left < sector_left ? inode_left : sector_left;
 
+		// printf("inode length: %d, write: %d\n", inode_length(inode), (int)sector_idx);
 		// printf("inode left, sector left, min left : %d, %d, %d\n", inode_left, sector_left, min_left);
 
 		/* Number of bytes to actually write into this sector. */
@@ -335,8 +360,10 @@ inode_write_at (struct inode *inode, const void *buffer_, off_t size,
 			/* Write full sector directly to disk. */
 			disk_write (filesys_disk, sector_idx, buffer + bytes_written); 
 		} else {
+			// printf("else\n");
 			/* We need a bounce buffer. */
 			if (bounce == NULL) {
+				// printf("malloc\n");
 				bounce = malloc (DISK_SECTOR_SIZE);
 				if (bounce == NULL)
 					break;
@@ -352,6 +379,8 @@ inode_write_at (struct inode *inode, const void *buffer_, off_t size,
 			memcpy (bounce + sector_ofs, buffer + bytes_written, chunk_size);
 			disk_write (filesys_disk, sector_idx, bounce); 
 			// pc_write(sector_idx, buffer, bytes_written, chunk_size, sector_ofs);
+
+			free (bounce);
 		}
 
 		/* Advance. */
@@ -359,7 +388,7 @@ inode_write_at (struct inode *inode, const void *buffer_, off_t size,
 		offset += chunk_size;
 		bytes_written += chunk_size;
 	}
-	free (bounce);
+	// printf("bytes written: %d\n", bytes_written);
 
 	return bytes_written;
 }
