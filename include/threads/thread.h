@@ -9,6 +9,7 @@
 #ifdef VM
 #include "vm/vm.h"
 #endif
+#include "filesys/directory.h"
 
 
 /* States in a thread's life cycle. */
@@ -162,6 +163,8 @@ struct thread {
 	int nice;
 	int recent_cpu;
 	
+	/*** current working directory ***/
+	struct dir *cwd;
 	
 
 };

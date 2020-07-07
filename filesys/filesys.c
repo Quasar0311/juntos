@@ -9,6 +9,7 @@
 #include "devices/disk.h"
 #include "filesys/fat.h"
 #include "filesys/page_cache.h"
+#include "threads/thread.h"
 
 /* The disk that contains the file system. */
 struct disk *filesys_disk;
@@ -34,6 +35,9 @@ filesys_init (bool format) {
 	fat_open ();
 
 	inode_create(cluster_to_sector(ROOT_DIR_CLUSTER), DISK_SECTOR_SIZE);
+	/*** first, root directory is for current cwd ***/
+	thread_current() -> cwd = dir_open_root();
+	dir_close(thread_current() -> cwd);
 	// printf("root create: %d\n", cluster_to_sector(ROOT_DIR_CLUSTER));
 #else
 	/* Original FS */
@@ -88,6 +92,53 @@ filesys_create (const char *name, off_t initial_size) {
 	return success && success3;
 }
 
+
+bool
+filesys_dir_create (const char *name) {
+	disk_sector_t inode_sector = 0;
+	disk_sector_t start;
+
+	struct dir *dir = split_path(name);
+	bool success = dir != NULL;
+
+	disk_sector_t sector = cluster_to_sector(fat_create_chain(inode_sector));
+	disk_sector_t success2 = dir_create(sector, 16);
+
+	bool success3 = dir_add(dir, name, sector);
+
+	dir_close (dir);
+	return success && success3;
+}
+
+struct dir *
+split_path (char *path, char *file_name) {
+	struct dir *dir;
+	char *save_ptr;
+	struct inode *inode = NULL;
+
+	if (path[0] == '/') {
+		dir = dir_open_root();
+	}
+	else {
+		dir = dir_reopen(thread_current() -> cwd);
+	}
+
+	path = strtok_r(path, "/", &save_ptr);
+	while (path != NULL) {
+		if (dir_lookup(dir, path, &inode)) {
+			dir_close(dir);
+			dir = dir_open(inode);
+			thread_current() -> cwd = dir;
+		}
+		else {
+			;
+		}
+		path = strtok_r(path, "/", &save_ptr);
+	}
+
+	return dir;
+}
+
 /* Opens the file with the given NAME.
  * Returns the new file if successful or a null pointer
  * otherwise.
@@ -97,6 +148,17 @@ struct file *
 filesys_open (const char *name) {
 	struct dir *dir = dir_open_root ();
 	struct inode *inode = NULL;
+
+	/*** directory split ***/
+	// char *token, *save_ptr;
+	// char *name_copy = palloc_get_page(0);
+	// memcpy(name_copy, name, strlen(name) + 1);
+
+	// for (token == strtok_r(name_copy, "/", &save_ptr); token != NULL;
+	// 		token = strtok_r(NULL, "/", &save_ptr)) {
+	// 			printf("hi\n");
+	// }
+
 	// printf("filesys open\n");
 
 	if (dir != NULL)

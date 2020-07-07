@@ -42,6 +42,13 @@ int syscall_dup2(int oldfd, int newfd);
 void *syscall_mmap (void *addr, size_t length, int writable, int fd, off_t offset);
 // void syscall_munmap (void *addr);
 
+bool syscall_chdir (const char *dir);
+bool syscall_mkdir (const char *dir);
+bool syscall_readdir (int fd, char *name);
+bool syscall_isdir (int fd);
+int syscall_inumber (int fd);
+int syscall_symlink (const char *target, const char *linkpath);
+
 /* System call.
  *
  * Previously system call services was handled by the interrupt handler
@@ -171,7 +178,7 @@ syscall_handler (struct intr_frame *f) {
 			break;
 		
 		/*** SYS_DUP2 ***/
-		case 21:
+		case 22:
 			f->R.rax=syscall_dup2((int)f->R.rdi, (int)f->R.rsi);
 			break;
 
@@ -185,6 +192,32 @@ syscall_handler (struct intr_frame *f) {
 		case SYS_MUNMAP:
 			check_address(f->R.rdi);
 			syscall_munmap((void *)f->R.rdi);
+			break;
+
+		/*** SYS_CHDIR ***/
+		case SYS_CHDIR:
+			break;
+
+		/*** SYS_MKDIR ***/
+		case SYS_MKDIR:
+
+			syscall_mkdir((char *) f -> R.rdi);
+			break;
+
+		/*** SYS_READDIR ***/
+		case SYS_READDIR:
+			break;
+
+		/*** SYS_ISDIR ***/
+		case SYS_ISDIR:
+			break;
+
+		/*** SYS_INUMBER ***/
+		case SYS_INUMBER:
+			break;
+
+		/*** SYS_SYMLINK ***/
+		case SYS_SYMLINK:
 			break;
 
 		default:
@@ -469,4 +502,9 @@ void syscall_lock_acquire (void) {
 void syscall_lock_release (void) {
 	lock_release(&filesys_lock);
 	return;
+}
+
+
+bool syscall_mkdir (const char *dir) {
+	return filesys_dir_create(dir);
 }
