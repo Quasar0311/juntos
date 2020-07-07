@@ -229,9 +229,6 @@ fat_get (cluster_t clst) {
 	if(fat[clst]==EOChain){
 		printf("end of chain: %d\n", clst);
 
-		for(int i=fat_fs->data_start; i<=fat_fs->fat_length; i++){
-			if(fat[i]==0) return (cluster_t)i;
-		}
 
 		return (cluster_t)clst;
 	}
