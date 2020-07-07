@@ -46,6 +46,7 @@ test_main (void)
 
   msg ("write \"a\" and \"b\" alternately");
   while (ofs_a < FILE_SIZE || ofs_b < FILE_SIZE) 
+  // while (ofs_a < FILE_SIZE) 
     {
       write_some_bytes ("a", fd_a, buf_a, &ofs_a);
       write_some_bytes ("b", fd_b, buf_b, &ofs_b);

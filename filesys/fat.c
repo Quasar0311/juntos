@@ -226,6 +226,16 @@ fat_get (cluster_t clst) {
 	/* TODO: Your code goes here. */
 	unsigned int *fat=fat_fs->fat;
 
+	if(fat[clst]==EOChain){
+		printf("end of chain: %d\n", clst);
+
+		for(int i=fat_fs->data_start; i<=fat_fs->fat_length; i++){
+			if(fat[i]==0) return (cluster_t)i;
+		}
+
+		return (cluster_t)clst;
+	}
+
 	return (cluster_t)fat[clst];
 }
 
@@ -235,5 +245,6 @@ cluster_to_sector (cluster_t clst) {
 	/* TODO: Your code goes here. */
 	unsigned int *fat=fat_fs->fat;
 
-	return (disk_sector_t)((SECTORS_PER_CLUSTER*clst)+fat_fs->data_start);
+	// return (disk_sector_t)((SECTORS_PER_CLUSTER*clst)+fat_fs->data_start);
+	return (disk_sector_t)clst;
 }
