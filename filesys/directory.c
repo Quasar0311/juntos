@@ -112,11 +112,11 @@ dir_lookup (const struct dir *dir, const char *name,
 	ASSERT (name != NULL);
 
 	if (lookup (dir, name, &e, NULL))
-		// *inode = inode_open (e.inode_sector);
-		*inode = inode_open (159);
+		*inode = inode_open (e.inode_sector);
+		// *inode = inode_open (163);
 	else
 		*inode = NULL;
-	// printf("dir lookup inode length: %d\n", inode_length(*inode));
+	printf("dir lookup inode length: %d\n", inode_length(*inode));
 	return *inode != NULL;
 }
 

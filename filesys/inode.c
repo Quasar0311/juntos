@@ -101,8 +101,8 @@ inode_create (disk_sector_t sector, off_t length) {
 	disk_sector_t start;
 
 	ASSERT (length >= 0);
-	// printf("push\n");
-
+	printf("inode create length: %d\n", length);
+	
 	/* If this assertion fails, the inode structure is not exactly
 	 * one sector in size, and you should fix that. */
 	ASSERT (sizeof *disk_inode == DISK_SECTOR_SIZE);
@@ -127,7 +127,7 @@ inode_create (disk_sector_t sector, off_t length) {
 		for(int i=1; i<sectors; i++){
 			static char zeros[DISK_SECTOR_SIZE];
 			cluster=fat_create_chain(cluster);
-			// printf("cluster : %d, sector: %d\n", cluster, cluster_to_sector(cluster));
+			printf("cluster : %d, sector: %d\n", cluster, cluster_to_sector(cluster));
 			disk_write(filesys_disk, cluster_to_sector(cluster), zeros);
 			// if(i==0){
 			// 	disk_inode->start=cluster_to_sector(cluster);
@@ -150,7 +150,7 @@ struct inode *
 inode_open (disk_sector_t sector) {
 	struct list_elem *e;
 	struct inode *inode;
-	// printf("inode open: %d\n", (int)sector);
+	printf("inode open: %d\n", (int)sector);
 
 	/* Check whether this inode is already open. */
 	for (e = list_begin (&open_inodes); e != list_end (&open_inodes);
