@@ -24,6 +24,7 @@ struct dir_entry {
  * given SECTOR.  Returns true if successful, false on failure. */
 bool
 dir_create (disk_sector_t sector, size_t entry_cnt) {
+	// printf("dir create inode create sector: %d\n", sector);
 	return inode_create (sector, entry_cnt * sizeof (struct dir_entry));
 }
 
@@ -112,13 +113,13 @@ dir_lookup (const struct dir *dir, const char *name,
 	ASSERT (name != NULL);
 
 	if (lookup (dir, name, &e, NULL)) {
-		printf("159!! : %d\n", e.inode_sector);
-		// *inode = inode_open (e.inode_sector);
-		*inode = inode_open (159);
+		// printf("159!! : %d\n", e.inode_sector);
+		*inode = inode_open (e.inode_sector);
+		// *inode = inode_open (159);
 	}
 	else
 		*inode = NULL;
-	// printf("dir lookup inode length: %d\n", inode_length(*inode));
+	// printf("dir lookup inode: %d length: %d\n", e.inode_sector, inode_length(*inode));
 	return *inode != NULL;
 }
 
@@ -140,11 +141,11 @@ dir_add (struct dir *dir, const char *name, disk_sector_t inode_sector) {
 	/* Check NAME for validity. */
 	if (*name == '\0' || strlen (name) > NAME_MAX)
 		return false;
-	// printf("lookup start: %s\n", name);
+
 	/* Check that NAME is not in use. */
 	if (lookup (dir, name, NULL, NULL))
 		goto done;
-	// printf("lookup finish\n");
+
 	/* Set OFS to offset of free slot.
 	 * If there are no free slots, then it will be set to the
 	 * current end-of-file.
@@ -161,6 +162,7 @@ dir_add (struct dir *dir, const char *name, disk_sector_t inode_sector) {
 	e.in_use = true;
 	strlcpy (e.name, name, sizeof e.name);
 	e.inode_sector = inode_sector;
+	// printf("dir add name: %s, sector: %d\n", name, (int)inode_sector);
 	success = inode_write_at (dir->inode, &e, sizeof e, ofs) == sizeof e;
 
 done:

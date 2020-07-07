@@ -153,7 +153,8 @@ fat_boot_create (void) {
 void
 fat_fs_init (void) {
 	/* TODO: Your code goes here. */
-	fat_fs->fat_length=fat_fs->bs.fat_sectors;
+	fat_fs->fat_length=fat_fs->bs.total_sectors;
+	// fat_fs->fat_length=fat_fs->bs.total_sectors;
 	fat_fs->data_start=fat_fs->bs.fat_start;
 }
 
@@ -173,6 +174,7 @@ fat_create_chain (cluster_t clst) {
 	for(int i=fat_fs->data_start; i<=fat_fs->fat_length; i++){
 		if(fat[i]==0){
 			ct=(cluster_t)i;
+			// printf("fat create chain: %d, %d, %d\n", ct, fat_fs->fat_length, i);
 			break;
 		}
 
@@ -181,6 +183,7 @@ fat_create_chain (cluster_t clst) {
 	}
 
 	if(clst==0){
+		// printf("clst is 0\n");
 		fat[ct]=EOChain;
 	}
 
@@ -188,7 +191,7 @@ fat_create_chain (cluster_t clst) {
 		fat[clst]=ct;
 		fat[ct]=EOChain;
 	}
-	printf("chain at : %d\n", ct);
+	// printf("chain at : %d\n", ct);
 	return ct;
 }
 
@@ -232,5 +235,5 @@ cluster_to_sector (cluster_t clst) {
 	/* TODO: Your code goes here. */
 	unsigned int *fat=fat_fs->fat;
 
-	return (disk_sector_t)((SECTORS_PER_CLUSTER*clst)+fat_fs->fat_length);
+	return (disk_sector_t)((SECTORS_PER_CLUSTER*clst)+fat_fs->data_start);
 }
