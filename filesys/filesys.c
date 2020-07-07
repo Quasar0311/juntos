@@ -34,6 +34,7 @@ filesys_init (bool format) {
 	fat_open ();
 
 	inode_create(cluster_to_sector(ROOT_DIR_CLUSTER), DISK_SECTOR_SIZE);
+	// printf("root create: %d\n", cluster_to_sector(ROOT_DIR_CLUSTER));
 #else
 	/* Original FS */
 	free_map_init ();
@@ -76,14 +77,14 @@ filesys_create (const char *name, off_t initial_size) {
 			// && dir_add (dir, name, inode_sector));
 			// &&dir_add(dir, name, start));
 	disk_sector_t sector = cluster_to_sector(fat_create_chain(inode_sector));
-	printf("sector for disk_inode at fs_create ; %d\n", sector);
+	// printf("sector for disk_inode at fs_create ; %d\n", sector);
 	disk_sector_t success2 = inode_create(sector, initial_size);
 	bool success3 = dir_add(dir, name, success2);
 	// if (!success && inode_sector != 0)
 		// free_map_release (inode_sector, 1);
 		// fat_remove_chain(inode_sector, 0);
 	dir_close (dir);
-	printf("suc : %d, %d, %d\n", success, success2, success3);
+	// printf("suc : %d, %d, %d\n", success, success2, success3);
 	return success && success3;
 }
 
@@ -96,6 +97,7 @@ struct file *
 filesys_open (const char *name) {
 	struct dir *dir = dir_open_root ();
 	struct inode *inode = NULL;
+	// printf("filesys open\n");
 
 	if (dir != NULL)
 		dir_lookup (dir, name, &inode);

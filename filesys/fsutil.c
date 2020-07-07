@@ -107,6 +107,7 @@ fsutil_put (char **argv) {
 	/* Create destination file. */
 	if (!filesys_create (file_name, size))
 		PANIC ("%s: create failed", file_name);
+	// printf("filesys open: %s\n", file_name);
 	dst = filesys_open (file_name);
 	if (dst == NULL)
 		PANIC ("%s: open failed", file_name);
@@ -115,7 +116,7 @@ fsutil_put (char **argv) {
 	while (size > 0) {
 		int chunk_size = size > DISK_SECTOR_SIZE ? DISK_SECTOR_SIZE : size;
 		disk_read (src, sector++, buffer);
-		// printf("size1 : %d, %d\n", size, chunk_size);
+		/*** buffer into dst ***/
 		if (file_write (dst, buffer, chunk_size) != chunk_size)
 			PANIC ("%s: write failed with %"PROTd" bytes unwritten",
 					file_name, size);
