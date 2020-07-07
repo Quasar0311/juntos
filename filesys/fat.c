@@ -188,7 +188,7 @@ fat_create_chain (cluster_t clst) {
 		fat[clst]=ct;
 		fat[ct]=EOChain;
 	}
-
+	printf("chain at : %d\n", ct);
 	return ct;
 }
 

@@ -50,19 +50,37 @@ get_disk_inode(const struct inode *inode, struct inode_disk *inode_disk){
  * INODE.
  * Returns -1 if INODE does not contain data for a byte at offset
  * POS. */
+// static disk_sector_t
+// // byte_to_sector (const struct inode *inode, off_t pos) {
+// byte_to_sector (const struct inode *inode, off_t pos) {
+// 	ASSERT (inode != NULL);
+// 	printf("pos : %d, inode start : %d\n", pos, inode -> data.start);
+// 	// printf("fatget161 : %d\n", fat_get(2));
+// 	if (pos < inode->data.length) {
+// 		cluster_t cluster = inode -> data.start;
+// 		for (int i = 0; i < pos / DISK_SECTOR_SIZE; i++) {
+// 			cluster = fat_get(cluster);
+// 		}
+// 		// printf("cluster : %d\n", cluster_to_sector(cluster));
+// 		return cluster_to_sector(cluster);
+// 	}
+// 	else
+// 		return -1;
+// 	// ASSERT(inode_disk!=NULL);
+// 	// if(pos<inode_disk->length)
+// 	// 	return inode_disk->start+pos/DISK_SECTOR_SIZE;
+// 	// else
+// 	// 	return -1;
+// }
 static disk_sector_t
 // byte_to_sector (const struct inode *inode, off_t pos) {
 byte_to_sector (const struct inode *inode, off_t pos) {
 	ASSERT (inode != NULL);
+	printf("pos : %d, inode start : %d\n", pos, inode -> data.start);
 	if (pos < inode->data.length)
-		return inode->sector + pos / DISK_SECTOR_SIZE;
+		return inode->data.start + pos / DISK_SECTOR_SIZE;
 	else
 		return -1;
-	// ASSERT(inode_disk!=NULL);
-	// if(pos<inode_disk->length)
-	// 	return inode_disk->start+pos/DISK_SECTOR_SIZE;
-	// else
-	// 	return -1;
 }
 
 /* List of open inodes, so that opening a single inode twice
@@ -112,7 +130,7 @@ inode_create (disk_sector_t sector, off_t length) {
 		for(int i=1; i<sectors; i++){
 			static char zeros[DISK_SECTOR_SIZE];
 			cluster=fat_create_chain(cluster);
-			// printf("cluster : %d\n", cluster);
+			// printf("cluster : %d\n", fat_get(cluster));
 			disk_write(filesys_disk, cluster_to_sector(cluster), zeros);
 			// if(i==0){
 			// 	disk_inode->start=cluster_to_sector(cluster);
@@ -152,7 +170,7 @@ inode_open (disk_sector_t sector) {
 		return NULL;
 
 	/* Initialize. */
-	printf("push inode : %p\n", inode);
+	
 	list_push_front (&open_inodes, &inode->elem);
 	inode->sector = sector;
 	inode->open_cnt = 1;
@@ -160,6 +178,7 @@ inode_open (disk_sector_t sector) {
 	inode->removed = false;
 	lock_init(&inode->extend_lock);
 	disk_read (filesys_disk, inode->sector, &inode->data);
+	printf("push inode : %p, %d, %d\n", inode, inode -> data.start, sector);
 	return inode;
 }
 
@@ -306,7 +325,7 @@ inode_write_at (struct inode *inode, const void *buffer_, off_t size,
 	off_t bytes_written = 0;
 	uint8_t *bounce = NULL;
 
-	// printf("inode write at : %d, %d\n", size, offset);
+	printf("inode write at : %p, %d\n", inode, offset);
 	if (inode->deny_write_cnt)
 		return 0;
 
@@ -315,10 +334,10 @@ inode_write_at (struct inode *inode, const void *buffer_, off_t size,
 	int old_length=inode_length(inode);
 	int write_end=offset+size-1;
 
-	if(write_end>old_length-1){
-		// printf("extensible file\n");
-		inode_update_file_length(&inode->data, offset, offset+size);
-	}
+	// if(write_end>old_length-1){
+	// 	// printf("extensible file\n");
+	// 	inode_update_file_length(&inode->data, offset, offset+size);
+	// }
 
 	lock_release(&inode->extend_lock);
 
@@ -350,7 +369,7 @@ inode_write_at (struct inode *inode, const void *buffer_, off_t size,
 			printf("inode : %p\n", &inode -> elem);
 			if (bounce == NULL) {
 				// printf("bounce\n");
-				bounce = malloc (DISK_SECTOR_SIZE+1);
+				bounce = malloc (DISK_SECTOR_SIZE);
 				if (bounce == NULL) {
 					// printf("malloc error\n");
 					break;
