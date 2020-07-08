@@ -322,6 +322,7 @@ syscall_open(const char *file){
 	}
 
 	lock_release(&filesys_lock);
+	// printf("fd : %d\n", fd);
 	return fd;
 }
 
@@ -510,7 +511,10 @@ bool syscall_chdir (const char *dir) {
 
 	dir = split_path(dir, file_name);
 	dir_close(thread_current() -> cwd);
+	printf("chdir : %s\n", file_name);
 	thread_current() -> cwd = dir;
+	dir_reopen(dir);
+	
 	return true;
 }
 

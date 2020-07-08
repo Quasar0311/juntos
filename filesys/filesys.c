@@ -75,13 +75,9 @@ filesys_create (const char *name, off_t initial_size) {
 	// start = inode_create(inode_sector, initial_size);
 	// printf("start : %d\n", start);
 	struct dir *dir = split_path(name, file_name);
+	printf("file name create : %s\n", file_name);
 	// printf("dir open success\n");
 	bool success = dir != NULL;
-			// && free_map_allocate (1, &inode_sector)
-			// && fat_create_chain(inode_sector)
-			// && inode_create (inode_sector, initial_size)
-			// && dir_add (dir, name, inode_sector));
-			// &&dir_add(dir, name, start));
 	disk_sector_t sector = cluster_to_sector(fat_create_chain(inode_sector));
 	// printf("sector for disk_inode at fs_create ; %d\n", sector);
 	disk_sector_t success2 = inode_create(sector, initial_size, 0);
@@ -126,9 +122,12 @@ filesys_dir_create (const char *name) {
 struct dir *
 split_path (const char *path, char *file_name) {
 	struct dir *dir;
-	char *token, *save_ptr;
+	char *token, *save_ptr, *next_token, *save_ptr2;
 	char *file_token;
 	struct inode *inode = NULL;
+	char *path2 = palloc_get_page(0);
+
+	memcpy(path2, path, strlen(path) + 1);
 
 	if (path == NULL || file_name == NULL) {
 		return NULL;
@@ -141,31 +140,33 @@ split_path (const char *path, char *file_name) {
 		dir = dir_open_root();
 	}
 	else {
-		// printf("parsing : %p\n", thread_current() -> cwd);
-		// dir = dir_open(dir_get_inode(thread_current() -> cwd));
-		// dir = thread_current() -> cwd;
 		dir = dir_reopen(thread_current() -> cwd);
-		// dir = dir_open_root();
 	}
+
+	next_token = strtok_r(path2, "/", &save_ptr2);
 
 	for (token = strtok_r(path, "/", &save_ptr); token != NULL;
 			token = strtok_r(NULL, "/", &save_ptr)) {
-			
+		next_token = strtok_r(NULL, "/", &save_ptr2);
+		// printf("next_token : %s, token :  %s\n", next_token, token);
+		if (next_token == NULL) {
+			// printf("next token null\n");
+			file_token = token;
+			break;//a
+		}
 		// printf("token : %s\n", token);
 		if (dir_lookup(dir, token, &inode)) {
 			if (inode_is_dir(inode)) {
 				dir_close(dir);
 				dir = dir_open(inode);
+				printf("path dir : %s, %p\n", token, dir);
 			}
-			// else {
-			// 	memcpy(file_name, token, sizeof(char) * (strlen(token) + 1));
-			// 	return NULL;
-			// }
 		}
 
 		file_token = token;
 	}
 	memcpy(file_name, file_token, sizeof(char) * (strlen(file_token) + 1));
+	palloc_free_page(path2);
 
 	return dir;
 }
@@ -181,11 +182,13 @@ filesys_open (const char *name) {
 	struct dir *dir = split_path(name, file_name);
 	struct inode *inode = NULL;
 
-	// printf("file name : %s\n ", file_name);
+	printf("file name : %s, dir : %p\n", file_name, dir);
 
 	if (dir != NULL)
 		dir_lookup (dir, file_name, &inode);
 	dir_close (dir);
+
+	// printf("inode2 : %p\n", inode);
 
 	return file_open (inode);
 }

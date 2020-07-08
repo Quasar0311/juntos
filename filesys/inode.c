@@ -339,6 +339,8 @@ inode_write_at (struct inode *inode, const void *buffer_, off_t size,
 	if (inode->deny_write_cnt)
 		return 0;
 
+
+
 	int old_length=inode_length(inode);
 	int write_end=offset+size-1;
 	// printf("inode write at inode length: %d\n", old_length);

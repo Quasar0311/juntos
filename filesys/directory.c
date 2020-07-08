@@ -112,6 +112,7 @@ dir_lookup (const struct dir *dir, const char *name,
 
 	ASSERT (dir != NULL);
 	ASSERT (name != NULL);
+	// printf("\ninode read at : %p, sector: %d\n", dir, inode_get_inumber(dir->inode));
 	// printf("dir lookup : %p\n", dir);
 	if (lookup (dir, name, &e, NULL)) {
 		// printf("159!! : %d\n", e.inode_sector);
@@ -121,6 +122,7 @@ dir_lookup (const struct dir *dir, const char *name,
 	else
 		*inode = NULL;
 	// printf("dir lookup inode: %d length: %d\n", e.inode_sector, inode_length(*inode));
+	// printf("inode1 : %p\n", *inode);
 	return *inode != NULL;
 }
 
