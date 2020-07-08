@@ -139,16 +139,16 @@ split_path (char *path, char *file_name) {
 	for (token = strtok_r(path, "/", &save_ptr); token != NULL;
 			token = strtok_r(NULL, "/", &save_ptr)) {
 			
-		printf("token : %s\n", token);
+		printf("path: %s, token : %s\n", path, token);
 		if (dir_lookup(dir, token, &inode)) {
 			if (inode_is_dir(inode)) {
 				dir_close(dir);
 				dir = dir_open(inode);
 			}
-			// else {
+			else {
 			// 	memcpy(file_name, token, sizeof(char) * (strlen(token) + 1));
-			// 	return NULL;
-			// }
+				return NULL;
+			}
 		}
 
 		file_token = token;

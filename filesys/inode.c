@@ -69,7 +69,7 @@ static disk_sector_t
 // byte_to_sector (const struct inode *inode, off_t pos) {
 byte_to_sector (const struct inode *inode, off_t pos) {
 	ASSERT (inode != NULL);
-	// printf("pos : %d, inode start : %d, length: %d\n", pos, inode -> data.start, inode->data.length);
+	printf("pos : %d, inode start : %d, length: %d\n", pos, inode -> data.start, inode->data.length);
 	// printf("fatget161 : %d\n", fat_get(2));
 	if (pos < inode->data.length) {
 		cluster_t cluster = inode -> data.start;
@@ -81,7 +81,7 @@ byte_to_sector (const struct inode *inode, off_t pos) {
 	}
 
 	else{
-		// printf("byte to sector -1\n");
+		printf("byte to sector -1\n");
 		return -1;
 	}
 }
@@ -246,8 +246,10 @@ inode_read_at (struct inode *inode, void *buffer_, off_t size, off_t offset) {
 	uint8_t *buffer = buffer_;
 	off_t bytes_read = 0;
 	uint8_t *bounce = NULL;
+	printf("inode read at size: %d\n", size);
 
 	while (size > 0) {
+		printf("byte to sector offset: %d\n", offset);
 		/* Disk sector to read, starting byte offset within sector. */
 		disk_sector_t sector_idx = byte_to_sector (inode/*inode*/, offset);
 		int sector_ofs = offset % DISK_SECTOR_SIZE;
