@@ -129,18 +129,20 @@ split_chdir (const char *path, char *file_name) {
 	char *token, *save_ptr, *next_token, *save_ptr2;
 	char *file_token;
 	struct inode *inode = NULL;
+	char *path1 = palloc_get_page(0);
 	char *path2 = palloc_get_page(0);
 
+	memcpy(path1, path, strlen(path) + 1);
 	memcpy(path2, path, strlen(path) + 1);
 
-	if (path == NULL || file_name == NULL) {
+	if (path1 == NULL || file_name == NULL) {
 		return NULL;
 	}
-	if (strlen(path) == 0) {
+	if (strlen(path1) == 0) {
 		return NULL;
 	}
 
-	if (path[0] == '/') {
+	if (path1[0] == '/') {
 		dir = dir_open_root();
 	}
 	else {
@@ -149,7 +151,7 @@ split_chdir (const char *path, char *file_name) {
 
 	next_token = strtok_r(path2, "/", &save_ptr2);
 
-	for (token = strtok_r(path, "/", &save_ptr); token != NULL;
+	for (token = strtok_r(path1, "/", &save_ptr); token != NULL;
 			token = strtok_r(NULL, "/", &save_ptr)) {
 		next_token = strtok_r(NULL, "/", &save_ptr2);
 		// printf("\nnext_token : %s, token :  %s\n", next_token, token);
@@ -170,6 +172,7 @@ split_chdir (const char *path, char *file_name) {
 		file_token = token;
 	}
 	memcpy(file_name, file_token, sizeof(char) * (strlen(file_token) + 1));
+	palloc_free_page(path1);
 	palloc_free_page(path2);
 
 	return dir;
@@ -181,18 +184,20 @@ split_path (const char *path, char *file_name) {
 	char *token, *save_ptr, *next_token, *save_ptr2;
 	char *file_token;
 	struct inode *inode = NULL;
+	char *path1 = palloc_get_page(0);
 	char *path2 = palloc_get_page(0);
 
+	memcpy(path1, path, strlen(path) + 1);
 	memcpy(path2, path, strlen(path) + 1);
 
-	if (path == NULL || file_name == NULL) {
+	if (path1 == NULL || file_name == NULL) {
 		return NULL;
 	}
-	if (strlen(path) == 0) {
+	if (strlen(path1) == 0) {
 		return NULL;
 	}
 
-	if (path[0] == '/') {
+	if (path1[0] == '/') {
 		dir = dir_open_root();
 	}
 	else {
@@ -201,7 +206,7 @@ split_path (const char *path, char *file_name) {
 
 	next_token = strtok_r(path2, "/", &save_ptr2);
 
-	for (token = strtok_r(path, "/", &save_ptr); token != NULL;
+	for (token = strtok_r(path1, "/", &save_ptr); token != NULL;
 			token = strtok_r(NULL, "/", &save_ptr)) {
 		next_token = strtok_r(NULL, "/", &save_ptr2);
 		// printf("\nnext_token : %s, token :  %s\n", next_token, token);
@@ -222,62 +227,11 @@ split_path (const char *path, char *file_name) {
 		file_token = token;
 	}
 	memcpy(file_name, file_token, sizeof(char) * (strlen(file_token) + 1));
+	palloc_free_page(path1);
 	palloc_free_page(path2);
 
 	return dir;
 }
-
-// struct dir *
-// split_dir (const char *path, char *file_name) {
-// 	struct dir *dir;
-// 	char *token, *save_ptr, *next_token, *save_ptr2;
-// 	char *file_token;
-// 	struct inode *inode = NULL;
-// 	char *path2 = palloc_get_page(0);
-
-// 	memcpy(path2, path, strlen(path) + 1);
-
-// 	if (path == NULL || file_name == NULL) {
-// 		return NULL;
-// 	}
-// 	if (strlen(path) == 0) {
-// 		return NULL;
-// 	}
-
-// 	if (path[0] == '/') {
-// 		dir = dir_open_root();
-// 	}
-// 	else {
-// 		dir = dir_reopen(thread_current() -> cwd);
-// 	}
-
-// 	next_token = strtok_r(path2, "/", &save_ptr2);
-
-// 	for (token = strtok_r(path, "/", &save_ptr); token != NULL;
-// 			token = strtok_r(NULL, "/", &save_ptr)) {
-// 		next_token = strtok_r(NULL, "/", &save_ptr2);
-// 		printf("\nnext_token : %s, token :  %s\n", next_token, token);
-// 		if (next_token == NULL) {
-// 			// printf("next token null\n");
-// 			file_token = token;
-// 			break;//a
-// 		}
-// 		// printf("token : %s\n", token);
-// 		if (dir_lookup(dir, token, &inode) && !dir_lookup(dir, next_token, &inode)) {
-// 			if (inode_is_dir(inode)) {
-// 				dir_close(dir);
-// 				dir = dir_open(inode);
-// 				printf("path dir : %s, %p\n", token, dir);
-// 			}
-// 		}
-
-// 		file_token = token;
-// 	}
-// 	memcpy(file_name, file_token, sizeof(char) * (strlen(file_token) + 1));
-// 	palloc_free_page(path2);
-
-// 	return dir;
-// }
 
 /* Opens the file with the given NAME.
  * Returns the new file if successful or a null pointer

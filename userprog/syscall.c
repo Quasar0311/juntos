@@ -196,13 +196,13 @@ syscall_handler (struct intr_frame *f) {
 
 		/*** SYS_CHDIR ***/
 		case SYS_CHDIR:
-			syscall_chdir((char *) f -> R.rdi);
+			f -> R.rax = syscall_chdir((char *) f -> R.rdi);
 			break;
 
 		/*** SYS_MKDIR ***/
 		case SYS_MKDIR:
 
-			syscall_mkdir((char *) f -> R.rdi);
+			f -> R.rax = syscall_mkdir((char *) f -> R.rdi);
 			break;
 
 		/*** SYS_READDIR ***/
@@ -314,12 +314,14 @@ syscall_open(const char *file){
 	struct thread *curr = thread_current();
 
 	lock_acquire(&filesys_lock);
-	
+	// printf("open1 : %s\n", file);
 	f=filesys_open(file);
 	fd=process_add_file(f);
+	// printf("open : %d\n", fd);
 	if (!strcmp(curr -> name, file)) {
 		file_deny_write(f);
 	}
+	// printf("open2 : %s\n", file);
 
 	lock_release(&filesys_lock);
 	return fd;
@@ -434,6 +436,7 @@ void
 syscall_close(int fd){
 	/*** close file by using file descriptor 
 	and initialize entry ***/
+	// printf("close fd : %d\n", fd);
 	process_close_file(fd);
 }
 
@@ -516,6 +519,9 @@ bool syscall_chdir (const char *dir) {
 
 
 bool syscall_mkdir (const char *dir) {
+	if (strlen(dir) == 0) {
+		return false;
+	}
 	return filesys_dir_create(dir);
 }
 
