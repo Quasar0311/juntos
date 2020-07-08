@@ -275,7 +275,7 @@ filesys_remove (const char *name) {
 
 	if (inode_is_dir(inode)) {
 		// printf("directory : %d\n", dir_element(dir));
-		if (!dir_readdir(dir, readdir_name) && dir != thread_current() -> cwd) {
+		if (!dir_empty(dir, readdir_name) && dir != thread_current() -> cwd) {
 			success = dir_remove(dir, file_name);
 		}
 	}

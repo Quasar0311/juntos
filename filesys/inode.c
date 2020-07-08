@@ -22,6 +22,7 @@ struct inode_disk {
 	uint32_t unused[124];               /* Not used. */
 
 	uint32_t is_dir;
+	// uint32_t dir_pos;
 };
 
 /* Returns the number of sectors to allocate for an inode SIZE
@@ -122,6 +123,7 @@ inode_create (disk_sector_t sector, off_t length, uint32_t is_dir) {
 		disk_inode->length = length;
 		disk_inode->magic = INODE_MAGIC;
 		disk_inode -> is_dir = is_dir;
+		// disk_inode->dir_pos=0;
 
 		// printf("sector, sectors, root sector : %d, %d, %d\n", sector, sectors, cluster_to_sector(sector));
 
@@ -440,7 +442,12 @@ inode_length (const struct inode *inode) {
 	return inode->data.length;
 }
 
-
-bool inode_is_dir(const struct inode *inode) {
+bool
+inode_is_dir(const struct inode *inode) {
 	return inode->data.is_dir;
 }
+
+// uint32_t
+// dir_pos(struct inode *inode){
+// 	return inode->data.dir_pos;
+// }

@@ -531,18 +531,6 @@ bool syscall_mkdir (const char *dir) {
 	return filesys_dir_create(dir);
 }
 
-
-bool syscall_isdir (int fd) {
-	struct file *f;
-	struct inode *inode;
-
-	f = process_get_file(fd);
-	inode = file_get_inode(f);
-
-	return inode_is_dir(inode);
-}
-
-
 bool syscall_readdir (int fd, char *name) {
 	struct file *f;
 	struct inode *inode;
@@ -554,11 +542,9 @@ bool syscall_readdir (int fd, char *name) {
 	if (!inode_is_dir(inode)) {
 		return false;
 	}
-
-	printf("readdir name : %s\n", name);
-
+	
 	return dir_readdir(dir_open(inode), name);
-
+	// return dir_readdir(dir_reopen(dir_open(inode)), name);
 }
 
 bool syscall_isdir (int fd){
