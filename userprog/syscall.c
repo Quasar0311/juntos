@@ -196,6 +196,7 @@ syscall_handler (struct intr_frame *f) {
 
 		/*** SYS_CHDIR ***/
 		case SYS_CHDIR:
+			syscall_chdir((char *) f -> R.rdi);
 			break;
 
 		/*** SYS_MKDIR ***/
@@ -502,6 +503,15 @@ void syscall_lock_acquire (void) {
 void syscall_lock_release (void) {
 	lock_release(&filesys_lock);
 	return;
+}
+
+bool syscall_chdir (const char *dir) {
+	char file_name[strlen(dir) + 1];
+
+	dir = split_path(dir, file_name);
+	dir_close(thread_current() -> cwd);
+	thread_current() -> cwd = dir;
+	return true;
 }
 
 

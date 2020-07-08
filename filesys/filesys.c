@@ -37,7 +37,7 @@ filesys_init (bool format) {
 	inode_create(cluster_to_sector(ROOT_DIR_CLUSTER), DISK_SECTOR_SIZE, 1);
 	/*** first, root directory is for current cwd ***/
 	thread_current() -> cwd = dir_open_root();
-	dir_close(thread_current() -> cwd);
+	// dir_close(thread_current() -> cwd);
 	// printf("root create: %d\n", cluster_to_sector(ROOT_DIR_CLUSTER));
 #else
 	/* Original FS */
@@ -75,7 +75,7 @@ filesys_create (const char *name, off_t initial_size) {
 	// start = inode_create(inode_sector, initial_size);
 	// printf("start : %d\n", start);
 	struct dir *dir = split_path(name, file_name);
-	printf("dir open success\n");
+	// printf("dir open success\n");
 	bool success = dir != NULL;
 			// && free_map_allocate (1, &inode_sector)
 			// && fat_create_chain(inode_sector)
@@ -97,23 +97,34 @@ filesys_create (const char *name, off_t initial_size) {
 
 bool
 filesys_dir_create (const char *name) {
-	// disk_sector_t inode_sector = 0;
-	// disk_sector_t start;
+	disk_sector_t inode_sector = 0;
+	disk_sector_t start;
+	struct dir *add_dir;
 
-	// struct dir *dir = split_path(name);
-	// bool success = dir != NULL;
+	char file_name[strlen(name) + 1];
 
-	// disk_sector_t sector = cluster_to_sector(fat_create_chain(inode_sector));
-	// disk_sector_t success2 = dir_create(sector, 16);
+	struct dir *dir = split_path(name, file_name);
+	bool success = dir != NULL;
 
-	// bool success3 = dir_add(dir, name, sector);
+	// printf("file name : %s\n", file_name);
 
-	// dir_close (dir);
-	// return success && success3;
+	disk_sector_t sector = cluster_to_sector(fat_create_chain(inode_sector));
+	disk_sector_t success2 = dir_create(sector, 16);
+
+	bool success3 = dir_add(dir, file_name, sector);
+
+	add_dir = dir_open(inode_open(sector));
+	dir_add(add_dir, ".", sector);
+	dir_add(add_dir, "..", inode_get_inumber(dir_get_inode(dir)));
+	dir_close(add_dir);
+
+	dir_close (dir);
+	// printf("dir_create\n");
+	return success && success3;
 }
 
 struct dir *
-split_path (char *path, char *file_name) {
+split_path (const char *path, char *file_name) {
 	struct dir *dir;
 	char *token, *save_ptr;
 	char *file_token;
@@ -130,16 +141,17 @@ split_path (char *path, char *file_name) {
 		dir = dir_open_root();
 	}
 	else {
-		printf("parsing : %p\n", thread_current() -> cwd);
-		dir = dir_open(dir_get_inode(thread_current() -> cwd));
+		// printf("parsing : %p\n", thread_current() -> cwd);
+		// dir = dir_open(dir_get_inode(thread_current() -> cwd));
 		// dir = thread_current() -> cwd;
-		// dir = dir_reopen(thread_current() -> cwd);
+		dir = dir_reopen(thread_current() -> cwd);
+		// dir = dir_open_root();
 	}
 
 	for (token = strtok_r(path, "/", &save_ptr); token != NULL;
 			token = strtok_r(NULL, "/", &save_ptr)) {
 			
-		printf("path: %s, token : %s\n", path, token);
+		// printf("token : %s\n", token);
 		if (dir_lookup(dir, token, &inode)) {
 			if (inode_is_dir(inode)) {
 				dir_close(dir);
@@ -165,23 +177,14 @@ split_path (char *path, char *file_name) {
  * or if an internal memory allocation fails. */
 struct file *
 filesys_open (const char *name) {
-	struct dir *dir = dir_open_root ();
+	char file_name[strlen(name) + 1];
+	struct dir *dir = split_path(name, file_name);
 	struct inode *inode = NULL;
 
-	/*** directory split ***/
-	// char *token, *save_ptr;
-	// char *name_copy = palloc_get_page(0);
-	// memcpy(name_copy, name, strlen(name) + 1);
-
-	// for (token == strtok_r(name_copy, "/", &save_ptr); token != NULL;
-	// 		token = strtok_r(NULL, "/", &save_ptr)) {
-	// 			printf("hi\n");
-	// }
-
-	// printf("filesys open\n");
+	// printf("file name : %s\n ", file_name);
 
 	if (dir != NULL)
-		dir_lookup (dir, name, &inode);
+		dir_lookup (dir, file_name, &inode);
 	dir_close (dir);
 
 	return file_open (inode);
@@ -193,8 +196,21 @@ filesys_open (const char *name) {
  * or if an internal memory allocation fails. */
 bool
 filesys_remove (const char *name) {
-	struct dir *dir = dir_open_root ();
-	bool success = dir != NULL && dir_remove (dir, name);
+	char file_name[strlen(name) + 1];
+	struct inode *inode;
+	struct dir *dir = split_path(name, file_name);
+	bool success;
+
+	dir_lookup(dir, file_name, &inode);
+
+	if (inode_is_dir(inode)) {
+		success = dir_remove(dir, file_name);
+	}
+	else {
+		success = dir_remove(dir, file_name);
+	}
+	
+	// bool success = dir != NULL && dir_remove (dir, name);
 	dir_close (dir);
 
 	return success;

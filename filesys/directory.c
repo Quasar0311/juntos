@@ -56,6 +56,7 @@ dir_open_root (void) {
  * Returns a null pointer on failure. */
 struct dir *
 dir_reopen (struct dir *dir) {
+	// printf("dir reopen : %p\n", dir->inode);
 	return dir_open (inode_reopen (dir->inode));
 }
 
@@ -87,7 +88,7 @@ lookup (const struct dir *dir, const char *name,
 
 	ASSERT (dir != NULL);
 	ASSERT (name != NULL);
-	printf("inode read at: %s\n", name);
+	// printf("inode read at : %p\n", dir);
 	for (ofs = 0; inode_read_at (dir->inode, &e, sizeof e, ofs) == sizeof e;
 			ofs += sizeof e)
 		if (e.in_use && !strcmp (name, e.name)) {
@@ -111,7 +112,7 @@ dir_lookup (const struct dir *dir, const char *name,
 
 	ASSERT (dir != NULL);
 	ASSERT (name != NULL);
-
+	// printf("dir lookup : %p\n", dir);
 	if (lookup (dir, name, &e, NULL)) {
 		// printf("159!! : %d\n", e.inode_sector);
 		*inode = inode_open (e.inode_sector);
