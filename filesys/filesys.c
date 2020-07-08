@@ -265,16 +265,20 @@ filesys_remove (const char *name) {
 	char file_name[strlen(name) + 1];
 	struct inode *inode;
 	struct dir *dir = split_path(name, file_name);
+	struct dir *dir2;
 	bool success;
 	char readdir_name[NAME_MAX + 1];
 
-	// printf("remove : %s\n", file_name);
+	// printf("remove : %s, %s\n", file_name, name);
 
 	dir_lookup(dir, file_name, &inode);
-
+	
 	if (inode_is_dir(inode)) {
+		dir2 = dir_open(inode);
 		// printf("directory : %d\n", dir_element(dir));
-		if (!dir_empty(dir, readdir_name) && dir != thread_current() -> cwd) {
+		// printf("dir2, cur : %p, %p\n", dir_get_inode(dir2), dir_get_inode(thread_current() -> cwd));
+		if (!dir_readdir(dir2, readdir_name) && dir_get_inode(dir2) != dir_get_inode(thread_current() -> cwd)) {
+			// printf("suc\n");
 			success = dir_remove(dir, file_name);
 		}
 	}

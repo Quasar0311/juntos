@@ -519,6 +519,7 @@ bool syscall_chdir (const char *dir) {
 	dir = split_chdir(dir, file_name);
 
 	if (dir == NULL) return  false;
+	// printf("chdir : %p\n", dir);
 
 	dir_close(thread_current() -> cwd);
 	thread_current() -> cwd = dir;

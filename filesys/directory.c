@@ -12,6 +12,7 @@ struct dir {
 	struct inode *inode;                /* Backing store. */
 	off_t pos;                          /* Current position. */
 	// int element;
+	off_t previous_pos;
 };
 
 /* A single directory entry. */
@@ -223,16 +224,20 @@ bool
 dir_readdir (struct dir *dir, char name[NAME_MAX + 1]) {
 	struct dir_entry e;
 
+	// printf("pos, prepos : %d\n", dir -> pos);
 	while (inode_read_at (dir->inode, &e, sizeof e, dir->pos) == sizeof e) {
 		dir->pos += sizeof e;
+		// printf("pos : %d\n", dir -> pos);
 		if (e.in_use) {
 			if(strcmp(e.name, ".") && strcmp(e.name, "..")){
 				strlcpy (name, e.name, NAME_MAX + 1);
 				// printf("ename : %s, name : %s\n", e.name, name);
+				// printf("true\n");
 				return true;
 			}
 		}
 	}
+	// printf("false\n");
 	return false;
 }
 
@@ -245,13 +250,16 @@ dir_empty (struct dir *dir, char name[NAME_MAX + 1]) {
 		dir->pos += sizeof e;
 		if (e.in_use) {
 			if(strcmp(e.name, ".") && strcmp(e.name, "..")) {
+				// printf("name : %s\n", e.name);
+
 				strlcat(name, e.name, NAME_MAX+1);
+				return true;
 			}
 		}
 	}
 
 	dir->pos=pos;
 
-	if(strcmp(name, "")) return true;
+	// printf("false\n");
 	return false;
 }
