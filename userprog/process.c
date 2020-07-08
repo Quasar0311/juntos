@@ -458,15 +458,17 @@ process_exit (void) {
 
 	/*** release file descriptor ***/
 	process_cleanup ();
+	
 
 	lock_release(&writable_lock);
 
 	sema_up(&curr -> exit_sema);
 
 	if (curr -> run_file != NULL) file_allow_write(curr->run_file);
-	dir_close(curr -> cwd);
+	
 
 	sema_down(&curr -> child_sema);
+	dir_close(curr -> cwd);
 }
 
 /* Free the current process's resources. */

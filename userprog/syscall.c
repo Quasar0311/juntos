@@ -511,5 +511,11 @@ bool syscall_mkdir (const char *dir) {
 
 
 bool syscall_isdir (int fd) {
-	
+	struct file *f;
+	struct inode *inode;
+
+	f = process_get_file(fd);
+	inode = file_get_inode(f);
+
+	return inode_is_dir(inode);
 }

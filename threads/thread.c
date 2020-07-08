@@ -308,7 +308,7 @@ thread_create (const char *name, int priority,
 	list_init(&t->mmap_list);
 
 	if (thread_current() -> cwd != NULL) {
-		t -> cwd = dir_reopen(thread_current() -> cwd);
+		t -> cwd = dir_open(dir_get_inode(thread_current() -> cwd));
 	}
 
 	/* Add to run queue. */
