@@ -207,6 +207,7 @@ syscall_handler (struct intr_frame *f) {
 
 		/*** SYS_READDIR ***/
 		case SYS_READDIR:
+			f -> R.rax = syscall_readdir((int) f -> R.rdi, (char *) f -> R.rsi);
 			break;
 
 		/*** SYS_ISDIR ***/
@@ -512,6 +513,9 @@ bool syscall_chdir (const char *dir) {
 	char file_name[strlen(dir) + 1];
 
 	dir = split_chdir(dir, file_name);
+
+	if (dir == NULL) return  false;
+
 	dir_close(thread_current() -> cwd);
 	thread_current() -> cwd = dir;
 	return true;
@@ -534,4 +538,23 @@ bool syscall_isdir (int fd) {
 	inode = file_get_inode(f);
 
 	return inode_is_dir(inode);
+}
+
+
+bool syscall_readdir (int fd, char *name) {
+	struct file *f;
+	struct inode *inode;
+	char readdir_name[NAME_MAX + 1];
+
+	f = process_get_file(fd);
+	inode = file_get_inode(f);
+
+	if (!inode_is_dir(inode)) {
+		return false;
+	}
+
+	// printf("readdir name : %s\n", name);
+
+	return dir_readdir(dir_open(inode), readdir_name);
+
 }

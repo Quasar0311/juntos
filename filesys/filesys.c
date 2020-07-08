@@ -77,15 +77,12 @@ filesys_create (const char *name, off_t initial_size) {
 	struct dir *dir = split_path(name, file_name);
 	// printf("dir open success\n");
 	bool success = dir != NULL;
-			// && free_map_allocate (1, &inode_sector)
-			// && fat_create_chain(inode_sector)
-			// && inode_create (inode_sector, initial_size)
-			// && dir_add (dir, name, inode_sector));
-			// &&dir_add(dir, name, start));
+
 	disk_sector_t sector = cluster_to_sector(fat_create_chain(inode_sector));
 	// printf("sector for disk_inode at fs_create ; %d\n", sector);
 	disk_sector_t success2 = inode_create(sector, initial_size, 0);
 	bool success3 = dir_add(dir, file_name, sector);
+
 	// if (!success && inode_sector != 0)
 		// free_map_release (inode_sector, 1);
 		// fat_remove_chain(inode_sector, 0);
@@ -154,19 +151,18 @@ split_chdir (const char *path, char *file_name) {
 	for (token = strtok_r(path1, "/", &save_ptr); token != NULL;
 			token = strtok_r(NULL, "/", &save_ptr)) {
 		next_token = strtok_r(NULL, "/", &save_ptr2);
-		// printf("\nnext_token : %s, token :  %s\n", next_token, token);
-		// if (next_token == NULL) {
-		// 	// printf("next token null\n");
-		// 	file_token = token;
-		// 	break;//a
-		// }
-		// printf("token : %s\n", token);
+
 		if (dir_lookup(dir, token, &inode)) {
+			// printf("lookup success\n");
 			if (inode_is_dir(inode)) {
+				// printf("lookup success2\n");
 				dir_close(dir);
 				dir = dir_open(inode);
 				// printf("path dir : %s, %p\n", token, dir);
 			}
+		}
+		else {
+			return NULL;
 		}
 
 		file_token = token;
@@ -202,6 +198,11 @@ split_path (const char *path, char *file_name) {
 	}
 	else {
 		dir = dir_reopen(thread_current() -> cwd);
+	}
+
+	if (!strcmp(path1, "/")) {
+		memcpy(file_name, path1, sizeof(char) * (strlen(path1) + 1));
+		return dir;
 	}
 
 	next_token = strtok_r(path2, "/", &save_ptr2);
@@ -245,6 +246,9 @@ filesys_open (const char *name) {
 	struct inode *inode = NULL;
 
 	// printf("file name : %s\n ", file_name);
+	if (!strcmp(name, "/")) {
+		return file_open(dir_get_inode(dir));
+	}
 
 	if (dir != NULL)
 		dir_lookup (dir, file_name, &inode);
@@ -263,13 +267,20 @@ filesys_remove (const char *name) {
 	struct inode *inode;
 	struct dir *dir = split_path(name, file_name);
 	bool success;
+	char readdir_name[NAME_MAX + 1];
+
+	// printf("remove : %s\n", file_name);
 
 	dir_lookup(dir, file_name, &inode);
 
 	if (inode_is_dir(inode)) {
-		success = dir_remove(dir, file_name);
+		// printf("directory : %d\n", dir_element(dir));
+		if (!dir_readdir(dir, readdir_name) && dir != thread_current() -> cwd) {
+			success = dir_remove(dir, file_name);
+		}
 	}
 	else {
+		// printf("file\n");
 		success = dir_remove(dir, file_name);
 	}
 	
