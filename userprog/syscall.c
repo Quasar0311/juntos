@@ -220,6 +220,7 @@ syscall_handler (struct intr_frame *f) {
 
 		/*** SYS_SYMLINK ***/
 		case SYS_SYMLINK:
+			f -> R.rax = syscall_symlink((char *)f -> R.rdi, (char *) f -> R.rsi);
 			break;
 
 		default:
@@ -556,5 +557,22 @@ bool syscall_readdir (int fd, char *name) {
 	// printf("readdir name : %s\n", name);
 
 	return dir_readdir(dir_open(inode), readdir_name);
+
+}
+
+
+int 
+syscall_symlink (const char *target, const char *linkpath) {
+	struct file *f;
+	int fd=-1;
+	struct thread *curr = thread_current();
+	struct inode *target_inode;
+
+	// printf("open1 : %s\n", file);
+	f=filesys_open(target);
+	target_inode = file_get_inode(f);
+	file_close(f);
+
+	
 
 }
