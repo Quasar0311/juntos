@@ -11,7 +11,7 @@
 struct dir {
 	struct inode *inode;                /* Backing store. */
 	off_t pos;                          /* Current position. */
-	// int element;
+	// int element; 
 };
 
 /* A single directory entry. */
@@ -89,7 +89,7 @@ lookup (const struct dir *dir, const char *name,
 
 	ASSERT (dir != NULL);
 	ASSERT (name != NULL);
-	// printf("inode read at : %p\n", dir);
+	printf("inode read at : %p\n", dir);
 	for (ofs = 0; inode_read_at (dir->inode, &e, sizeof e, ofs) == sizeof e;
 			ofs += sizeof e)
 		if (e.in_use && !strcmp (name, e.name)) {
@@ -113,7 +113,7 @@ dir_lookup (const struct dir *dir, const char *name,
 
 	ASSERT (dir != NULL);
 	ASSERT (name != NULL);
-	// printf("dir lookup : %p\n", dir);
+	printf("dir lookup : %p\n", dir);
 	if (lookup (dir, name, &e, NULL)) {
 		// printf("159!! : %d\n", e.inode_sector);
 		*inode = inode_open (e.inode_sector);
@@ -121,7 +121,7 @@ dir_lookup (const struct dir *dir, const char *name,
 	}
 	else
 		*inode = NULL;
-	// printf("dir lookup inode: %d length: %d\n", e.inode_sector, inode_length(*inode));
+	printf("dir lookup inode: %d length: %d\n", e.inode_sector, inode_length(*inode));
 	return *inode != NULL;
 }
 
@@ -233,25 +233,34 @@ dir_readdir (struct dir *dir, char name[NAME_MAX + 1]) {
 			}
 		}
 	}
+	// printf("dir readdir failed\n");
 	return false;
 }
 
-bool
-dir_empty (struct dir *dir, char name[NAME_MAX + 1]) {
-	struct dir_entry e;
-	off_t pos;
+// bool
+// dir_empty (struct dir *dir, char name[NAME_MAX + 1]) {
+// 	struct dir_entry e;
+// 	off_t pos;
 
-	while (inode_read_at (dir->inode, &e, sizeof e, dir->pos) == sizeof e) {
-		dir->pos += sizeof e;
-		if (e.in_use) {
-			if(strcmp(e.name, ".") && strcmp(e.name, "..")) {
-				strlcat(name, e.name, NAME_MAX+1);
-			}
-		}
-	}
+// 	while (inode_read_at (dir->inode, &e, sizeof e, dir->pos) == sizeof e) {
+// 		dir->pos += sizeof e;
+// 		if (e.in_use) {
+// 			if(strcmp(e.name, ".") && strcmp(e.name, "..")) {
+// 				// printf("name : %s\n", e.name);
 
-	dir->pos=pos;
+// 				strlcat(name, e.name, NAME_MAX+1);
+// 				return true;
+// 			}
+// 		}
+// 	}
 
-	if(strcmp(name, "")) return true;
-	return false;
-}
+// 	dir->pos=pos;
+
+// 	// printf("false\n");
+// 	return false;
+// }
+
+// int
+// dir_element(struct dir *dir){
+// 	return dir->element;
+// }

@@ -222,6 +222,7 @@ syscall_handler (struct intr_frame *f) {
 
 		/*** SYS_SYMLINK ***/
 		case SYS_SYMLINK:
+			f -> R.rax = syscall_symlink((char *)f -> R.rdi, (char *) f -> R.rsi);
 			break;
 
 		default:
@@ -565,5 +566,40 @@ int syscall_inumber (int fd){
 	inode = file_get_inode(f);
 
 	return inode_get_inumber(inode);
+}
 
+int 
+syscall_symlink (const char *target, const char *linkpath) {
+	struct file *f;
+	int fd=-1;
+	struct thread *curr = thread_current();
+	struct inode *target_inode;
+	disk_sector_t inumber;
+	char file_name[strlen(linkpath) + 1];
+	struct dir *dir;
+
+	printf("\nsymlink\n");
+	if(dir_lookup(curr->cwd, target, &target_inode)) printf("dir lookup success\n");
+	f=filesys_open(target);
+	printf("filesys open\n");
+	target_inode = file_get_inode(f);
+	if (target_inode == NULL) {
+		printf("target inode is null\n");
+		return -1;
+	}
+	// file_close(f);
+
+	inumber = inode_get_inumber(target_inode);
+	dir = split_path(linkpath, file_name);
+	printf("inode len : %d\n", inode_length(target_inode));
+	// inode_create(inumber, inode_length(target_inode), 0);
+	printf("inumber sector : %d\n", inumber);
+	if (!dir_add(dir, file_name, inumber)){
+		printf("dir add failed\n");
+		return -1;
+	}
+
+	dir_close(dir);
+
+	return 0;
 }

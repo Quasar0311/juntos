@@ -73,7 +73,7 @@ filesys_create (const char *name, off_t initial_size) {
 	disk_sector_t start;
 	char file_name[strlen(name) + 1];
 	// start = inode_create(inode_sector, initial_size);
-	// printf("start : %d\n", start);
+	printf("\nstart : %d\n", start);
 	struct dir *dir = split_path(name, file_name);
 	// printf("dir open success\n");
 	bool success = dir != NULL;
@@ -245,7 +245,7 @@ filesys_open (const char *name) {
 	struct dir *dir = split_path(name, file_name);
 	struct inode *inode = NULL;
 
-	// printf("file name : %s\n ", file_name);
+	printf("file name : %s\n ", file_name);
 	if (!strcmp(name, "/")) {
 		return file_open(dir_get_inode(dir));
 	}
@@ -266,16 +266,20 @@ filesys_remove (const char *name) {
 	char file_name[strlen(name) + 1];
 	struct inode *inode;
 	struct dir *dir = split_path(name, file_name);
+	struct dir *dir2;
 	bool success;
 	char readdir_name[NAME_MAX + 1];
 
-	// printf("remove : %s\n", file_name);
+	// printf("remove : %s, %s\n", file_name, name);
 
 	dir_lookup(dir, file_name, &inode);
-
+	
 	if (inode_is_dir(inode)) {
+		dir2 = dir_open(inode);
 		// printf("directory : %d\n", dir_element(dir));
-		if (!dir_empty(dir, readdir_name) && dir != thread_current() -> cwd) {
+		// if (!dir_empty(dir2, readdir_name) && dir != thread_current() -> cwd) {
+		if (!dir_readdir(dir2, readdir_name) && dir != thread_current() -> cwd) {
+			// printf("suc\n");
 			success = dir_remove(dir, file_name);
 		}
 	}
