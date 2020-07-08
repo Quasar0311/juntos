@@ -230,7 +230,7 @@ dir_readdir (struct dir *dir, char name[NAME_MAX + 1]) {
 				// strlcpy (name, e.name, NAME_MAX + 1);
 				strlcat(name, e.name, NAME_MAX+1);
 				// printf("ename : %s, name : %s\n", e.name, name);
-				// return true;
+				return true;
 			}
 		}
 	}

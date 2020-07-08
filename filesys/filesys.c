@@ -245,7 +245,6 @@ filesys_open (const char *name) {
 	struct dir *dir = split_path(name, file_name);
 	struct inode *inode = NULL;
 
-	// printf("file name : %s\n ", file_name);
 	if (!strcmp(name, "/")) {
 		return file_open(dir_get_inode(dir));
 	}

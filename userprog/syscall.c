@@ -19,6 +19,7 @@
 #include "filesys/file.h"
 #include "filesys/filesys.h"
 #include "threads/malloc.h"
+#include "filesys/inode.h"
 
 struct lock filesys_lock;
 
@@ -533,17 +534,6 @@ bool syscall_mkdir (const char *dir) {
 }
 
 
-bool syscall_isdir (int fd) {
-	struct file *f;
-	struct inode *inode;
-
-	f = process_get_file(fd);
-	inode = file_get_inode(f);
-
-	return inode_is_dir(inode);
-}
-
-
 bool syscall_readdir (int fd, char *name) {
 	struct file *f;
 	struct inode *inode;
@@ -556,9 +546,11 @@ bool syscall_readdir (int fd, char *name) {
 		return false;
 	}
 
-	printf("readdir name : %s\n", name);
+	// printf("readdir name : %s\n", name);
 
-	return dir_readdir(dir_open(inode), name);
+	if (!dir_readdir(dir_open(inode), name)) return false;
+
+	return true;
 
 }
 
@@ -590,12 +582,24 @@ syscall_symlink (const char *target, const char *linkpath) {
 	int fd=-1;
 	struct thread *curr = thread_current();
 	struct inode *target_inode;
+	disk_sector_t inumber;
+	char file_name[strlen(linkpath) + 1];
+	struct dir *dir;
 
 	// printf("open1 : %s\n", file);
 	f=filesys_open(target);
 	target_inode = file_get_inode(f);
-	file_close(f);
+	if (target_inode == NULL) return -1;
+	// file_close(f);
 
-	
+	inumber = inode_get_inumber(target_inode);
+	dir = split_path(linkpath, file_name);
+	// printf("inode len : %d\n", inode_length(target_inode));
+	// inode_create(inumber, inode_length(target_inode), 0);
+	// printf("inumber sector : %d\n", inumber);
+	if (!dir_add(dir, file_name, inumber)) return -1;
 
+	dir_close(dir);
+
+	return 0;
 }
