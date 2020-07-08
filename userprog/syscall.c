@@ -212,10 +212,12 @@ syscall_handler (struct intr_frame *f) {
 
 		/*** SYS_ISDIR ***/
 		case SYS_ISDIR:
+			f->R.rax=syscall_isdir((int)f->R.rdi);
 			break;
 
 		/*** SYS_INUMBER ***/
 		case SYS_INUMBER:
+			f->R.rax=syscall_inumber((int)f->R.rdi);
 			break;
 
 		/*** SYS_SYMLINK ***/
@@ -545,7 +547,7 @@ bool syscall_isdir (int fd) {
 bool syscall_readdir (int fd, char *name) {
 	struct file *f;
 	struct inode *inode;
-	char readdir_name[NAME_MAX + 1];
+	// char readdir_name[NAME_MAX + 1];
 
 	f = process_get_file(fd);
 	inode = file_get_inode(f);
@@ -554,9 +556,30 @@ bool syscall_readdir (int fd, char *name) {
 		return false;
 	}
 
-	// printf("readdir name : %s\n", name);
+	printf("readdir name : %s\n", name);
 
-	return dir_readdir(dir_open(inode), readdir_name);
+	return dir_readdir(dir_open(inode), name);
+
+}
+
+bool syscall_isdir (int fd){
+	struct file *f;
+	struct inode *inode;
+
+	f = process_get_file(fd);
+	inode = file_get_inode(f);
+
+	return inode_is_dir(inode);
+}
+
+int syscall_inumber (int fd){
+	struct file *f;
+	struct inode *inode;
+
+	f = process_get_file(fd);
+	inode = file_get_inode(f);
+
+	return inode_get_inumber(inode);
 
 }
 
