@@ -508,7 +508,7 @@ void syscall_lock_release (void) {
 bool syscall_chdir (const char *dir) {
 	char file_name[strlen(dir) + 1];
 
-	dir = split_path(dir, file_name);
+	dir = split_chdir(dir, file_name);
 	dir_close(thread_current() -> cwd);
 	thread_current() -> cwd = dir;
 	return true;
