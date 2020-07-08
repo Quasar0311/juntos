@@ -11,7 +11,7 @@
 struct dir {
 	struct inode *inode;                /* Backing store. */
 	off_t pos;                          /* Current position. */
-	int element;
+	// int element;
 };
 
 /* A single directory entry. */
@@ -166,9 +166,9 @@ dir_add (struct dir *dir, const char *name, disk_sector_t inode_sector) {
 	e.inode_sector = inode_sector;
 	success = inode_write_at (dir->inode, &e, sizeof e, ofs) == sizeof e;
 
-	if(strcmp(name, ".") && strcmp(name, "..")) {
-		dir -> element++;
-	}
+	// if(strcmp(name, ".") && strcmp(name, "..")) {
+	// 	dir -> element++;
+	// }
 	// printf("dir add name: %s, sector: %d, element : %d\n", name, (int)inode_sector, dir -> element);
 
 done:
@@ -203,9 +203,9 @@ dir_remove (struct dir *dir, const char *name) {
 	if (inode_write_at (dir->inode, &e, sizeof e, ofs) != sizeof e)
 		goto done;
 
-	if(strcmp(name, ".") && strcmp(name, "..")) {
-		dir -> element--;
-	}
+	// if(strcmp(name, ".") && strcmp(name, "..")) {
+	// 	dir -> element--;
+	// }
 
 	/* Remove inode. */
 	inode_remove (inode);
@@ -222,20 +222,24 @@ done:
 bool
 dir_readdir (struct dir *dir, char name[NAME_MAX + 1]) {
 	struct dir_entry e;
-
+	// printf("name: %s\n", name);
 	while (inode_read_at (dir->inode, &e, sizeof e, dir->pos) == sizeof e) {
 		dir->pos += sizeof e;
 		if (e.in_use) {
-			strlcpy (name, e.name, NAME_MAX + 1);
-			printf("name1 : %s\n", name);
-			return true;
+			if(strcmp(e.name, ".") && strcmp(e.name, "..")) {
+				// strlcpy (name, e.name, NAME_MAX + 1);
+				strlcat(name, e.name, NAME_MAX+1);
+				// printf("ename : %s, name : %s\n", e.name, name);
+				// return true;
+			}
 		}
 	}
-	printf("name2 : %s\n", name);
+	// printf("full name: %s\n", name);
+	if(strcmp(name, "")) return true;
 	return false;
 }
 
-int
-dir_element (struct dir *dir) {
-	return dir -> element;
-}
+// int
+// dir_element (struct dir *dir) {
+// 	return dir -> element;
+// }
