@@ -222,24 +222,36 @@ done:
 bool
 dir_readdir (struct dir *dir, char name[NAME_MAX + 1]) {
 	struct dir_entry e;
-	// printf("name: %s\n", name);
+
 	while (inode_read_at (dir->inode, &e, sizeof e, dir->pos) == sizeof e) {
 		dir->pos += sizeof e;
 		if (e.in_use) {
-			if(strcmp(e.name, ".") && strcmp(e.name, "..")) {
-				// strlcpy (name, e.name, NAME_MAX + 1);
-				strlcat(name, e.name, NAME_MAX+1);
+			if(strcmp(e.name, ".") && strcmp(e.name, "..")){
+				strlcpy (name, e.name, NAME_MAX + 1);
 				// printf("ename : %s, name : %s\n", e.name, name);
 				return true;
 			}
 		}
 	}
-	// printf("full name: %s\n", name);
-	if(strcmp(name, "")) return true;
 	return false;
 }
 
-// int
-// dir_element (struct dir *dir) {
-// 	return dir -> element;
-// }
+bool
+dir_empty (struct dir *dir, char name[NAME_MAX + 1]) {
+	struct dir_entry e;
+	off_t pos;
+
+	while (inode_read_at (dir->inode, &e, sizeof e, dir->pos) == sizeof e) {
+		dir->pos += sizeof e;
+		if (e.in_use) {
+			if(strcmp(e.name, ".") && strcmp(e.name, "..")) {
+				strlcat(name, e.name, NAME_MAX+1);
+			}
+		}
+	}
+
+	dir->pos=pos;
+
+	if(strcmp(name, "")) return true;
+	return false;
+}

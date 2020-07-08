@@ -533,7 +533,6 @@ bool syscall_mkdir (const char *dir) {
 	return filesys_dir_create(dir);
 }
 
-
 bool syscall_readdir (int fd, char *name) {
 	struct file *f;
 	struct inode *inode;
@@ -545,13 +544,9 @@ bool syscall_readdir (int fd, char *name) {
 	if (!inode_is_dir(inode)) {
 		return false;
 	}
-
-	// printf("readdir name : %s\n", name);
-
-	if (!dir_readdir(dir_open(inode), name)) return false;
-
-	return true;
-
+	
+	return dir_readdir(dir_open(inode), name);
+	// return dir_readdir(dir_reopen(dir_open(inode)), name);
 }
 
 bool syscall_isdir (int fd){
