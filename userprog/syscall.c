@@ -508,3 +508,8 @@ void syscall_lock_release (void) {
 bool syscall_mkdir (const char *dir) {
 	return filesys_dir_create(dir);
 }
+
+
+bool syscall_isdir (int fd) {
+	
+}

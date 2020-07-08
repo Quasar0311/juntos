@@ -16,6 +16,7 @@
 #ifdef USERPROG
 #include "userprog/process.h"
 #endif
+#include "filesys/directory.h"
 
 #define NICE_DEFAULT 0
 #define RECENT_CPU_DEFAULT 0
@@ -305,6 +306,10 @@ thread_create (const char *name, int priority,
 
 	/*** vm ***/
 	list_init(&t->mmap_list);
+
+	if (thread_current() -> cwd != NULL) {
+		t -> cwd = dir_reopen(thread_current() -> cwd);
+	}
 
 	/* Add to run queue. */
 	thread_unblock (t);

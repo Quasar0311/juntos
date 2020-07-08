@@ -24,6 +24,7 @@
 #include "vm/vm.h"
 #include "vm/file.h"
 #endif
+#include "filesys/directory.h"
 
 static void process_cleanup (void);
 static bool load (const char *file_name, struct intr_frame *if_);
@@ -461,7 +462,10 @@ process_exit (void) {
 	lock_release(&writable_lock);
 
 	sema_up(&curr -> exit_sema);
+
 	if (curr -> run_file != NULL) file_allow_write(curr->run_file);
+	dir_close(curr -> cwd);
+
 	sema_down(&curr -> child_sema);
 }
 

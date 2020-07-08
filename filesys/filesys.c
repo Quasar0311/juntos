@@ -34,7 +34,7 @@ filesys_init (bool format) {
 
 	fat_open ();
 
-	inode_create(cluster_to_sector(ROOT_DIR_CLUSTER), DISK_SECTOR_SIZE);
+	inode_create(cluster_to_sector(ROOT_DIR_CLUSTER), DISK_SECTOR_SIZE, 1);
 	/*** first, root directory is for current cwd ***/
 	thread_current() -> cwd = dir_open_root();
 	dir_close(thread_current() -> cwd);
@@ -83,7 +83,7 @@ filesys_create (const char *name, off_t initial_size) {
 			// &&dir_add(dir, name, start));
 	disk_sector_t sector = cluster_to_sector(fat_create_chain(inode_sector));
 	// printf("sector for disk_inode at fs_create ; %d\n", sector);
-	disk_sector_t success2 = inode_create(sector, initial_size);
+	disk_sector_t success2 = inode_create(sector, initial_size, 0);
 	bool success3 = dir_add(dir, name, sector);
 	// if (!success && inode_sector != 0)
 		// free_map_release (inode_sector, 1);
@@ -96,19 +96,19 @@ filesys_create (const char *name, off_t initial_size) {
 
 bool
 filesys_dir_create (const char *name) {
-	disk_sector_t inode_sector = 0;
-	disk_sector_t start;
+	// disk_sector_t inode_sector = 0;
+	// disk_sector_t start;
 
-	struct dir *dir = split_path(name);
-	bool success = dir != NULL;
+	// struct dir *dir = split_path(name);
+	// bool success = dir != NULL;
 
-	disk_sector_t sector = cluster_to_sector(fat_create_chain(inode_sector));
-	disk_sector_t success2 = dir_create(sector, 16);
+	// disk_sector_t sector = cluster_to_sector(fat_create_chain(inode_sector));
+	// disk_sector_t success2 = dir_create(sector, 16);
 
-	bool success3 = dir_add(dir, name, sector);
+	// bool success3 = dir_add(dir, name, sector);
 
-	dir_close (dir);
-	return success && success3;
+	// dir_close (dir);
+	// return success && success3;
 }
 
 struct dir *

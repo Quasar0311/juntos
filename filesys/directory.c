@@ -25,7 +25,7 @@ struct dir_entry {
 bool
 dir_create (disk_sector_t sector, size_t entry_cnt) {
 	// printf("dir create inode create sector: %d\n", sector);
-	return inode_create (sector, entry_cnt * sizeof (struct dir_entry));
+	return inode_create (sector, entry_cnt * sizeof (struct dir_entry), 1);
 }
 
 /* Opens and returns the directory for the given INODE, of which

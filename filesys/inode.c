@@ -19,7 +19,9 @@ struct inode_disk {
 	disk_sector_t start;                /* First data sector. */
 	off_t length;                       /* File size in bytes. */
 	unsigned magic;                     /* Magic number. */
-	uint32_t unused[125];               /* Not used. */
+	uint32_t unused[124];               /* Not used. */
+
+	uint32_t is_dir;
 };
 
 /* Returns the number of sectors to allocate for an inode SIZE
@@ -67,19 +69,19 @@ static disk_sector_t
 // byte_to_sector (const struct inode *inode, off_t pos) {
 byte_to_sector (const struct inode *inode, off_t pos) {
 	ASSERT (inode != NULL);
-	printf("pos : %d, inode start : %d, length: %d\n", pos, inode -> data.start, inode->data.length);
+	// printf("pos : %d, inode start : %d, length: %d\n", pos, inode -> data.start, inode->data.length);
 	// printf("fatget161 : %d\n", fat_get(2));
 	if (pos < inode->data.length) {
 		cluster_t cluster = inode -> data.start;
 		for (int i = 0; i < pos / DISK_SECTOR_SIZE; i++) {
 			cluster = fat_get(cluster);
 		}
-		printf("cluster : %d\n", cluster);
+		// printf("cluster : %d\n", cluster);
 		return cluster;
 	}
 
 	else{
-		printf("byte to sector -1\n");
+		// printf("byte to sector -1\n");
 		return -1;
 	}
 }
@@ -100,7 +102,7 @@ inode_init (void) {
  * Returns true if successful.
  * Returns false if memory or disk allocation fails. */
 disk_sector_t
-inode_create (disk_sector_t sector, off_t length) {
+inode_create (disk_sector_t sector, off_t length, uint32_t is_dir) {
 	struct inode_disk *disk_inode = NULL;
 	bool success = false;
 	disk_sector_t start;
@@ -119,6 +121,7 @@ inode_create (disk_sector_t sector, off_t length) {
 		static char zeros[DISK_SECTOR_SIZE];
 		disk_inode->length = length;
 		disk_inode->magic = INODE_MAGIC;
+		disk_inode -> is_dir = is_dir;
 
 		// printf("sector, sectors, root sector : %d, %d, %d\n", sector, sectors, cluster_to_sector(sector));
 
@@ -290,16 +293,16 @@ inode_update_file_length(struct inode *inode, off_t start_pos, off_t end_pos){
 	cluster_t cluster;
 	static char zeros [DISK_SECTOR_SIZE];
 	size_t sectors;
-	printf("\nextensible file\n");
+	// printf("\nextensible file\n");
 	struct inode_disk inode_disk=inode->data;
 
 	inode_disk.length=end_pos;
 	disk_write(filesys_disk, inode->sector, &inode_disk);
 	disk_read (filesys_disk, inode->sector, &inode->data);
 
-	printf("byte to sector: %d\n", start_pos);
+	// printf("byte to sector: %d\n", start_pos);
 	cluster=fat_create_chain(byte_to_sector(inode, start_pos));
-	printf("start pos: %d, cluster: %d\n", start_pos, cluster);
+	// printf("start pos: %d, cluster: %d\n", start_pos, cluster);
 	disk_write(filesys_disk, cluster_to_sector(cluster), zeros);
 
 	// printf("disk inode sector: %d, inode disk length: %d\n", inode->sector, inode_disk.length);
@@ -435,4 +438,9 @@ inode_allow_write (struct inode *inode) {
 off_t
 inode_length (const struct inode *inode) {
 	return inode->data.length;
+}
+
+
+bool inode_is_dir(const struct inode *inode) {
+	return inode->data.is_dir;
 }

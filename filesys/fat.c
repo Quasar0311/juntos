@@ -242,6 +242,6 @@ cluster_to_sector (cluster_t clst) {
 	/* TODO: Your code goes here. */
 	unsigned int *fat=fat_fs->fat;
 
-	return (disk_sector_t)((SECTORS_PER_CLUSTER*clst)+fat_fs->data_start);
-	// return (disk_sector_t)clst;
+	// return (disk_sector_t)((SECTORS_PER_CLUSTER*clst)+fat_fs->data_start);
+	return (disk_sector_t)clst;
 }
