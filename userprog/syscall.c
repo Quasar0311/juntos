@@ -535,7 +535,8 @@ bool syscall_mkdir (const char *dir) {
 bool syscall_readdir (int fd, char *name) {
 	struct file *f;
 	struct inode *inode;
-	// char readdir_name[NAME_MAX + 1];
+	struct dir *dir;
+	bool result=false;
 
 	f = process_get_file(fd);
 	inode = file_get_inode(f);
@@ -543,8 +544,17 @@ bool syscall_readdir (int fd, char *name) {
 	if (!inode_is_dir(inode)) {
 		return false;
 	}
+
+	dir=dir_open(inode);
+
+	for(int i=0; i<file_get_pos(f); i++){
+		result=dir_readdir(dir, name);
+	}
+
+	file_incr_pos(f);
 	
-	return dir_readdir(dir_open(inode), name);
+	return result;
+	// return dir_readdir(dir_open(inode), name);
 	// return dir_readdir(dir_reopen(dir_open(inode)), name);
 }
 
@@ -578,24 +588,24 @@ syscall_symlink (const char *target, const char *linkpath) {
 	char file_name[strlen(linkpath) + 1];
 	struct dir *dir;
 
-	printf("\nsymlink\n");
-	if(dir_lookup(curr->cwd, target, &target_inode)) printf("dir lookup success\n");
+	// printf("\nsymlink\n");
+	// if(dir_lookup(curr->cwd, target, &target_inode)) printf("dir lookup success\n");
 	f=filesys_open(target);
-	printf("filesys open\n");
+	// printf("filesys open\n");
 	target_inode = file_get_inode(f);
 	if (target_inode == NULL) {
-		printf("target inode is null\n");
+		// printf("target inode is null\n");
 		return -1;
 	}
 	// file_close(f);
 
 	inumber = inode_get_inumber(target_inode);
 	dir = split_path(linkpath, file_name);
-	printf("inode len : %d\n", inode_length(target_inode));
+	// printf("inode len : %d\n", inode_length(target_inode));
 	// inode_create(inumber, inode_length(target_inode), 0);
-	printf("inumber sector : %d\n", inumber);
+	// printf("inumber sector : %d\n", inumber);
 	if (!dir_add(dir, file_name, inumber)){
-		printf("dir add failed\n");
+		// printf("dir add failed\n");
 		return -1;
 	}
 

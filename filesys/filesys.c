@@ -73,7 +73,7 @@ filesys_create (const char *name, off_t initial_size) {
 	disk_sector_t start;
 	char file_name[strlen(name) + 1];
 	// start = inode_create(inode_sector, initial_size);
-	printf("\nstart : %d\n", start);
+	// printf("\nstart : %d\n", start);
 	struct dir *dir = split_path(name, file_name);
 	// printf("dir open success\n");
 	bool success = dir != NULL;
@@ -245,7 +245,7 @@ filesys_open (const char *name) {
 	struct dir *dir = split_path(name, file_name);
 	struct inode *inode = NULL;
 
-	printf("file name : %s\n ", file_name);
+	// printf("file name : %s\n ", file_name);
 	if (!strcmp(name, "/")) {
 		return file_open(dir_get_inode(dir));
 	}

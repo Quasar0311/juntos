@@ -43,11 +43,11 @@ struct inode {
 	struct lock extend_lock;
 };
 
-static bool
-get_disk_inode(const struct inode *inode, struct inode_disk *inode_disk){
-	disk_read(filesys_disk, inode->sector, inode_disk);
-	return true;
-}
+// static bool
+// get_disk_inode(const struct inode *inode, struct inode_disk *inode_disk){
+// 	disk_read(filesys_disk, inode->sector, inode_disk);
+// 	return true;
+// }
 
 /* Returns the disk sector that contains byte offset POS within
  * INODE.
@@ -105,7 +105,7 @@ inode_init (void) {
 disk_sector_t
 inode_create (disk_sector_t sector, off_t length, uint32_t is_dir) {
 	struct inode_disk *disk_inode = NULL;
-	bool success = false;
+	// bool success = false;
 	disk_sector_t start;
 
 	ASSERT (length >= 0);
@@ -144,7 +144,7 @@ inode_create (disk_sector_t sector, off_t length, uint32_t is_dir) {
 			// 	disk_inode->start=cluster_to_sector(cluster);
 			// }
 		}
-		success=true;
+		// success=true;
 		start=disk_inode->start;
 
 		free (disk_inode);
@@ -309,6 +309,7 @@ inode_update_file_length(struct inode *inode, off_t start_pos, off_t end_pos){
 
 	// printf("disk inode sector: %d, inode disk length: %d\n", inode->sector, inode_disk.length);
 	// disk_write(filesys_disk, inode->sector, &inode_disk);
+	if(inode->sector>4020) return false;
 
 	sectors=bytes_to_sectors(end_pos-start_pos);
 
@@ -317,6 +318,8 @@ inode_update_file_length(struct inode *inode, off_t start_pos, off_t end_pos){
 		// printf("cluster : %d, sector: %d\n", cluster, cluster_to_sector(cluster));
 		disk_write(filesys_disk, cluster_to_sector(cluster), zeros);
 	}
+
+	return true;
 	// printf("cluster : %d, sector: %d\n", cluster, cluster_to_sector(cluster));
 
 	// printf("disk read inode sector: %d\n", inode->sector);
@@ -337,7 +340,7 @@ inode_write_at (struct inode *inode, const void *buffer_, off_t size,
 	off_t bytes_written = 0;
 	uint8_t *bounce = NULL;
 
-	// printf("inode write at : %d, %d\n", size, offset);
+	// printf("\ninode write at : %d, %d\n", size, offset);
 	if (inode->deny_write_cnt)
 		return 0;
 
@@ -348,7 +351,8 @@ inode_write_at (struct inode *inode, const void *buffer_, off_t size,
 	lock_acquire(&inode->extend_lock);
 
 	if(write_end>old_length-1){
-		inode_update_file_length(inode, offset, offset+size);
+		if(!inode_update_file_length(inode, offset, offset+size))
+			return -1;
 	}
 
 	lock_release(&inode->extend_lock);

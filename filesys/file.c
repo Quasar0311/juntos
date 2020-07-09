@@ -8,6 +8,7 @@ struct file {
 	struct inode *inode;        /* File's inode. */
 	off_t pos;                  /* Current position. */
 	bool deny_write;            /* Has file_deny_write() been called? */
+	off_t dir_pos;
 };
 
 /* Opens a file for the given INODE, of which it takes ownership,
@@ -20,6 +21,7 @@ file_open (struct inode *inode) {
 		file->inode = inode;
 		file->pos = 0;
 		file->deny_write = false;
+		file->dir_pos=1;
 		return file;
 	} else {
 		inode_close (inode);
@@ -162,4 +164,15 @@ off_t
 file_tell (struct file *file) {
 	ASSERT (file != NULL);
 	return file->pos;
+}
+
+off_t
+file_get_pos(struct file *file){
+	return file->dir_pos;
+}
+
+void
+file_incr_pos(struct file *file){
+	// file->dir_pos=pos;
+	file->dir_pos++;
 }
