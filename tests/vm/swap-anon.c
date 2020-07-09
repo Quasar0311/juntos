@@ -33,6 +33,7 @@ test_main (void)
             msg ("write sparsely over page %zu", i);
         mem = (big_chunks+(i*PAGE_SIZE));
         *mem = (char)i;
+        msg("i : %d", i);
     }
 
     for (i = 0 ; i < PAGE_COUNT ; i++) {

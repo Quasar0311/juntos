@@ -172,7 +172,7 @@ vm_get_victim (void) {
 	if(lru_clock==NULL){
 		// printf("lru clock is null\n");
 		lru_clock=list_begin(&lru_list);
-	} 
+	}
 
 	victim=list_entry(lru_clock, struct frame, lru_elem);
 	start=victim;
@@ -201,8 +201,8 @@ vm_evict_frame (void) {
 	struct frame *victim = vm_get_victim ();
 	/* TODO: swap out the victim and return the evicted frame. */
 	// printf("vm evict frame\n");
-	del_frame_from_lru_list(victim);
-	swap_out(victim->page);
+	if (pml4_is_dirty(thread_current() -> pml4, victim -> page -> va))
+		swap_out(victim->page);
 
 	return victim;
 }
