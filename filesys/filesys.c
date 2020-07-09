@@ -146,6 +146,11 @@ split_chdir (const char *path, char *file_name) {
 		dir = dir_reopen(thread_current() -> cwd);
 	}
 
+	if (!strcmp(path1, "/")) {
+		memcpy(file_name, path1, sizeof(char) * (strlen(path1) + 1));
+		return dir;
+	}
+
 	next_token = strtok_r(path2, "/", &save_ptr2);
 
 	for (token = strtok_r(path1, "/", &save_ptr); token != NULL;
@@ -268,8 +273,12 @@ filesys_remove (const char *name) {
 	struct dir *dir2;
 	bool success;
 	char readdir_name[NAME_MAX + 1];
+	struct thread *curr = thread_current();
 
 	// printf("remove : %s, %s\n", file_name, name);
+	if (!strcmp(name, "/")) {
+		return false;
+	}
 
 	dir_lookup(dir, file_name, &inode);
 	
@@ -279,6 +288,14 @@ filesys_remove (const char *name) {
 		// printf("dir2, cur : %p, %p\n", dir_get_inode(dir2), dir_get_inode(thread_current() -> cwd));
 		if (!dir_readdir(dir2, readdir_name) && dir_get_inode(dir2) != dir_get_inode(thread_current() -> cwd)) {
 			// printf("suc\n");
+			for (int i = 2; i < curr -> next_fd; i++) {
+				if (curr -> fd_table[i] != NULL) {
+					if (file_get_inode(curr -> fd_table[i]) == inode) {
+						dir_close(dir);
+						return false;
+					}
+				}
+			}
 			success = dir_remove(dir, file_name);
 		}
 	}

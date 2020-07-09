@@ -43,7 +43,7 @@ int syscall_dup2(int oldfd, int newfd);
 void *syscall_mmap (void *addr, size_t length, int writable, int fd, off_t offset);
 // void syscall_munmap (void *addr);
 
-bool syscall_chdir (const char *dir);
+bool syscall_chdir (const char *direc);
 bool syscall_mkdir (const char *dir);
 bool syscall_readdir (int fd, char *name);
 bool syscall_isdir (int fd);
@@ -513,10 +513,11 @@ void syscall_lock_release (void) {
 	return;
 }
 
-bool syscall_chdir (const char *dir) {
-	char file_name[strlen(dir) + 1];
+bool syscall_chdir (const char *direc) {
+	struct dir *dir;
+	char file_name[strlen(direc) + 1];
 
-	dir = split_chdir(dir, file_name);
+	dir = split_chdir(direc, file_name);
 
 	if (dir == NULL) return  false;
 	// printf("chdir : %p\n", dir);
