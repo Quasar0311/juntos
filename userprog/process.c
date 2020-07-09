@@ -34,6 +34,8 @@ struct lock writable_lock;
 
 struct lock lazy_lock;
 
+struct lock page_lock;
+
 int 
 process_add_file(struct file *f){
 	struct thread *curr=thread_current();
@@ -147,6 +149,9 @@ process_create_initd (const char *file_name) { //process_execute
 
 	lock_init(&writable_lock);
 	lock_init(&lazy_lock);
+
+	lock_init(&page_lock);
+
 	for (token = strtok_r(file_title, " ", &save_ptr); token != NULL;
 	token = strtok_r(NULL, " ", &save_ptr)) {
 		strlcpy(file_title, token, strlen(token) + 1);
@@ -318,11 +323,18 @@ __do_fork (void *aux) {
 		}
 	}
 
-	parent->process_load=true;	
+	parent->process_load=true;
+
 
 	/*** if memory load finish, resume parent process ***/
 	sema_up(&thread_current()->parent->load_sema);
+	// for (int i = 0; i < 1000000000; i++) {
+	// 	;
+	// }
+	sema_down(&thread_current() -> parent -> wait_sema);
 	process_init ();
+
+	// lock_acquire(&page_lock);
 	
 	/* Finally, switch to the newly created process. */
 	if (succ) {
@@ -357,11 +369,13 @@ process_exec (void *f_name) { //start_process
 
 	/* We first kill the current context */
 	// printf("process cleanup\n");
+	// supplemental_page_table_kill(&curr -> spt);
 	// process_cleanup ();
 
 	/* And then load the binary */
 	if (curr -> tid > 3) lock_acquire(&writable_lock);
 	
+	// lock_acquire(&page_lock);
 	supplemental_page_table_init(&curr->spt);
 	success = load (file_name, &_if);
 	
@@ -394,6 +408,7 @@ process_wait (tid_t child_tid) {
 	 * XXX:       implementing the process_wait. */
 	struct list_elem *e;
 	struct thread *child;
+	struct thread *curr = thread_current();
 	
 	if (list_empty(&thread_current() -> child_list)) {
 		return -1;
@@ -411,6 +426,7 @@ process_wait (tid_t child_tid) {
 		return -1;
 	}
 	// printf("sema_Down\n");
+	if (curr -> tid > 1) sema_up(&curr -> wait_sema);
 	sema_down(&child -> exit_sema);
 	// printf("sd\n");
 	for (e = list_begin(&thread_current() -> child_list); e != list_end(&thread_current() -> child_list); e = list_next(e)) {
@@ -455,6 +471,7 @@ process_exit (void) {
 	// printf("process cleanup finished\n");
 
 	lock_release(&writable_lock);
+	// lock_release(&page_lock);
 
 	sema_up(&curr -> exit_sema);
 	if (curr -> run_file != NULL) file_allow_write(curr->run_file);
@@ -620,10 +637,10 @@ load (const char *file_name, struct intr_frame *if_) {
 				strlcpy(file_title, token, token_len + 1);
 				break;
 	}
-
+	// printf("a1\n");
 	/* Open executable file. */
 	file = filesys_open (file_title);
-
+	// printf("a2\n");
 	if (file == NULL) {
 		printf ("load: %s: open failed\n", file_title);
 		goto done;
@@ -647,7 +664,7 @@ load (const char *file_name, struct intr_frame *if_) {
 		printf ("load: %s: error loading executable\n", file_name);
 		goto done;
 	}
-
+	// printf("asdf\n");
 	/* Read program headers. */
 	file_ofs = ehdr.e_phoff;
 	for (i = 0; i < ehdr.e_phnum; i++) {
@@ -702,7 +719,7 @@ load (const char *file_name, struct intr_frame *if_) {
 				break;
 		}
 	}
-
+	// printf("setup stack ready\n");
 	/* Set up stack. */
 	if (!setup_stack (if_)){
 		printf("setup stack failed\n");
@@ -1012,16 +1029,19 @@ setup_stack (struct intr_frame *if_) {
 	void *stack_bottom = (void *) (((uint8_t *) USER_STACK) - PGSIZE);
 	struct thread *curr=thread_current();
 
+	// lock_acquire(&page_lock);
 	/* TODO: Map the stack on stack_bottom and claim the page immediately.
 	 * TODO: If success, set the rsp accordingly.
 	 * TODO: You should mark the page is stack. */
 	/* TODO: Your code goes here */ 
+	// printf("stack setup\n");
 	vm_alloc_page_with_initializer(VM_ANON, stack_bottom, true, NULL, NULL);
 	success=vm_claim_page(stack_bottom);
 	if(success){
 		if_->rsp=USER_STACK;
 		spt_find_page(&curr->spt, stack_bottom)->is_loaded=true;
 	}
+	
 	// printf("setup stack: %p, success: %d\n", stack_bottom, success);
 	// printf(success ? "setup stack success\n" : "setup stack failed\n");
 	// if(!success) printf("setup stack really failed\n");
