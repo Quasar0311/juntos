@@ -299,15 +299,20 @@ inode_update_file_length(struct inode *inode, off_t start_pos, off_t end_pos){
 	struct inode_disk inode_disk=inode->data;
 
 	inode_disk.length=end_pos;
+
+	// printf("disk inode sector: %d, disk size: %d\n", inode->sector, disk_size(filesys_disk));
+
+	if(inode->sector>=disk_size(filesys_disk)) return false;
 	disk_write(filesys_disk, inode->sector, &inode_disk);
 	disk_read (filesys_disk, inode->sector, &inode->data);
 
 	// printf("byte to sector: %d\n", start_pos);
 	cluster=fat_create_chain(byte_to_sector(inode, start_pos));
 	// printf("start pos: %d, cluster: %d\n", start_pos, cluster);
+
+	if(cluster_to_sector(cluster)>=disk_size(filesys_disk)) return false;
 	disk_write(filesys_disk, cluster_to_sector(cluster), zeros);
 
-	// printf("disk inode sector: %d, inode disk length: %d\n", inode->sector, inode_disk.length);
 	// disk_write(filesys_disk, inode->sector, &inode_disk);
 
 	sectors=bytes_to_sectors(end_pos-start_pos);
@@ -315,14 +320,12 @@ inode_update_file_length(struct inode *inode, off_t start_pos, off_t end_pos){
 	for(int i=1; i<sectors; i++){
 		cluster=fat_create_chain(cluster);
 		// printf("cluster : %d, sector: %d\n", cluster, cluster_to_sector(cluster));
+		
+		if(cluster_to_sector(cluster)>=disk_size(filesys_disk)) return false;
 		disk_write(filesys_disk, cluster_to_sector(cluster), zeros);
 	}
-	// printf("cluster : %d, sector: %d\n", cluster, cluster_to_sector(cluster));
 
-	// printf("disk read inode sector: %d\n", inode->sector);
-	// disk_read (filesys_disk, inode->sector, &inode->data);
-	
-	// printf("inode disk length: %d, %d\n", inode_disk.length, inode_length(inode));
+	return true;
 }
 
 /* Writes SIZE bytes from BUFFER into INODE, starting at OFFSET.
