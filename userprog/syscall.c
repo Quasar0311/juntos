@@ -19,6 +19,7 @@
 #include "filesys/file.h"
 #include "filesys/filesys.h"
 #include "threads/malloc.h"
+#include "filesys/inode.h"
 
 struct lock filesys_lock;
 
@@ -42,7 +43,7 @@ int syscall_dup2(int oldfd, int newfd);
 void *syscall_mmap (void *addr, size_t length, int writable, int fd, off_t offset);
 // void syscall_munmap (void *addr);
 
-bool syscall_chdir (const char *dir);
+bool syscall_chdir (const char *direc);
 bool syscall_mkdir (const char *dir);
 bool syscall_readdir (int fd, char *name);
 bool syscall_isdir (int fd);
@@ -512,12 +513,14 @@ void syscall_lock_release (void) {
 	return;
 }
 
-bool syscall_chdir (const char *dir) {
-	char file_name[strlen(dir) + 1];
+bool syscall_chdir (const char *direc) {
+	struct dir *dir;
+	char file_name[strlen(direc) + 1];
 
-	dir = split_chdir(dir, file_name);
+	dir = split_chdir(direc, file_name);
 
 	if (dir == NULL) return  false;
+	// printf("chdir : %p\n", dir);
 
 	dir_close(thread_current() -> cwd);
 	thread_current() -> cwd = dir;
@@ -588,15 +591,10 @@ syscall_symlink (const char *target, const char *linkpath) {
 	char file_name[strlen(linkpath) + 1];
 	struct dir *dir;
 
-	// printf("\nsymlink\n");
-	// if(dir_lookup(curr->cwd, target, &target_inode)) printf("dir lookup success\n");
+	// printf("open1 : %s\n", file);
 	f=filesys_open(target);
-	// printf("filesys open\n");
 	target_inode = file_get_inode(f);
-	if (target_inode == NULL) {
-		// printf("target inode is null\n");
-		return -1;
-	}
+	if (target_inode == NULL) return -1;
 	// file_close(f);
 
 	inumber = inode_get_inumber(target_inode);
@@ -604,10 +602,7 @@ syscall_symlink (const char *target, const char *linkpath) {
 	// printf("inode len : %d\n", inode_length(target_inode));
 	// inode_create(inumber, inode_length(target_inode), 0);
 	// printf("inumber sector : %d\n", inumber);
-	if (!dir_add(dir, file_name, inumber)){
-		// printf("dir add failed\n");
-		return -1;
-	}
+	if (!dir_add(dir, file_name, inumber)) return -1;
 
 	dir_close(dir);
 
