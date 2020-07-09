@@ -11,8 +11,7 @@
 struct dir {
 	struct inode *inode;                /* Backing store. */
 	off_t pos;                          /* Current position. */
-	// int element;
-	off_t previous_pos;
+	// int element; 
 };
 
 /* A single directory entry. */
@@ -237,29 +236,34 @@ dir_readdir (struct dir *dir, char name[NAME_MAX + 1]) {
 			}
 		}
 	}
-	// printf("false\n");
+	// printf("dir readdir failed\n");
 	return false;
 }
 
-bool
-dir_empty (struct dir *dir, char name[NAME_MAX + 1]) {
-	struct dir_entry e;
-	off_t pos;
+// bool
+// dir_empty (struct dir *dir, char name[NAME_MAX + 1]) {
+// 	struct dir_entry e;
+// 	off_t pos;
 
-	while (inode_read_at (dir->inode, &e, sizeof e, dir->pos) == sizeof e) {
-		dir->pos += sizeof e;
-		if (e.in_use) {
-			if(strcmp(e.name, ".") && strcmp(e.name, "..")) {
-				// printf("name : %s\n", e.name);
+// 	while (inode_read_at (dir->inode, &e, sizeof e, dir->pos) == sizeof e) {
+// 		dir->pos += sizeof e;
+// 		if (e.in_use) {
+// 			if(strcmp(e.name, ".") && strcmp(e.name, "..")) {
+// 				// printf("name : %s\n", e.name);
 
-				strlcat(name, e.name, NAME_MAX+1);
-				return true;
-			}
-		}
-	}
+// 				strlcat(name, e.name, NAME_MAX+1);
+// 				return true;
+// 			}
+// 		}
+// 	}
 
-	dir->pos=pos;
+// 	dir->pos=pos;
 
-	// printf("false\n");
-	return false;
-}
+// 	// printf("false\n");
+// 	return false;
+// }
+
+// int
+// dir_element(struct dir *dir){
+// 	return dir->element;
+// }

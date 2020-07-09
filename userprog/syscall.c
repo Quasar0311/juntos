@@ -538,7 +538,8 @@ bool syscall_mkdir (const char *dir) {
 bool syscall_readdir (int fd, char *name) {
 	struct file *f;
 	struct inode *inode;
-	// char readdir_name[NAME_MAX + 1];
+	struct dir *dir;
+	bool result=false;
 
 	f = process_get_file(fd);
 	inode = file_get_inode(f);
@@ -546,8 +547,17 @@ bool syscall_readdir (int fd, char *name) {
 	if (!inode_is_dir(inode)) {
 		return false;
 	}
+
+	dir=dir_open(inode);
+
+	for(int i=0; i<file_get_pos(f); i++){
+		result=dir_readdir(dir, name);
+	}
+
+	file_incr_pos(f);
 	
-	return dir_readdir(dir_open(inode), name);
+	return result;
+	// return dir_readdir(dir_open(inode), name);
 	// return dir_readdir(dir_reopen(dir_open(inode)), name);
 }
 
@@ -569,9 +579,7 @@ int syscall_inumber (int fd){
 	inode = file_get_inode(f);
 
 	return inode_get_inumber(inode);
-
 }
-
 
 int 
 syscall_symlink (const char *target, const char *linkpath) {
