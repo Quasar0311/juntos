@@ -177,11 +177,16 @@ process_create_initd (const char *file_name) { //process_execute
 /* A thread function that launches first user process. */
 static void
 initd (void *f_name) {
+	// char *fname = palloc_get_page(0);
+	// memcpy(fname, f_name, 3);
 #ifdef VM
 	supplemental_page_table_init (&thread_current ()->spt);
 #endif
 	process_init ();
-
+	// printf("fname : %s\n", fname);
+	// if (!strcmp(fname, 'tar')) {
+	// 	printf("dd\n");
+	// }
 	if (process_exec (f_name) < 0)
 		PANIC("Fail to launch initd\n");
 	NOT_REACHED ();
@@ -450,6 +455,7 @@ process_exit (void) {
 
 	/*** close all files of process ***/
 	while(curr -> next_fd >= 3){
+		// inode_close(file_get_inode(process_get_file(curr -> next_fd - 1)));
 		process_close_file(curr -> next_fd - 1);
 		curr -> next_fd--;
 	}
@@ -468,7 +474,7 @@ process_exit (void) {
 	
 
 	sema_down(&curr -> child_sema);
-	dir_close(curr -> cwd);
+	// dir_close(curr -> cwd);
 }
 
 /* Free the current process's resources. */

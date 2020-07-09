@@ -215,7 +215,9 @@ inode_close (struct inode *inode) {
 	if (inode == NULL)
 		return;
 
-	disk_write(filesys_disk, inode->sector, &inode->data);
+	// printf("inode close\n");
+	// if(cluster_to_sector(inode->sector)<disk_size(filesys_disk))
+		// disk_write(filesys_disk, cluster_to_sector(inode->sector), &inode->data);
 
 	/* Release resources if this was the last opener. */
 	if (--inode->open_cnt == 0) {

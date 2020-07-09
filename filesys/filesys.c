@@ -191,7 +191,12 @@ split_path (const char *path, char *file_name) {
 	memcpy(path1, path, strlen(path) + 1);
 	memcpy(path2, path, strlen(path) + 1);
 
+	// if (!strcmp(path1, "tar")) printf("hi\n");
+
+	// printf("path : %s\n", path1);
+
 	if (path1 == NULL || file_name == NULL) {
+		// printf("null?\n");
 		return NULL;
 	}
 	if (strlen(path1) == 0) {
@@ -215,7 +220,7 @@ split_path (const char *path, char *file_name) {
 	for (token = strtok_r(path1, "/", &save_ptr); token != NULL;
 			token = strtok_r(NULL, "/", &save_ptr)) {
 		next_token = strtok_r(NULL, "/", &save_ptr2);
-		// printf("\nnext_token : %s, token :  %s\n", next_token, token);
+		// printf("next_token : %s, token :  %s\n", next_token, token);
 		if (next_token == NULL) {
 			// printf("next token null\n");
 			file_token = token;
@@ -232,6 +237,7 @@ split_path (const char *path, char *file_name) {
 
 		file_token = token;
 	}
+	// printf("file_token : %s\n", file_token);
 	memcpy(file_name, file_token, sizeof(char) * (strlen(file_token) + 1));
 	palloc_free_page(path1);
 	palloc_free_page(path2);
