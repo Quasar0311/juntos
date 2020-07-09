@@ -215,6 +215,8 @@ inode_close (struct inode *inode) {
 	if (inode == NULL)
 		return;
 
+	disk_write(filesys_disk, inode->sector, &inode->data);
+
 	/* Release resources if this was the last opener. */
 	if (--inode->open_cnt == 0) {
 		/* Remove from inode list and release lock. */
@@ -299,23 +301,29 @@ inode_update_file_length(struct inode *inode, off_t start_pos, off_t end_pos){
 	struct inode_disk inode_disk=inode->data;
 
 	inode_disk.length=end_pos;
+
+	// printf("disk inode sector: %d, disk size: %d\n", inode->sector, disk_size(filesys_disk));
+
+	if(inode->sector>=disk_size(filesys_disk)) return false;
 	disk_write(filesys_disk, inode->sector, &inode_disk);
 	disk_read (filesys_disk, inode->sector, &inode->data);
 
 	// printf("byte to sector: %d\n", start_pos);
 	cluster=fat_create_chain(byte_to_sector(inode, start_pos));
 	// printf("start pos: %d, cluster: %d\n", start_pos, cluster);
+
+	if(cluster_to_sector(cluster)>=disk_size(filesys_disk)) return false;
 	disk_write(filesys_disk, cluster_to_sector(cluster), zeros);
 
-	// printf("disk inode sector: %d, inode disk length: %d\n", inode->sector, inode_disk.length);
 	// disk_write(filesys_disk, inode->sector, &inode_disk);
-	if(inode->sector>4020) return false;
 
 	sectors=bytes_to_sectors(end_pos-start_pos);
 
 	for(int i=1; i<sectors; i++){
 		cluster=fat_create_chain(cluster);
 		// printf("cluster : %d, sector: %d\n", cluster, cluster_to_sector(cluster));
+		
+		if(cluster_to_sector(cluster)>=disk_size(filesys_disk)) return false;
 		disk_write(filesys_disk, cluster_to_sector(cluster), zeros);
 	}
 

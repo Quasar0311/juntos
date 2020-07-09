@@ -468,7 +468,7 @@ process_exit (void) {
 	
 
 	sema_down(&curr -> child_sema);
-	// dir_close(curr -> cwd);
+	dir_close(curr -> cwd);
 }
 
 /* Free the current process's resources. */
